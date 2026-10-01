@@ -1,0 +1,3863 @@
+body[data-dsh-orca-maid] {
+  --maid-sidebar-width: clamp(258px, 20.2vw, 326px);
+  /* The host eases its sidebar track for 0.3s on this curve; every skin layer
+     that moves with the track borrows the same clock instead of keeping a
+     private duration, so the stage, the wordmark and the seam ruler arrive
+     together with the pane edge rather than ahead of or behind it. */
+  --maid-track-duration: var(--ds-transition-duration-slow, 300ms);
+  --maid-track-ease: var(--ds-ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));
+  /* Sidebar art stage height, measured from the pane top; the browsing
+     region's frosted panel starts exactly at this seam (120px of controls). */
+  --maid-stage: clamp(240px, 34vh, 320px);
+  /* Extra host rows above the logo row push every absolutely placed stage
+     piece down by this much (see the macOS desktop block). */
+  --maid-stage-top: 0px;
+  --maid-blue: #2563eb;
+  --maid-cyan: #20c7e8;
+  --maid-ink: #11151b;
+  --maid-graphite: #343b47;
+  --maid-muted: #778399;
+  --maid-question-focus: #2563eb;
+  --maid-question-focus-wash: rgba(37, 99, 235, 0.11);
+  --maid-line: rgba(43, 55, 72, 0.14);
+  --maid-surface: rgba(253, 250, 244, 0.78);
+  --maid-surface-strong: rgba(255, 252, 246, 0.92);
+  /* The frosted sheet every non-conversation `main` page reads on: opaque
+     enough to hold small type, transparent enough that the scene stays a
+     backdrop. */
+  --maid-reading-surface: rgba(251, 247, 239, 0.66);
+  --maid-shadow: 0 18px 55px rgba(27, 39, 58, 0.12), 0 2px 5px rgba(27, 39, 58, 0.1);
+  /* MAID z-index ladder. DSH's own layer contract is menu 100, Modal 1000,
+     portal menu 1100, so every MAID chrome value stays below 1000: official
+     Modal/menu overlays always win, while the settings surface (the top MAID
+     band) still clears ordinary body-level plugin chrome. */
+  --maid-z-seam: 850;
+  --maid-z-standby: 900;
+  --maid-z-tooltip: 950;
+  --maid-z-restore: 955;
+  --maid-z-ghost: 965;
+  --maid-z-cordis: 975;
+  --maid-z-settings: 980;
+  --maid-settings-overlay-z: 980;
+  isolation: isolate;
+  color: var(--maid-ink);
+  background-color: #f6f1e7;
+  background-image: none;
+  --dsw-static-blue-50: #ebe7de !important;
+  --dsw-static-blue-100: #ddd8cc !important;
+  --dsw-static-blue-300: #a89f8e !important;
+  --dsw-static-blue-400: #6a655a !important;
+  --dsw-static-blue-500: #4b483f !important;
+  --dsw-static-blue-600: #3a372f !important;
+  --dsw-static-blue-800: #2e2c26 !important;
+  --dsw-static-blue-950: #1f1d18 !important;
+  --dsw-static-deepseek-50: #ebe7de !important;
+  --dsw-static-deepseek-100: #ddd8cc !important;
+  --dsw-static-deepseek-300: #a89f8e !important;
+  --dsw-static-deepseek-400: #6a655a !important;
+  --dsw-static-deepseek-500: #4b483f !important;
+  --dsw-static-deepseek-600: #3a372f !important;
+  --dsw-static-deepseek-800: #2e2c26 !important;
+  --dsw-static-deepseek-900: #26241f !important;
+  --dsw-alias-bg-base: rgba(250, 247, 241, 0.24) !important;
+  --dsw-alias-bg-layer-1: rgba(255, 252, 246, 0.62) !important;
+  --dsw-alias-bg-layer-2: rgba(247, 244, 238, 0.74) !important;
+  --dsw-alias-bg-layer-3: rgba(240, 236, 229, 0.82) !important;
+  --dsw-alias-bg-module-platform: rgba(247, 244, 238, 0.78) !important;
+  --dsw-alias-bg-overlay: rgba(253, 250, 244, 0.96) !important;
+  --dsw-alias-border-l1: rgba(43, 55, 72, 0.1) !important;
+  --dsw-alias-border-l2: rgba(43, 55, 72, 0.16) !important;
+  --dsw-alias-border-l3: rgba(43, 55, 72, 0.25) !important;
+  --dsw-alias-border-l4: rgba(43, 55, 72, 0.36) !important;
+  --dsw-alias-brand-primary: #2563eb !important;
+  --dsw-alias-brand-primary-invert: #ffffff !important;
+  --dsw-alias-brand-text: #1d4ed8 !important;
+  --dsw-alias-button-primary-fill: #2563eb !important;
+  --dsw-alias-button-primary-hover: #1d4ed8 !important;
+  /* The composer's send button is the host's `.primary` control and reads
+     `--dsw-alias-button-info-*`, not the primary aliases. The dark palette
+     always overrode them; the light palette did not, so light mode fell back
+     to the host default (charcoal) and the send button never matched the
+     accent. */
+  --dsw-alias-button-info-fill: #2563eb !important;
+  --dsw-alias-button-info-hover: #1d4ed8 !important;
+  --dsw-alias-button-floating-fill: rgba(255, 252, 246, 0.92) !important;
+  --dsw-alias-button-floating-hover: #e8e4da !important;
+  --dsw-alias-button-tool-bar-fill: rgba(255, 252, 246, 0.64) !important;
+  --dsw-alias-button-tool-bar-hover: rgba(216, 210, 198, 0.9) !important;
+  --dsw-alias-interactive-bg-active: color-mix(in srgb, var(--maid-blue) 14%, transparent) !important;
+  --dsw-alias-interactive-bg-hover: color-mix(in srgb, var(--maid-blue) 7%, transparent) !important;
+  --dsw-alias-interactive-bg-hover-solid: #e8e4da !important;
+  --dsw-alias-label-primary: #11151b !important;
+  --dsw-alias-label-secondary: #343b47 !important;
+  --dsw-alias-label-tertiary: #778399 !important;
+  --dsw-alias-label-caption: #8d98aa !important;
+  /* 0.2.0-rc.2's sticky menu-group heading defaults to a host grey plate while
+     a group scrolls; keep it on the MAID menu surface instead. */
+  --dsw-alias-menu-group-header-fill: #fbf7ef !important;
+  --dsw-alias-state-business-primary: #2563eb !important;
+  --dsw-alias-state-business-tertiary: #dbe7ff !important;
+  --dsw-specific-bubble: rgba(232, 228, 218, 0.84) !important;
+  --dsw-specific-bubble-highlight: rgba(216, 210, 198, 0.94) !important;
+  --dsw-specific-input-major: rgba(253, 250, 244, 0.72) !important;
+  --dsw-specific-menu: rgba(253, 250, 244, 0.96) !important;
+  --dsw-specific-selector: rgba(246, 243, 236, 0.9) !important;
+  --dsw-specific-sidebar-fill: rgba(250, 247, 241, 0.58) !important;
+  --dsw-specific-sidebar-nav-item-active: rgba(216, 210, 198, 0.82) !important;
+  --dsw-specific-sidebar-nav-item-active-accent: #2563eb !important;
+  --dsw-specific-sidebar-nav-item-hover: rgba(232, 228, 218, 0.86) !important;
+  --dsw-input-solid: #fbf7ef !important;
+}
+
+/* Fullscreen ornaments are body children, so the host's portal no-drag rule
+   would erase the window drag band even with pointer-events:none. Reset only
+   passive chrome; native and skin-owned controls keep their no-drag regions.
+   !important outranks the host rule's :not(#root) specificity. */
+html[data-platform='darwin'] body[data-dsh-orca-maid]
+  > :is([data-skin-chrome='light-scene'], [data-skin-chrome='dark-scene'], [data-skin-chrome='spine'], [data-skin-chrome='standby']) {
+  -webkit-app-region: initial !important;
+}
+
+body[data-dsh-orca-maid] [data-turn-trigger] {
+  border-color: var(--maid-line);
+  border-radius: 0;
+  background: var(--maid-surface-strong);
+}
+
+body[data-dsh-orca-maid] [data-turn-trigger]:hover {
+  border-color: var(--maid-blue);
+}
+
+/* MAID shape contract: keep interactive surfaces and skin chrome rectilinear
+   without matching every generated DOM node. The former universal descendant
+   and pseudo-element rules made xterm's high-churn row renderer repeatedly
+   resolve MAID styles for thousands of terminal spans. */
+body[data-dsh-orca-maid],
+body[data-dsh-orca-maid] :where(
+  button,
+  input,
+  textarea,
+  select,
+  [role='button'],
+  [role='checkbox'],
+  [role='combobox'],
+  [role='dialog'],
+  [role='listbox'],
+  [role='menu'],
+  [role='menuitem'],
+  [role='menuitemradio'],
+  [role='option'],
+  [role='radio'],
+  [role='switch'],
+  [role='tab'],
+  [role='tooltip'],
+  [role='treeitem'],
+  [data-composer-card],
+  [data-composer-input],
+  [data-skin-chrome]
+):not(
+  [data-slot='conversation.input.left'] *,
+  [data-slot='conversation.input.right'] *,
+  [data-slot='sidebar.footer.action'] *,
+  [data-slot='settings.section'] *
+),
+body[data-dsh-orca-maid] :where(
+  button,
+  [role='button'],
+  [role='dialog'],
+  [role='menu'],
+  [role='menuitem'],
+  [role='menuitemradio'],
+  [role='tooltip'],
+  [data-composer-card],
+  [data-skin-chrome]
+):not(
+  [data-slot='conversation.input.left'] *,
+  [data-slot='conversation.input.right'] *,
+  [data-slot='sidebar.footer.action'] *,
+  [data-slot='settings.section'] *
+)::before,
+body[data-dsh-orca-maid] :where(
+  button,
+  [role='button'],
+  [role='dialog'],
+  [role='menu'],
+  [role='menuitem'],
+  [role='menuitemradio'],
+  [role='tooltip'],
+  [data-composer-card],
+  [data-skin-chrome]
+):not(
+  [data-slot='conversation.input.left'] *,
+  [data-slot='conversation.input.right'] *,
+  [data-slot='sidebar.footer.action'] *,
+  [data-slot='settings.section'] *
+)::after {
+  border-radius: 0 !important;
+}
+
+/* The element list above only reaches interactive roles, so host surfaces
+   drawn as plain divs from the radius scale kept their curves: cards, panels,
+   and component variables derived from it, such as the side panel's guide
+   entries (`--dsl-guide-entry-radius: var(--dsw-radius-xl)`), where the
+   split-menu "New terminal" entry is a div beside two square buttons.
+   Zeroing the scale itself squares every token-drawn surface, present and
+   future, with no per-node selector cost. The hands-off seats of the element
+   contract get the host scale back (ui-theme 0.1.7 values) so plugin controls
+   there keep their own geometry. */
+body[data-dsh-orca-maid] {
+  --dsw-radius-xs: 0px;
+  --dsw-radius-sm: 0px;
+  --dsw-radius-md: 0px;
+  --dsw-radius-lg: 0px;
+  --dsw-radius-xl: 0px;
+  --dsw-radius-panel: 0px;
+}
+
+body[data-dsh-orca-maid] :is(
+  [data-slot='conversation.input.left'],
+  [data-slot='conversation.input.right'],
+  [data-slot='sidebar.footer.action'],
+  [data-slot='settings.section']
+) {
+  --dsw-radius-xs: 4px;
+  --dsw-radius-sm: 8px;
+  --dsw-radius-md: 12px;
+  --dsw-radius-lg: 16px;
+  --dsw-radius-xl: 20px;
+  --dsw-radius-panel: 28px;
+}
+
+/* Keep chat bubbles rectilinear in every theme, matching the MAID shape
+   contract even when the host ships rounded user-message bubbles. */
+body[data-dsh-orca-maid] [data-chat-flow] *,
+body[data-dsh-orca-maid] [data-chat-flow] *::before,
+body[data-dsh-orca-maid] [data-chat-flow] *::after {
+  border-radius: 0 !important;
+}
+
+/* Switch: a machined breaker slot instead of the host's capsule with a ball.
+   The shape contract squares the track but never reaches the thumb, so the
+   control shipped as a round white ball floating in a hard rectangle — and
+   because the light palette's accent IS graphite, the ON state was a dark
+   block that read like the OFF one. Both parts are rectilinear here: OFF is a
+   hollow block resting in a recessed slot, ON is the same block travelled
+   right, filled with the accent, in an accent-tinted slot behind an accent
+   frame. Geometry stays the host's 36x20 with a 1px frame and a 1px inset, so
+   the 16px travel, hit box, layout and the `aria-checked` state source are all
+   unchanged.
+
+   Unlike the shape contract this deliberately reaches into the settings
+   dialog: that dialog already carries its own universal rectilinear zeroing
+   (`[role='dialog'][data-shortcut-modal='settings'] *`), so the switch inside it
+   is square either way and excluding the section would give one control two
+   designs. Only the hands-off seats keep the host's own switch. */
+body[data-dsh-orca-maid] :where([role='switch']):not(
+  [data-slot='conversation.input.left'] *,
+  [data-slot='conversation.input.right'] *,
+  [data-slot='sidebar.footer.action'] *
+) {
+  box-sizing: border-box;
+  width: 36px;
+  height: 20px;
+  padding: 1px;
+  border: 1px solid var(--maid-line);
+  border-radius: 0 !important;
+  background: color-mix(in srgb, var(--maid-ink) 7%, var(--dsw-input-solid));
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+body[data-dsh-orca-maid] :where([role='switch'][aria-checked='true']):not(
+  [data-slot='conversation.input.left'] *,
+  [data-slot='conversation.input.right'] *,
+  [data-slot='sidebar.footer.action'] *
+) {
+  border-color: color-mix(in srgb, var(--maid-blue) 62%, transparent);
+  background: color-mix(in srgb, var(--maid-blue) 18%, var(--dsw-input-solid));
+}
+
+body[data-dsh-orca-maid] :where([role='switch']):not(
+  [data-slot='conversation.input.left'] *,
+  [data-slot='conversation.input.right'] *,
+  [data-slot='sidebar.footer.action'] *
+) > [class*='thumb'] {
+  box-sizing: border-box;
+  display: block;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--maid-muted);
+  border-radius: 0 !important;
+  background: var(--maid-surface-strong);
+  transition: transform 140ms ease, background-color 140ms ease, border-color 140ms ease;
+}
+
+body[data-dsh-orca-maid] :where([role='switch'][aria-checked='true']):not(
+  [data-slot='conversation.input.left'] *,
+  [data-slot='conversation.input.right'] *,
+  [data-slot='sidebar.footer.action'] *
+) > [class*='thumb'] {
+  transform: translateX(16px);
+  border-color: var(--maid-blue);
+  background: var(--maid-blue);
+}
+
+/* Portaled announcements and previews sit outside every seat the role list
+   above reaches. The host toast is `body > [role='alert']` driven by its own
+   `--dsh-toast-hold`, the hover card carries `--dsh-hover-preview-fade`; both
+   inline properties are the components' timing contracts, so they identify
+   the surfaces without generated class names. The toast becomes a squared
+   MAID panel with the signal edge the menus use; its fade and position stay
+   the host's. */
+body[data-dsh-orca-maid] > [role='alert'][style*='--dsh-toast-hold'] {
+  border: 1px solid var(--maid-line);
+  border-radius: 0 !important;
+  background: #fbf7ef;
+  color: var(--maid-ink);
+  box-shadow: inset 2px 0 var(--maid-blue), var(--maid-shadow);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] > [role='alert'][style*='--dsh-toast-hold'] {
+  background: #0f151f;
+}
+
+body[data-dsh-orca-maid] > [role='alert'][style*='--dsh-toast-hold'] button {
+  color: var(--maid-blue);
+}
+
+body[data-dsh-orca-maid] > [style*='--dsh-hover-preview-fade'] {
+  border: 1px solid var(--maid-line);
+  border-radius: 0 !important;
+}
+
+/* The shared StateDot (session rows, todo, approval, plugin states) paints its
+   6px core on `::after` with a hard-coded 50% radius, and the numbered step
+   variant is a round badge; neither is a token surface. Both are an
+   aria-hidden span carrying `data-state`, so square that pair locally; the
+   ongoing spinner is an SVG glyph and keeps its ring. */
+body[data-dsh-orca-maid] :where(span[data-state][aria-hidden='true']):not(
+  [data-slot='conversation.input.left'] *,
+  [data-slot='conversation.input.right'] *,
+  [data-slot='sidebar.footer.action'] *
+),
+body[data-dsh-orca-maid] :where(span[data-state][aria-hidden='true']):not(
+  [data-slot='conversation.input.left'] *,
+  [data-slot='conversation.input.right'] *,
+  [data-slot='sidebar.footer.action'] *
+)::after {
+  border-radius: 0 !important;
+}
+
+/* Status tags (Tag's `data-tone`) are pills in the host. A panel page — the
+   plugin manager, a conversation manager, whatever the next plugin ships — is
+   a management surface with no high-churn content, and plugin pages draw
+   their cards and rows from their own hard-coded radii (a 10px card no token
+   reaches), so it takes the same whole-subtree rectilinear pass the settings
+   dialog already has. The `main` outlet renders either the conversation, which
+   the host wraps in its own `main.conversation` slot, or a keyed panel page as
+   the outlet's direct child; that split is the seat test every panel-page rule
+   below shares, and it needs no `:has()` scan of the transcript. */
+body[data-dsh-orca-maid] [data-tone],
+body[data-dsh-orca-maid][data-maid-panel-page] [data-slot='main'] > :not([data-slot='main.conversation']),
+body[data-dsh-orca-maid][data-maid-panel-page] [data-slot='main'] > :not([data-slot='main.conversation']) *,
+body[data-dsh-orca-maid][data-maid-panel-page] [data-slot='main'] > :not([data-slot='main.conversation']) *::before,
+body[data-dsh-orca-maid][data-maid-panel-page] [data-slot='main'] > :not([data-slot='main.conversation']) *::after {
+  border-radius: 0 !important;
+}
+
+/* Command shells own their rounded frame outside the listbox. Keep the
+   popupSelect relation local to the composer overlay, including empty lists. */
+body[data-dsh-orca-maid] [data-trigger-menu],
+body[data-dsh-orca-maid] [data-slot='conversation.input.overlay']
+  div[aria-label]:has(> input):has(> [role='listbox']) {
+  box-sizing: border-box;
+  border: 1px solid var(--maid-line);
+  border-radius: 0 !important;
+  background: var(--dsw-input-solid);
+  box-shadow: var(--maid-shadow);
+  color: var(--maid-ink);
+}
+
+body[data-dsh-orca-maid] [data-slot='conversation.input.overlay']
+  [role='option'][aria-selected='true'] {
+  box-shadow: inset 2px 0 var(--maid-blue);
+}
+
+/* The open-in-app split frame is a div; its two native buttons retain their
+   launch/menu behavior, separator, disabled state and error feedback. */
+body[data-dsh-orca-maid] [data-slot='conversation.session.header.utilities']
+  div[class$='_split']:has(> button[aria-haspopup='menu']) {
+  border-radius: 0 !important;
+  border-color: var(--maid-line);
+  background: var(--maid-surface-strong);
+}
+
+/* The right panel reads on the same frosted sheet as every other panel page.
+   The host draws no background on the panel box (`.panel`, a fixed-width layer
+   anchored to the frame's right edge that stays mounted while collapsed);
+   only the docked items inside it slide, on a 0.3s transform. The skin used to
+   paint an opaque floor on the box itself, which appeared and vanished at once
+   while the content slid — a slab popping in ahead of its own contents, and a
+   full-height band that hid the scene. The sheet hangs on the sliding items, so
+   it travels with them on the host's clock, and the scene stays visible behind
+   it. Floating panels escape the dock and have nothing behind them to slide
+   over, so they keep an opaque floor, and so does fullscreen, which covers the
+   whole frame. */
+body[data-dsh-orca-maid] [data-sidebar-right-panel] {
+  color: var(--maid-ink);
+  border-color: var(--maid-line);
+}
+
+body[data-dsh-orca-maid] [data-sidebar-right-panel]:not([data-sidebar-right-panel='fullscreen'])
+  :is([data-dockkit-host='dock'], [data-dockkit-empty]) {
+  background-color: var(--maid-reading-surface);
+  backdrop-filter: blur(6px) saturate(0.95);
+  transition: background-color 220ms ease-out;
+  border-color: var(--maid-line);
+  border-radius: 0 !important;
+}
+
+/* The blur is recomputed every frame on a 344px x full-height layer that is
+   sliding, and in software raster that dropped about 40% of the frames of a
+   panel toggle (29 of 55 frames drawn). The host holds `data-animating` on the
+   frame for exactly the track toggle, so the blur stays off while it runs.
+   Dropping the blur alone let the panel slide over the sharp scene and then
+   snap to frosted once settled. Instead the sliding sheet wears a near-opaque
+   floor of the same paper tone — what the blur averages the scene into — so it
+   reads as the same sheet at no per-frame cost. Once settled the blur switches
+   on underneath that floor, where the switch is invisible, and the floor fades
+   back to translucent. The floor jumps in without a transition, because the
+   blur it stands in for is already gone. */
+body[data-dsh-orca-maid] [data-animating] [data-sidebar-right-panel]:not([data-sidebar-right-panel='fullscreen'])
+  :is([data-dockkit-host='dock'], [data-dockkit-empty]) {
+  background-color: color-mix(in srgb, var(--dsw-input-solid) 90%, transparent);
+  backdrop-filter: none;
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-dsh-orca-maid] [data-sidebar-right-panel]:not([data-sidebar-right-panel='fullscreen'])
+    :is([data-dockkit-host='dock'], [data-dockkit-empty]) {
+    transition: none;
+  }
+}
+
+body[data-dsh-orca-maid] [data-sidebar-right-panel='fullscreen']
+  :is([data-dockkit-host='dock'], [data-dockkit-empty]),
+body[data-dsh-orca-maid] [data-sidebar-right-panel] [data-dockkit-float] {
+  background: var(--dsw-input-solid);
+  border-color: var(--maid-line);
+  border-radius: 0 !important;
+}
+
+body[data-dsh-orca-maid] [data-sidebar-right-panel] [data-dockkit-float] {
+  box-shadow: var(--maid-shadow);
+}
+
+body[data-dsh-orca-maid] [data-sidebar-right-panel] [data-dockkit-strip],
+body[data-dsh-orca-maid] [data-sidebar-right-panel] [data-dockkit-float-grip] {
+  background: color-mix(in srgb, var(--maid-blue) 5%, transparent);
+  border-bottom-color: var(--maid-line);
+}
+
+body[data-dsh-orca-maid] [data-sidebar-right-panel]
+  [data-dockkit-tab][aria-selected='true'] {
+  box-shadow: inset 0 -2px var(--maid-blue);
+}
+
+body[data-dsh-orca-maid] [data-dockkit-tab-menu] {
+  background: var(--dsw-input-solid);
+  border-color: var(--maid-line);
+  box-shadow: var(--maid-shadow);
+}
+
+/* The plugin manager is one of those reading panes: a keyed `main` panel
+   that replaces the conversation in the centre column with dense card and
+   detail copy. It used to bring an opaque floor of its own, which read as a
+   plain page next to every other panel; the column-level sheet below now
+   owns the floor for all of them, and a second opaque one would only cover it. */
+body[data-dsh-orca-maid] [data-plugin-panel] {
+  color: var(--maid-ink);
+}
+
+/* Panel pages read on one frosted sheet. Stock gives the `main` seat the
+   column's `--dsw-alias-bg-base` as its floor; this skin makes that token
+   nearly transparent so the scene shows through, which left every panel page
+   sitting directly on the artwork: card fills resolved to a 24% wash and the
+   character ran behind the text. Restoring the floor per plugin only covers
+   plugins someone has already met, so the sheet is keyed on the seat.
+
+   It hangs on the column, not on the page root. Switching between two keyed
+   panels replaces the root element; a `backdrop-filter` layer recreated with
+   it re-samples its backdrop on every switch, and a page whose first paint is a
+   short loading line stretches it from a strip to the full column. Painting it
+   with the column's `::before` also keeps the filter off every content
+   ancestor: a filtered ancestor becomes the containing block of any
+   `position: fixed` overlay a plugin draws inside its page. */
+body[data-dsh-orca-maid][data-maid-panel-page]
+  [class*='centerCol'] {
+  position: relative;
+}
+
+body[data-dsh-orca-maid][data-maid-panel-page]
+  [class*='centerCol']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--maid-reading-surface);
+  backdrop-filter: blur(6px) saturate(0.95);
+  pointer-events: none;
+}
+
+/* The page root only lifts above the sheet; it must not carry the filter. Its
+   cards take the skin's own surface instead of the 24% base wash, so a row
+   still reads as a row on the sheet. Host overlays portal to body, so the new
+   stacking context traps nothing. */
+body[data-dsh-orca-maid][data-maid-panel-page] [data-slot='main'] > :not([data-slot='main.conversation']) {
+  position: relative;
+  z-index: 2;
+  --dsw-alias-bg-base: var(--maid-surface);
+}
+
+/* Host primitives spend `disabled` as a 40% opacity budget, priced against the
+   opaque floor this skin gave up. On the sheet a 12px label lands near 2.6:1;
+   a third more opacity keeps the state readable while still reading as
+   disabled. `:where()` keeps host and plugin rules able to outrank it. */
+body[data-dsh-orca-maid][data-maid-panel-page]
+  [data-slot='main'] > :not([data-slot='main.conversation'])
+  :where(button, [role='button']):disabled {
+  opacity: 0.55;
+}
+
+/* Process groups have their own disclosure title outside DisclosureRow. */
+body[data-dsh-orca-maid] [data-step-process] > div > button[data-process-activity] {
+  padding: 5px 8px;
+  border-left: 2px solid var(--maid-line);
+  background: var(--maid-surface-strong);
+  color: var(--maid-graphite);
+}
+
+body[data-dsh-orca-maid] [data-step-process] > div > button[data-process-activity]:is(:hover, :focus-visible, [aria-expanded='true']) {
+  border-left-color: var(--maid-blue);
+  color: var(--maid-ink);
+}
+
+body[data-dsh-orca-maid] [data-slot='settings.launcher'] button[data-collapsed][aria-haspopup='menu'] {
+  border: 1px solid var(--maid-line);
+  background: var(--maid-surface-strong);
+}
+
+body[data-dsh-orca-maid] [data-slot='settings.launcher'] button[data-collapsed][aria-haspopup='menu']:is(:hover, :focus-visible, [aria-expanded='true']) {
+  border-color: var(--maid-blue);
+  background: var(--dsw-input-solid);
+}
+
+/* Stats include noninteractive span pills as well as buttons. Their own
+   reading surface keeps small figures distinct from the scene behind them. */
+body[data-dsh-orca-maid] [data-composer-stats] [class$='_pill'] {
+  border-radius: 0 !important;
+  background: var(--dsw-input-solid);
+  color: var(--maid-graphite);
+}
+
+body[data-dsh-orca-maid] [data-composer-stats] button[class$='_pill']:is(:hover, [aria-expanded='true']) {
+  background: color-mix(in srgb, var(--maid-blue) 10%, var(--dsw-input-solid));
+  color: var(--maid-ink);
+}
+
+body[data-dsh-orca-maid] [role='dialog']:has(> [data-session-stats-details]),
+body[data-dsh-orca-maid] [role='dialog']:has(> [data-session-stats-usage]) {
+  background: var(--dsw-input-solid);
+  border-color: var(--maid-line);
+  box-shadow: var(--maid-shadow);
+}
+
+/* Temporary compatibility patch for upstream DSH issue #614. RC1 removes
+   the reserved scrollbar gutter on hover/focus even when a wide-table
+   candidate does not overflow, moving the hit-test edge into a layout loop.
+   Remove this after the host stops changing the wrapper's box geometry. */
+body[data-dsh-orca-maid]
+  [data-chat-flow-kind='assistant-step'] :global(.md-table-wide) {
+  padding-bottom: var(--dsh-scrollbar-width, 8px);
+}
+
+/* Keep the plugin terminal's forced measurements and intermediate redraws
+   inside the terminal boundary. Paint containment prevents a resize frame
+   from spilling underneath the adjacent Explorer panel. */
+body[data-dsh-orca-maid] [data-dsh-better-sidebar] :global(.xterm) {
+  contain: layout paint style;
+}
+
+body[data-dsh-orca-maid] [data-dsh-better-sidebar] [class*='_bottomPanel'],
+body[data-dsh-orca-maid] [data-dsh-better-sidebar] [class*='_terminalWrap'],
+body[data-dsh-orca-maid] [data-dsh-better-sidebar] [class$='_terminal'] {
+  overflow: clip;
+}
+
+body[data-dsh-orca-maid] [data-maid-terminal-width-locked] {
+  box-sizing: border-box;
+  width: var(--maid-terminal-locked-width) !important;
+  min-width: var(--maid-terminal-locked-width) !important;
+  max-width: var(--maid-terminal-locked-width) !important;
+  align-self: flex-start;
+  overflow: clip;
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] {
+  --maid-blue: #4d91ff;
+  --maid-cyan: #45d9f4;
+  --maid-ink: #eef4ff;
+  --maid-graphite: #c8d2e2;
+  --maid-muted: #8998af;
+  --maid-question-focus: #78a8ef;
+  --maid-question-focus-wash: rgba(120, 168, 239, 0.14);
+  --maid-line: rgba(180, 199, 226, 0.16);
+  --maid-surface: rgba(12, 17, 26, 0.82);
+  --maid-surface-strong: rgba(15, 21, 31, 0.94);
+  --maid-reading-surface: rgba(14, 20, 30, 0.72);
+  --maid-shadow: 0 18px 55px rgba(0, 0, 0, 0.42), 0 2px 5px rgba(0, 0, 0, 0.32);
+  color: var(--maid-ink);
+  background-color: #090d14;
+  background-image: none;
+  --dsw-alias-bg-base: rgba(8, 12, 19, 0.22) !important;
+  --dsw-alias-bg-layer-1: rgba(14, 20, 30, 0.84) !important;
+  --dsw-alias-bg-layer-2: rgba(19, 27, 40, 0.88) !important;
+  --dsw-alias-bg-layer-3: rgba(26, 35, 50, 0.92) !important;
+  --dsw-alias-bg-module-platform: rgba(19, 27, 40, 0.88) !important;
+  --dsw-alias-bg-overlay: rgba(15, 21, 31, 0.97) !important;
+  --dsw-alias-border-l1: rgba(180, 199, 226, 0.1) !important;
+  --dsw-alias-border-l2: rgba(180, 199, 226, 0.16) !important;
+  --dsw-alias-border-l3: rgba(180, 199, 226, 0.24) !important;
+  --dsw-alias-border-l4: rgba(180, 199, 226, 0.34) !important;
+  --dsw-alias-brand-primary: #4d91ff !important;
+  --dsw-alias-brand-primary-invert: #07101f !important;
+  --dsw-alias-brand-text: #a9c9ff !important;
+  --dsw-alias-button-primary-fill: var(--maid-blue) !important;
+  --dsw-alias-button-primary-hover: #2e81ff !important;
+  --dsw-alias-button-info-fill: #4d91ff !important;
+  --dsw-alias-button-info-hover: #2e81ff !important;
+  --dsw-static-deepseek-500: #4d91ff !important;
+  --dsw-static-deepseek-200: #a9c9ff !important;
+  --dsw-alias-button-floating-fill: rgba(19, 27, 40, 0.95) !important;
+  --dsw-alias-button-floating-hover: #202c40 !important;
+  --dsw-alias-button-tool-bar-fill: rgba(24, 34, 50, 0.88) !important;
+  --dsw-alias-button-tool-bar-hover: rgba(33, 49, 74, 0.95) !important;
+  --dsw-alias-interactive-bg-active: rgba(77, 145, 255, 0.2) !important;
+  --dsw-alias-interactive-bg-hover: rgba(77, 145, 255, 0.11) !important;
+  --dsw-alias-interactive-bg-hover-solid: #1d2a3f !important;
+  --dsw-alias-label-primary: #eef4ff !important;
+  --dsw-alias-label-secondary: #c8d2e2 !important;
+  --dsw-alias-label-tertiary: #8998af !important;
+  --dsw-alias-label-caption: #718198 !important;
+  --dsw-alias-menu-group-header-fill: #0f151f !important;
+  --dsw-alias-state-business-primary: #4d91ff !important;
+  --dsw-alias-state-business-tertiary: #183459 !important;
+  --dsw-specific-bubble: rgba(24, 42, 66, 0.9) !important;
+  --dsw-specific-bubble-highlight: rgba(30, 56, 88, 0.94) !important;
+  --dsw-specific-input-major: rgba(14, 20, 30, 0.86) !important;
+  --dsw-specific-menu: rgba(15, 21, 31, 0.97) !important;
+  --dsw-specific-selector: rgba(20, 29, 43, 0.94) !important;
+  --dsw-specific-sidebar-fill: rgba(8, 12, 19, 0.8) !important;
+  --dsw-specific-sidebar-nav-item-active: rgba(29, 54, 88, 0.88) !important;
+  --dsw-specific-sidebar-nav-item-active-accent: #4d91ff !important;
+  --dsw-specific-sidebar-nav-item-hover: rgba(25, 38, 58, 0.9) !important;
+  --dsw-input-solid: #0e141e !important;
+}
+
+body[data-dsh-orca-maid] [id='root'] {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+/* Light mode mirrors the dark narrative with one continuous observation
+   studio: the relaxed wink welcomes a new session, then the same character,
+   chair and console crossfade into the working pose when the task begins. */
+body[data-dsh-orca-maid] .lightScene {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+  background: #f6f1e7;
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] .lightScene {
+  display: none;
+}
+
+body[data-dsh-orca-maid] .lightScene::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(248, 250, 253, 0.34) 0%, rgba(248, 250, 253, 0.18) 46%, rgba(248, 250, 253, 0.02) 72%),
+    linear-gradient(180deg, rgba(248, 250, 253, 0.03), transparent 68%, rgba(239, 243, 248, 0.16));
+}
+
+body[data-dsh-orca-maid] .lightSceneLayer {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.008);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  filter: saturate(0.9) contrast(0.98) blur(0);
+  will-change: opacity, transform, filter;
+  transition:
+    opacity 640ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 640ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+body[data-dsh-orca-maid] .lightSceneHero {
+  opacity: 0.94;
+  transform: scale(1) translateY(0);
+  filter: saturate(0.9) contrast(0.98) blur(0);
+  background-image: var(--orca-maid-light-hero-art);
+}
+
+body[data-dsh-orca-maid] .lightSceneActive {
+  opacity: 0;
+  transform: scale(1.015) translateY(6px);
+  filter: saturate(0.9) contrast(0.98) blur(2px);
+  background-image: var(--orca-maid-light-active-art);
+}
+
+body[data-dsh-orca-maid]:not([data-ds-dark-theme])[data-maid-scene='active'] .lightSceneHero {
+  opacity: 0;
+  transform: scale(1.02) translateY(-8px);
+  filter: saturate(0.9) contrast(0.98) blur(2px);
+}
+
+body[data-dsh-orca-maid]:not([data-ds-dark-theme])[data-maid-scene='active'] .lightSceneActive {
+  opacity: 0.94;
+  transform: scale(1) translateY(0);
+  filter: saturate(0.9) contrast(0.98) blur(0);
+}
+
+/* Dark mode is a two-state narrative rather than a decorative wallpaper:
+   the mug scene welcomes the user in hero/empty states, while the reading
+   scene takes over once a task begins. Both use the same crop, grade and
+   veil so the crossfade feels like one room changing posture. */
+body[data-dsh-orca-maid] .darkScene {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  display: none;
+  overflow: hidden;
+  pointer-events: none;
+  background: #090d14;
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] .darkScene {
+  display: block;
+}
+
+body[data-dsh-orca-maid] .darkScene::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(6, 10, 16, 0.58) 0%, rgba(6, 10, 16, 0.38) 38%, rgba(6, 10, 16, 0.12) 68%, rgba(6, 10, 16, 0.18) 100%),
+    linear-gradient(180deg, rgba(5, 9, 15, 0.08), rgba(7, 11, 18, 0.12) 58%, rgba(5, 9, 15, 0.34));
+}
+
+body[data-dsh-orca-maid] .darkSceneLayer {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.01);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  filter: brightness(0.88) saturate(0.74) contrast(1.05) blur(0);
+  will-change: opacity, transform, filter;
+  transition:
+    opacity 640ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 640ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+body[data-dsh-orca-maid] .darkSceneHero {
+  opacity: 0.94;
+  transform: scale(1) translateY(0);
+  filter: brightness(0.88) saturate(0.74) contrast(1.05) blur(0);
+  background-image: var(--orca-maid-dark-hero-art);
+}
+
+body[data-dsh-orca-maid] .darkSceneActive {
+  opacity: 0;
+  transform: scale(1.015) translateY(6px);
+  filter: brightness(0.88) saturate(0.74) contrast(1.05) blur(2px);
+  background-image: var(--orca-maid-dark-active-art);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme][data-maid-scene='active'] .darkSceneHero {
+  opacity: 0;
+  transform: scale(1.02) translateY(-8px);
+  filter: brightness(0.88) saturate(0.74) contrast(1.05) blur(2px);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme][data-maid-scene='active'] .darkSceneActive {
+  opacity: 0.94;
+  transform: scale(1) translateY(0);
+  filter: brightness(0.88) saturate(0.74) contrast(1.05) blur(0);
+}
+
+/* Skin-manager preferences are document attributes, so this stylesheet owns
+   only presentation while the shared manager owns persistence and timers. */
+html[data-dsh-whale-maid-background='hidden']
+  body[data-dsh-orca-maid]
+  :is(.lightScene, .darkScene) {
+  display: none !important;
+}
+
+html[data-dsh-whale-maid-art='hidden']
+  body[data-dsh-orca-maid]
+  :is(.lightSceneLayer, .darkSceneLayer) {
+  opacity: 0 !important;
+  visibility: hidden;
+}
+
+html[data-dsh-whale-maid-character='hidden']
+  body[data-dsh-orca-maid]
+  [data-skin-chrome='status-character'],
+html[data-dsh-whale-maid-pricing='hidden']
+  body[data-dsh-orca-maid]
+  [data-skin-chrome='pricing-light'] {
+  display: none !important;
+}
+
+/* Both the manual switch and the schedule project the same character state. */
+html[data-dsh-whale-maid-character='hidden'] body[data-dsh-orca-maid] {
+  --maid-stage: 120px;
+}
+
+html[data-dsh-whale-maid-character='hidden'] body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide]
+  :is([data-slot='sidebar'] > :first-child)::after {
+  content: none;
+}
+
+/* Settings and menu surfaces must be fully opaque: the left nav and the row
+   menus are the settings interface's secondary level, and a translucent card
+   lets the conversation show through and reads as click-through.
+
+   Through DSH 0.1.7-rc.1 SettingsPanel is not a document-root portal: the
+   host mounts it inside the sidebar content root and it reaches the viewport
+   with `position: fixed`. From rc.2 it portals to <body> beside #root and
+   carries `data-shortcut-modal='settings'`; the sidebar releases below key on
+   `data-maid-settings-in-sidebar` so they run for the slot mount only, and
+   the settings selectors accept both mounts.
+   Every stacking context this skin adds along that ancestor chain — the
+   content root's `isolation: isolate`, plus the promotions this block used to
+   apply to the sidebar column and the dialog carrier — is a context the
+   product itself never had, and a fixed panel that cannot paint out of an
+   ancestor context is the Safari/WebKit failure reported against maid-atelier
+   in #40 and against this skin in #53: the mask appears, the panel measures
+   and hit-tests correctly, and it never draws. So retire those contexts while
+   the dialog is open rather than promoting them. `z-index: auto` with the
+   element's `position` left alone creates no stacking context, so the
+   overlay's own z-index competes at page level again, exactly like a portaled
+   dialog would.
+
+   #root is deliberately NOT released, and that is the one promotion here that
+   is load bearing: index.ts appends the opaque scene layers to <body> AFTER
+   #root, so #root's positive z-index is the only thing keeping .lightScene /
+   .darkScene (both `position: fixed; z-index: 0`, both an opaque flat colour)
+   behind the application. Dropping it to `auto` makes those backdrops paint
+   over the entire app while settings is open — measured on both WebKit and
+   Blink — and it is also what holds other plugins' body-level panels below
+   the dialog. Everything the panel has to cover lives inside #root, so
+   keeping this one context costs the fix nothing. */
+body[data-dsh-orca-maid][data-maid-settings-open] [id='root'] {
+  z-index: var(--maid-settings-overlay-z) !important;
+}
+/* Cordis is also mounted below #root while the seam ruler is body-owned.
+   Promote the app root to the Cordis rung so the escaped fixed panel can
+   outrank every skin decoration without crossing the official Modal ceiling. */
+body[data-dsh-orca-maid][data-maid-cordis-panel-open] [id='root'] {
+  z-index: var(--maid-z-cordis) !important;
+}
+
+/* The sidebar content root is a stacking context for the whole session: the
+   sidebar layering block below gives it `position: relative` and, decisively,
+   `isolation: isolate`, which forms a context on its own no matter what the
+   z-index says. Release the isolation together with the promotion while the
+   dialog is open; the `position: relative` from that block stays, and
+   relative + z-index auto is not a stacking context. */
+body[data-dsh-orca-maid][data-maid-settings-in-sidebar] :is([data-slot='sidebar'] > :first-child) {
+  z-index: auto;
+  isolation: auto;
+}
+
+/* The settings trigger and overlay live below the host's sidebar column,
+   while the window toggles are fixed inside the adjacent center column. This
+   rule used to promote the column so descendants could outrank that sibling;
+   releasing the column's z-index reaches the same place without a context,
+   because the fixed overlay then stacks against the center column itself.
+   `position: relative` is kept deliberately — dropping to `static` re-homes
+   absolutely positioned descendants, and in maid-atelier it also tripped
+   Chromium into compositing a filtered layer over the mask's backdrop-filter
+   (4d3e346). `overflow: visible` still carries its own weight: the column
+   clips at its own box regardless of stacking. Both releases key on the
+   slot mount only (DSH through 0.1.7-rc.1): the rc.2 body portal is not in
+   the sidebar chain, and unclipping the column there only lets the sidebar
+   stage spill while settings is open. */
+body[data-dsh-orca-maid][data-maid-settings-in-sidebar]
+  [class*='sidebarCol'] {
+  position: relative;
+  z-index: auto;
+  overflow: visible;
+}
+
+/* Full-screen settings owns the complete viewport. Host window toggles and
+   MAID's body-level telemetry are unrelated chrome, so remove them from both
+   painting and hit testing until the dialog closes. */
+body[data-dsh-orca-maid][data-maid-settings-open] :is(.spine, .signalChip, .standby, .statusCharacter, .pricingLight) {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* The fixed settings overlay is mounted inside the sidebar footer, and the
+   sidebar layering block below already makes every direct child of the content
+   root `position: relative; z-index: 1` — i.e. a stacking context wrapped
+   around the fixed panel. Release this carrier's z-index while the dialog is
+   open so the overlay stacks at page level instead; `position: relative` is
+   restated rather than dropped, so the carrier's containing-block role never
+   changes with the dialog's presence.
+   The official sidebar also fades every direct child during its 1024px
+   auto-collapse, then runs a delayed rail-in animation on this footer. Keep
+   the dialog carrier opaque and animation-free while it owns the viewport,
+   otherwise resizing across that breakpoint briefly fades the whole panel. */
+body[data-dsh-orca-maid][data-maid-settings-open]
+  [data-slot='sidebar'] > :first-child > [data-maid-dialog-carrier] {
+  position: relative;
+  z-index: auto;
+  opacity: 1 !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+body[data-dsh-orca-maid] [role='dialog'] {
+  --maid-dialog-bg: #fbf7ef;
+  background: var(--maid-dialog-bg);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] [role='dialog'] {
+  --maid-dialog-bg: #0f151f;
+}
+
+/* Responsive settings shell. The official overlay, focus handling and
+   settings slots remain intact; MAID only changes its spatial behavior.
+   Large screens dock beside the settings trigger; every constrained viewport
+   becomes a full workspace instead of squeezing an intermediate modal. */
+body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) {
+  position: fixed;
+  z-index: var(--maid-settings-overlay-z);
+  isolation: isolate;
+  box-sizing: border-box;
+  inset: 0;
+  padding: 24px;
+  pointer-events: auto;
+}
+
+/* DSH 0.1.7-rc.2 portals the overlay to <body>, beside #root rather than inside
+   it, so it now shares a stacking context with the #root promotion above.
+   One rung over that promotion keeps the panel on top without relying on the
+   portal's document order, and still under the host Modal ceiling (1000) so a
+   dialog opened from inside settings keeps covering it. */
+body[data-dsh-orca-maid][data-maid-settings-open] > [role='presentation']:has(> [role='dialog'][data-shortcut-modal='settings']) {
+  z-index: calc(var(--maid-settings-overlay-z) + 1);
+}
+
+body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > :first-child {
+  z-index: 0;
+  animation: maidSettingsMaskIn 170ms ease-out both;
+}
+
+body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] {
+  width: min(800px, calc(100vw - 48px));
+  max-width: none;
+  height: min(760px, calc(100vh - 48px));
+  position: relative;
+  z-index: 1;
+  border: 1px solid var(--maid-line);
+  box-shadow: var(--maid-shadow);
+  transform-origin: left bottom;
+  animation: maidSettingsPanelIn 200ms ease-out both;
+}
+
+/* The cordis plugin panel is a fixed popover mounted inside the sidebar
+   footer. The sidebar layering block below wraps every direct child of the
+   content root in a stacking context (`position: relative; z-index: 1`) and
+   isolates the content root itself, so the panel's overflow over the center
+   column paints and hit-tests below the column — clicks on that region fall
+   through to the blank conversation surface. Retire those contexts while the
+   panel is open, exactly like the settings block above does for its dialog.
+   The host's real z=1 carrier is the direct foot-area child containing the
+   panel, not the nested sidebar.footer.action slot. */
+body[data-dsh-orca-maid][data-maid-cordis-panel-open]
+  :is([data-slot='sidebar'] > :first-child) {
+  z-index: auto;
+  isolation: auto;
+}
+
+body[data-dsh-orca-maid][data-maid-cordis-panel-open]
+  [data-slot='sidebar'] > :first-child > [data-maid-cordis-carrier] {
+  position: relative;
+  z-index: auto;
+}
+
+/* Once both ancestor contexts are released, give the host's fixed panel the
+   top rung inside the promoted root. */
+body[data-dsh-orca-maid][data-maid-cordis-panel-open] [data-cordis-panel] {
+  z-index: var(--maid-z-cordis);
+}
+
+/* The settings surface is an owned instrument panel. Its inner cards, tag
+   chips, badges, status dots and toggle knobs are divs/spans that miss the
+   shape contract (which only covers interactive elements), so the settings
+   dialog subtree gets the same universal rectilinear zeroing as the chat
+   flow. The dialog's own mask and decorations live outside this subtree, and
+   scrollbar pseudo-elements are not matched by `*` — the global square
+   scrollbar styling keeps governing them. */
+body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) *,
+body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) *::before,
+body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) *::after {
+  border-radius: 0 !important;
+}
+
+@keyframes maidSettingsMaskIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Tooltip bubbles stay mounted inside the dialog but consume viewport
+   coordinates. Keep the panel entrance to paint-only properties: a transform,
+   even translateX(0) retained by fill-mode, would re-home those fixed bubbles. */
+@keyframes maidSettingsPanelIn {
+  from {
+    opacity: 0;
+    box-shadow: none;
+  }
+  to {
+    opacity: 1;
+    box-shadow: var(--maid-shadow);
+  }
+}
+
+/* The title and signal chevron stay outside the scrolling category list.
+   The footer reserves enough space for the chevron to clear every button. */
+body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav {
+  position: relative;
+  min-height: 0;
+  padding-bottom: 24px;
+  overflow: hidden;
+}
+
+body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav > :first-child {
+  flex-shrink: 0;
+}
+
+body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav > :last-child {
+  /* Short docked lists keep the group's bottom alignment. */
+  flex: 0 1 auto;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav > :last-child > button {
+  flex-shrink: 0;
+}
+
+body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav > :last-child::-webkit-scrollbar {
+  display: none;
+}
+
+body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav[data-maid-settings-more]::after {
+  content: '';
+  position: absolute;
+  bottom: 9px;
+  left: calc(50% - 5px);
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
+  border: solid var(--maid-blue);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+/* Large desktop: the panel opens immediately beside the sidebar trigger and
+   grows from its lower-left corner. Navigation stays near the pointer. */
+@media (min-width: 1100px) and (min-height: 681px) {
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) {
+    justify-content: flex-start;
+    align-items: flex-end;
+    padding: 18px 18px 18px 72px;
+  }
+
+  body[data-dsh-orca-maid][data-maid-settings-sidebar-wide]
+    :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) {
+    padding-left: calc(var(--maid-sidebar-width) + 16px);
+  }
+
+  /* The docked panel sits on the bottom edge; its height also gives up the
+     desktop window strip so a short window cannot push its top under the
+     titlebar menu and caption buttons. */
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] {
+    width: min(760px, calc(100vw - 108px));
+    height: min(680px, calc(100vh - 36px - var(--maid-window-strip, 0px)));
+  }
+
+  body[data-dsh-orca-maid][data-maid-settings-sidebar-wide]
+    :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] {
+    width: min(760px, calc(100vw - var(--maid-sidebar-width) - 34px));
+  }
+
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav {
+    /* Keep short navigation bottom-aligned; overflow starts at the first item. */
+    justify-content: safe flex-end;
+    padding-bottom: 24px;
+    border-right: 1px solid var(--maid-line);
+  }
+
+  /* Keep the status character visible when the docked settings panel leaves
+     the upper-left stage free on large screens. The full-screen settings
+     modal on smaller viewports still hides it so it cannot cover content. */
+  body[data-dsh-orca-maid][data-maid-settings-open] .statusCharacter {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: none;
+  }
+
+  html[data-dsh-whale-maid-settings-layout='centered']
+    body[data-dsh-orca-maid][data-maid-settings-open]
+    :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) {
+    justify-content: center;
+    align-items: center;
+    padding: calc(24px + var(--maid-window-strip, 0px)) 24px 24px;
+  }
+
+  html[data-dsh-whale-maid-settings-layout='centered']
+    body[data-dsh-orca-maid][data-maid-settings-sidebar-wide]
+    :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) {
+    padding-left: 24px;
+  }
+
+  html[data-dsh-whale-maid-settings-layout='centered']
+    body[data-dsh-orca-maid][data-maid-settings-open]
+    :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'],
+  html[data-dsh-whale-maid-settings-layout='centered']
+    body[data-dsh-orca-maid][data-maid-settings-sidebar-wide]
+    :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] {
+    width: min(800px, calc(100vw - 48px));
+    height: min(760px, calc(100vh - 48px - var(--maid-window-strip, 0px)));
+    transform-origin: center;
+  }
+
+  html[data-dsh-whale-maid-settings-layout='centered']
+    body[data-dsh-orca-maid][data-maid-settings-open]
+    :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav {
+    justify-content: flex-start;
+    padding-bottom: 24px;
+  }
+}
+
+/* Settings nav: active section uses a slightly deeper brown emphasis, and
+   adjacent section cells are separated by a same-color hairline. */
+body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) > nav button[aria-current='true'] {
+  background: color-mix(in srgb, var(--maid-blue) 18%, transparent);
+  color: var(--maid-ink);
+}
+
+body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) > nav button + button {
+  border-top: 2px solid color-mix(in srgb, var(--maid-blue) 28%, transparent);
+  border-radius: 0;
+}
+
+/* Desktop shells keep a window strip above the page. Windows paints its
+   caption buttons over the titlebar the shell sizes as
+   --dsh-windows-titlebar-height; macOS reserves the traffic-light band the
+   host publishes as --dsh-frame-top-clearance. The full workspace below
+   starts under that strip, as the host's own full-window overlays do; the
+   web shell has no strip. */
+html[data-windows-titlebar] body[data-dsh-orca-maid] {
+  --maid-window-strip: var(--dsh-windows-titlebar-height, 40px);
+}
+
+html[data-platform='darwin'] body[data-dsh-orca-maid] {
+  --maid-window-strip: var(--dsh-frame-top-clearance, 0px);
+}
+
+/* Any viewport below the desktop dock threshold becomes a full workspace: no
+   centering tax, crushed columns or clipped lower controls. The overlay
+   centers the dialog in the whole window, so a top margin equal to the
+   height it gives up keeps the margin box window-tall and seats the dialog
+   exactly under the window strip. */
+@media (max-width: 1099px), (max-height: 680px) {
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) {
+    padding: 0;
+  }
+
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] {
+    width: 100vw;
+    max-width: none;
+    height: calc(100vh - var(--maid-window-strip, 0px));
+    height: calc(100dvh - var(--maid-window-strip, 0px));
+    max-height: none;
+    margin-top: var(--maid-window-strip, 0px);
+    border: 0;
+    box-shadow: none;
+  }
+}
+
+/* Phones and narrow panes move the category rail above the content. */
+@media (max-width: 640px) {
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] {
+    flex-direction: column;
+  }
+
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav {
+    box-sizing: border-box;
+    width: 100%;
+    gap: 8px;
+    padding: 10px 12px 24px;
+    max-height: 40%;
+    border-bottom: 1px solid var(--maid-line);
+  }
+
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav > :last-child {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-content: start;
+    gap: 4px;
+  }
+
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav > :first-child {
+    padding: 0 4px;
+  }
+
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav button {
+    min-width: 0;
+    height: 36px;
+    padding: 7px 8px;
+  }
+
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav + div {
+    min-height: 0;
+  }
+
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav + div > :first-child {
+    min-height: 46px;
+    height: auto;
+    padding: 8px 10px;
+  }
+
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav + div > :last-child {
+    padding: 0 14px 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav > :last-child {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Official setting rows are desktop two-column flex layouts. On phone-sized
+   content panes, stack copy above its control and release the 48px text gutter
+   so descriptions remain normal sentences instead of vertical fragments. */
+@media (max-width: 520px) {
+  body[data-dsh-orca-maid]
+    :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav + div > :last-child
+    [class$='_row']:has(> [class$='_rowText']) {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  body[data-dsh-orca-maid]
+    :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav + div > :last-child
+    [class$='_rowText'] {
+    width: 100%;
+    padding-right: 0;
+  }
+
+  body[data-dsh-orca-maid]
+    :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav + div > :last-child
+    [class$='_row']:has(> [class$='_rowText']) > :last-child,
+  body[data-dsh-orca-maid][data-maid-settings-open]
+    :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav + div > :last-child
+    [class$='_row']:has(> [class$='_rowText']) [class$='_selector'] {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+  }
+
+  body[data-dsh-orca-maid]
+    :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'] > nav + div > :last-child
+    [class$='_selector'] {
+    justify-content: space-between;
+  }
+}
+
+body[data-dsh-orca-maid] [role='menu'] {
+  background: #fbf7ef;
+  pointer-events: auto;
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] [role='menu'] {
+  background: #0f151f;
+}
+
+/* Permission modes use three independent equipment glyphs and risk colors.
+   The selector keys off MAID's semantic icon marker, not localized labels or
+   generated CSS-module class names, so the hero and active composer agree. */
+body[data-dsh-orca-maid] {
+  --maid-permission-read: #168aa6;
+  --maid-permission-write: #b8780c;
+  --maid-permission-full: #c74440;
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] {
+  --maid-permission-read: #45c7df;
+  --maid-permission-write: #e5ad45;
+  --maid-permission-full: #ff7771;
+}
+
+body[data-dsh-orca-maid] :is([data-composer-seat] button, [role='menuitem'])[data-maid-permission='read'] {
+  color: var(--maid-permission-read);
+}
+
+body[data-dsh-orca-maid] :is([data-composer-seat] button, [role='menuitem'])[data-maid-permission='write'] {
+  color: var(--maid-permission-write);
+}
+
+body[data-dsh-orca-maid] :is([data-composer-seat] button, [role='menuitem'])[data-maid-permission='full'] {
+  color: var(--maid-permission-full);
+}
+
+body[data-dsh-orca-maid] [data-composer-seat] button:not([role='menuitem'])[data-maid-permission] {
+  border-left: 1px solid color-mix(in srgb, currentColor 34%, transparent);
+  background: color-mix(in srgb, currentColor 5%, transparent);
+}
+
+body[data-dsh-orca-maid] [role='menuitem'][data-maid-permission] {
+  border-left: 2px solid transparent;
+}
+
+body[data-dsh-orca-maid] [role='menuitem'][data-maid-permission]:hover,
+body[data-dsh-orca-maid] [role='menuitem'][data-maid-permission]:has(> svg[data-orca-maid-icon='check']) {
+  border-left-color: color-mix(in srgb, currentColor 64%, transparent);
+  background: color-mix(in srgb, currentColor 7%, transparent);
+}
+
+/* Appearance choices use the same compact equipment-marker language as the
+   provider picker. Keep the glyph and label on one centered axis so missing
+   or narrow icon artwork cannot leave the copy sitting low in the tile. */
+body[data-dsh-orca-maid]
+  :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings'])
+  [class$='_cubeRow'] > button[class*='_themeCube'] {
+  position: relative;
+  min-height: 64px;
+  padding-block: 0;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 22px;
+}
+
+body[data-dsh-orca-maid]
+  :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings'])
+  [class$='_cubeRow'] > button[class*='_themeCube'] > svg {
+  flex: none;
+}
+
+body[data-dsh-orca-maid]
+  :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings'])
+  [class$='_cubeRow'] > button[class*='_themeCube'][aria-pressed='true']::after {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 7px;
+  height: 7px;
+  content: '';
+  border: 1px solid var(--maid-blue);
+  background: var(--maid-blue);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 58% 100%, 58% 42%, 0 42%);
+}
+
+/* Chromium's customizable-select contract lets the provider catalog keep its
+   native keyboard, focus and form behavior while replacing the operating
+   system's saturated blue popup. The fallback remains the host's normal
+   select on engines without base-select support. */
+@supports (appearance: base-select) {
+  body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) select {
+    appearance: base-select;
+    min-height: 34px;
+    border: 1px solid var(--maid-line);
+    background: color-mix(in srgb, var(--maid-surface-strong) 94%, transparent);
+    box-shadow: inset 3px 0 0 color-mix(in srgb, var(--maid-blue) 24%, transparent);
+    /* Bare selects (the skin manager's customization card and its hour/minute
+       pickers) also become a flex row so ::picker-icon sits vertically
+       centered, with single-line truncation for long option labels. */
+    display: flex;
+    align-items: center;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  body[data-dsh-orca-maid]
+    :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings'])
+    select[class$='_selectInput'] {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    height: 34px;
+    padding-block: 0;
+    padding-inline: 10px;
+    line-height: 22px;
+    text-align: left;
+  }
+
+  body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) select:hover {
+    border-color: color-mix(in srgb, var(--maid-blue) 42%, var(--maid-line));
+    box-shadow: inset 3px 0 0 color-mix(in srgb, var(--maid-blue) 58%, transparent);
+  }
+
+  body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) select::picker-icon {
+    width: 8px;
+    height: 6px;
+    margin-left: 10px;
+    flex: none;
+    content: '';
+    background: currentColor;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transition: transform 140ms ease;
+  }
+
+  body[data-dsh-orca-maid]
+    :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings'])
+    select[class$='_selectInput']::picker-icon {
+    flex: none;
+    margin-left: auto;
+  }
+
+  body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) select:open::picker-icon {
+    transform: rotate(180deg);
+  }
+
+  body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) select::picker(select) {
+    appearance: base-select;
+    max-height: min(420px, 62vh);
+    margin-block: 4px;
+    padding: 4px;
+    border: 1px solid color-mix(in srgb, var(--maid-graphite) 34%, transparent);
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--maid-blue) 7%, transparent), transparent 42%),
+      color-mix(in srgb, var(--maid-surface-strong) 98%, transparent);
+    box-shadow: 8px 10px 0 rgba(27, 39, 58, 0.08), 0 18px 42px rgba(27, 39, 58, 0.16);
+    color: var(--maid-ink);
+    scrollbar-color: color-mix(in srgb, var(--maid-graphite) 42%, transparent) transparent;
+  }
+
+  body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) select option {
+    align-items: center;
+    min-height: 30px;
+    padding: 7px 30px 7px 10px;
+    border-left: 2px solid transparent;
+    background: transparent;
+    color: var(--maid-graphite);
+    font: 500 12px/1.3 ui-monospace, "SFMono-Regular", Consolas, monospace;
+    letter-spacing: 0.01em;
+    /* Keep long labels on one line (truncated by the picker's own clip). */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) select option:hover,
+  body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) select option:focus-visible {
+    border-left-color: color-mix(in srgb, var(--maid-blue) 48%, transparent);
+    background: color-mix(in srgb, var(--maid-blue) 7%, transparent);
+    color: var(--maid-ink);
+  }
+
+  body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) select option:checked {
+    border-left-color: var(--maid-blue);
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--maid-blue) 16%, transparent), transparent 74%);
+    color: var(--maid-blue);
+    font-weight: 700;
+  }
+
+  body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) select option::checkmark {
+    content: '';
+    width: 7px;
+    height: 7px;
+    margin-left: auto;
+    border: 1px solid currentColor;
+    background: currentColor;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 58% 100%, 58% 42%, 0 42%);
+  }
+}
+
+/* Promote the provider picker's equipment-list language to the composer's
+   model and effort picker. The official menu keeps ownership of focus,
+   keyboard navigation and selection; MAID only redraws its existing states. */
+body[data-dsh-orca-maid]
+  [class$='_menu'][data-maid-model-menu] {
+  width: min(276px, calc(100vw - 32px));
+  padding: 4px;
+  border: 1px solid color-mix(in srgb, var(--maid-graphite) 34%, transparent);
+  border-radius: 0;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--maid-blue) 7%, transparent), transparent 42%),
+    #fbf7ef;
+  box-shadow: 8px 10px 0 rgba(27, 39, 58, 0.08), 0 18px 42px rgba(27, 39, 58, 0.16);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme]
+  [class$='_menu'][data-maid-model-menu] {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--maid-blue) 10%, transparent), transparent 42%),
+    #0f151f;
+}
+
+/* 0.2.0-rc.2 moves `role='menu'` onto the scroll list inside the menu surface.
+   The surface owns the MAID plate and its gradient, so the nested list must
+   stay clear instead of repainting an opaque plate over them. */
+body[data-dsh-orca-maid] [class$='_menu'][data-maid-model-menu] [role='menu'] {
+  background: transparent;
+}
+
+body[data-dsh-orca-maid]
+  [class$='_menu'][data-maid-menu-groups] :is([class$='_groupTitle'], [data-menu-group-heading]) {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 8px 5px;
+  border-bottom: 1px solid color-mix(in srgb, var(--maid-graphite) 16%, transparent);
+  background: #fbf7ef;
+  color: var(--maid-muted);
+  font: 600 10px/1.4 ui-monospace, "SFMono-Regular", Consolas, monospace;
+  letter-spacing: 0.08em;
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme]
+  [class$='_menu'][data-maid-menu-groups] :is([class$='_groupTitle'], [data-menu-group-heading]) {
+  background: #0f151f;
+}
+
+body[data-dsh-orca-maid]
+  [class$='_menu'][data-maid-menu-groups] :is([class$='_groupTitle'], [data-menu-group-heading])::before {
+  width: 4px;
+  height: 4px;
+  content: '';
+  border: 1px solid currentColor;
+}
+
+body[data-dsh-orca-maid]
+  [class$='_menu'][data-maid-menu-models] [role='menuitemradio'] {
+  min-height: 38px;
+  padding: 6px 8px;
+  border: 0;
+  border-left: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+}
+
+body[data-dsh-orca-maid]
+  [class$='_menu'][data-maid-menu-models]
+  [role='menuitemradio']:is(:hover, :focus-visible) {
+  border-left-color: color-mix(in srgb, var(--maid-blue) 48%, transparent);
+  background: color-mix(in srgb, var(--maid-blue) 7%, transparent);
+}
+
+body[data-dsh-orca-maid]
+  [class$='_menu'][data-maid-menu-models]
+  [role='menuitemradio'][aria-checked='true'] {
+  border-left-color: var(--maid-blue);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--maid-blue) 16%, transparent), transparent 74%);
+  color: var(--maid-blue);
+}
+
+body[data-dsh-orca-maid]
+  [class$='_menu'][data-maid-menu-models]
+  [role='menuitemradio'] [class$='_modelName'] {
+  font: 600 12px/1.4 ui-monospace, "SFMono-Regular", Consolas, monospace;
+  letter-spacing: 0.01em;
+}
+
+body[data-dsh-orca-maid]
+  [class$='_menu'][data-maid-menu-models]
+  [role='menuitemradio'] [class$='_description'] {
+  margin-top: 2px;
+  font-size: 11px;
+}
+
+body[data-dsh-orca-maid]
+  [class$='_menu'][data-maid-menu-models]
+  [role='menuitemradio'][aria-checked='true'] [class$='_check'] > svg {
+  display: none;
+}
+
+body[data-dsh-orca-maid]
+  [class$='_menu'][data-maid-menu-models]
+  [role='menuitemradio'][aria-checked='true'] [class$='_check']::before {
+  width: 7px;
+  height: 7px;
+  content: '';
+  border: 1px solid currentColor;
+  background: currentColor;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 58% 100%, 58% 42%, 0 42%);
+}
+
+body[data-dsh-orca-maid]
+  [class$='_menu'][data-maid-menu-cells] [role='menuitem'] {
+  border-radius: 0;
+}
+
+body[data-dsh-orca-maid]
+  [class$='_menu'][data-maid-menu-cells] [class$='_cell'] {
+  min-height: 40px;
+  border-left: 2px solid transparent;
+}
+
+body[data-dsh-orca-maid]
+  [class$='_menu'][data-maid-menu-cells] [class$='_cell']:hover {
+  border-left-color: color-mix(in srgb, var(--maid-blue) 48%, transparent);
+  background: color-mix(in srgb, var(--maid-blue) 7%, transparent);
+}
+
+/* Replace the production shell wordmark while preserving its new-session button.
+   The official mark and name sit inside slot divs below the brand button; the
+   flat `> svg` rule also covers a mark rendered directly under it. */
+body[data-dsh-orca-maid] [data-orca-maid-brand] > svg,
+body[data-dsh-orca-maid] [data-orca-maid-brand] [data-slot='sidebar.brand.mark'] svg {
+  display: none;
+}
+body[data-dsh-orca-maid] [data-orca-maid-brand] [data-slot='sidebar.brand.name'] {
+  display: none !important;
+}
+body[data-dsh-orca-maid] [data-orca-maid-brand] {
+  align-self: center;
+  height: 30px;
+}
+body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > :first-child {
+  position: relative;
+}
+body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > :first-child::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  top: 15px;
+  left: 4px;
+  width: 2px;
+  height: 30px;
+  border-radius: 0;
+  background: linear-gradient(180deg, transparent, rgba(0, 126, 255, 0.9) 24%, #c9f5ff 52%, rgba(0, 126, 255, 0.82) 76%, transparent);
+  box-shadow: 0 0 5px rgba(0, 126, 255, 0.55), 0 0 12px rgba(0, 126, 255, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(0) scaleY(0.72);
+  will-change: transform, opacity;
+}
+body[data-dsh-orca-maid] .dshWordmark {
+  display: block;
+  position: absolute;
+  z-index: 1;
+  top: calc(21px + var(--maid-stage-top, 0px));
+  left: 0;
+  width: 118px;
+  height: 30px;
+  min-width: 118px;
+  max-width: none;
+  /* The wordmark is tinted through currentColor, so the accent reaches it
+     without touching the host's markup. Dark mode keeps its own override. */
+  color: var(--maid-blue);
+  opacity: 0.82;
+  pointer-events: none;
+  /* The rail and wide logo share a 36px vertical center. Use the final
+     track width, independent of the host logo row's delayed layout switch. */
+  transform: translateX(calc((var(--maid-sidebar-width, 56px) - 118px) / 2)) scale(0.28);
+  transform-origin: center;
+  transition:
+    opacity 150ms ease,
+    transform var(--maid-track-duration) var(--maid-track-ease);
+}
+body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] .dshWordmark {
+  opacity: 1;
+  transform: translateX(16px) scale(1);
+}
+body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > :first-child::after {
+  animation: maidWordmarkScan 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) > :first-child > :first-child > button:first-of-type > svg,
+body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) > :first-child > :first-child > button:first-of-type [data-slot='sidebar.brand.mark'] svg {
+  opacity: 0;
+}
+body[data-dsh-orca-maid][data-ds-dark-theme] .dshWordmark { color: #eef4ff; }
+
+@keyframes maidWordmarkScan {
+  0% {
+    opacity: 0;
+    transform: translateX(0) scaleY(0.72);
+  }
+  18% { opacity: 0.92; }
+  72% { opacity: 0.58; }
+  100% {
+    opacity: 0;
+    transform: translateX(116px) scaleY(1);
+  }
+}
+
+/* The operator stage belongs to the sidebar only; its state actor is mounted as
+   live chrome while this pseudo-element keeps the scrim and seam ruler. */
+body[data-dsh-orca-maid] :is([data-slot='sidebar'] > :first-child) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: rgba(250, 247, 241, 0.64);
+}
+
+body[data-dsh-orca-maid] :is([data-slot='sidebar'] > :first-child)::before {
+  position: absolute;
+  inset: var(--maid-stage-top, 0px) auto 0 0;
+  z-index: 0;
+  width: var(--maid-sidebar-art-width, 280px);
+  content: '';
+  pointer-events: none;
+  /* The actor owns a dedicated stage at the top of the column, hard-stopped at
+     the seam by an opaque surface, with a ruler tick band just above it. */
+  background-image:
+    linear-gradient(180deg, rgba(250, 247, 241, 0.55) 0%, rgba(250, 247, 241, 0) 76px),
+    linear-gradient(180deg,
+      rgba(250, 247, 241, 0) 0,
+      rgba(250, 247, 241, 0) calc(var(--maid-stage, 300px) - 1px),
+      rgba(250, 247, 241, 0.9) var(--maid-stage, 300px),
+      rgba(250, 247, 241, 0.94) 100%),
+    repeating-linear-gradient(90deg, rgba(43, 55, 72, 0.22) 0 1px, transparent 1px 7px);
+  background-position:
+    0 0,
+    0 0,
+    0 calc(var(--maid-stage, 300px) - 10px);
+  background-repeat: no-repeat;
+  background-size: 100% 100%, 100% 100%, 100% 8px;
+  opacity: 0;
+  transition: opacity var(--maid-track-duration) var(--maid-track-ease);
+  will-change: opacity;
+}
+
+body[data-dsh-orca-maid] :is([data-slot='sidebar'] > :first-child) > :not([role='tooltip'], [data-orca-maid-wordmark], [data-plugin-entry]) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Plugin-injected sidebar entries (skill-explorer / ssh / task-board rows;
+   L2 semantic attribute, issue #506) are direct children of the sidebar root,
+   one slot below the official New Session button. In the wide stage the
+   official button's transparent hit plane (z-index: 2, ::before over the
+   portrait area) would swallow clicks meant for these rows — keep the entries
+   on the rung above it so the row itself stays clickable while the rest of
+   the stage still opens a new session.
+
+   The wide stage also owns the top of the pane (portrait art down to
+   --maid-stage), so instead of floating one text row on the art, push the
+   entries below the stage: they read as a control row above the workspace.
+   Flow anchor = the production shell's measured 120px from pane top to the
+   browsing region's normal position (see the region rule below); entries sit
+   at that same slot, so the margin drops them to stage + 4.
+
+   Two marker shapes exist for the same intent (issue #116): the entry may be
+   the button itself, or the plugin's own portalled host is the direct child
+   and the button lives inside it. The `[data-plugin-entry]` host shape also
+   reports the plugin identity, so it doubles as the general opt-in for a
+   plugin-injected block. Both must stay out of the native-button takeover
+   below: that takeover hides every child of a matching button, and a plugin
+   row that copies the host's own button class is exactly the case it reaches.
+
+   The shell has a third row of the same shape: the official global panel list
+   (`nav.panelList`, the Plugins entry) sits between New Session and the
+   browsing region, so every injected row now inherits a flow anchor 44px
+   lower. It is an official row rather than an injected one, but it lands in
+   the same place for the same reason, and it must clear the stage for one
+   more: the wide stage's transparent New Session hit plane is painted at
+   z-index 2 over the whole portrait area, which both hid the row behind the
+   artwork and swallowed its clicks. */
+body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide]
+  > :first-child
+  > :is(button[data-dsh-part='sidebar-entry'], [data-plugin-entry], nav[class*='panelList']) {
+  position: relative;
+  z-index: 3;
+  margin-top: calc(var(--maid-stage, 300px) - 116px);
+}
+
+/* The browsing-region rule below assumes the 120px production flow (no
+   plugin rows). With an entry above it that flow starts one row lower, so the
+   stage-margin must retire or the region drops by a full stage and leaves a
+   dead band between the entry and the workspace. Without the entry the
+   original margin still does the stage push. */
+body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide]
+  > :first-child[data-maid-sidebar-entries]
+  [class*='regionArea'] {
+  margin-top: 0;
+}
+
+/* The stage offset applies to the FIRST injected entry only: sibling plugins
+   (ssh / task-board / skill-explorer) stack their rows one after the other,
+   so a full stage-sized margin on every entry would separate each native row
+   by 124–204px. The z-index promotion above still covers all entries. */
+body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide]
+  > :first-child
+  > :is(button[data-dsh-part='sidebar-entry'], [data-plugin-entry])
+  ~ :is(button[data-dsh-part='sidebar-entry'], [data-plugin-entry]) {
+  margin-top: 0;
+}
+
+/* With the official panel row above them the injected entries are no longer
+   the first row under New Session: that row already paid the stage offset, so
+   the entry that follows it must not pay a second one. Same intent as the
+   sibling rule above, different predecessor. */
+body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide]
+  > :first-child
+  > nav[class*='panelList']
+  ~ :is(button[data-dsh-part='sidebar-entry'], [data-plugin-entry]) {
+  margin-top: 0;
+}
+
+/* Tooltip bubbles mount beside their anchors inside that anchor's carrier,
+   which the lift above just turned into a stacking context: the fixed bubble
+   cannot paint out of it and loses to the conversation header — the same
+   defect maid-atelier fixed for its shell. Release only the carrier while it
+   holds a tooltip: position stays relative (no re-homing), so the lifted
+   chrome below is unaffected and the bubble's own overlay tier competes at
+   page level again. */
+body[data-dsh-orca-maid]
+  [data-slot='sidebar']
+  > :first-child
+  > [data-maid-tooltip-carrier] {
+  z-index: auto;
+}
+
+/* The sidebar root itself is `isolation: isolate` (a stacking context on its
+   own no matter what the z-index says), so the carrier release above is not
+   enough: the fixed bubble still cannot leave the root and loses to the
+   center column, whose title bar sits inside the official frame's z-index: 1
+   context. Release the root's isolation together with the promotion while a
+   tooltip is present — the same mechanism the settings-open block uses — so
+   the bubble's z-index: 100 competes at the frame level again. Everything
+   else inside the root is absolutely positioned inside the sidebar box and
+   never crosses the pane, so releasing the context cannot leak chrome.
+   NOTE: the tag must sit on the SAME element as the :is() match (no
+   descendant space) — with a space it would release the root's child
+   (already isolation: auto) and leave the root context intact. */
+body[data-dsh-orca-maid]
+  :is([data-slot='sidebar'] > :first-child)[data-maid-tooltip-root] {
+  z-index: auto;
+  isolation: auto;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] :is([data-slot='sidebar'] > :first-child)::before {
+  opacity: 1;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > .statusCharacter {
+  --maid-character-signal: var(--maid-cyan);
+  position: absolute;
+  z-index: 1;
+  top: calc(58px + var(--maid-stage-top, 0px));
+  left: 22px;
+  /* Keep one stable stage width while the sidebar track moves. The sidebar's
+     own overflow edge then wipes the artwork in and out at exactly the track's
+     speed, without ever changing the sprite cell's aspect ratio. The sprite
+     carries no clip or slide of its own — a private 180ms wipe outran the
+     300ms track and emptied the stage while the sidebar was still half open.
+     It only fades out in the last moments of a collapse, once the edge has
+     left too little of it to read as a figure. */
+  width: calc(var(--maid-sidebar-art-width, 280px) - 30px);
+  height: calc(var(--maid-stage, 300px) - 66px);
+  overflow: visible;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 90ms linear calc(var(--maid-track-duration) - 90ms);
+  will-change: opacity;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > .statusCharacter {
+  opacity: 1;
+  transition: opacity 120ms ease-out;
+}
+
+body[data-dsh-orca-maid] .statusCharacterFrame {
+  --maid-character-mirror: 1;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: calc(var(--maid-stage, 300px) - 66px);
+  height: 100%;
+  margin-inline: auto;
+  overflow: hidden;
+  transform: scaleX(var(--maid-character-mirror));
+  animation: maidGateWeave 1.06s steps(8, end) infinite;
+  will-change: transform;
+}
+
+html[data-dsh-whale-maid-character-mirror='mirrored']
+  body[data-dsh-orca-maid]
+  .statusCharacterFrame {
+  --maid-character-mirror: -1;
+}
+
+body[data-dsh-orca-maid] .statusCharacterSprite {
+  position: absolute;
+  inset: 0;
+  background-image: var(--orca-maid-status-atlas);
+  background-position: var(--maid-status-x, 0%) var(--maid-status-y, 0%);
+  background-repeat: no-repeat;
+  background-size: 800% 1000%;
+  image-rendering: auto;
+  /* The shipped artwork is a full-colour blue maid, so the old monochrome
+     grade (sepia + heavy contrast) is gone: sepia would drag the blue toward
+     yellow. Only a light contrast lift and a warm ground shadow remain. */
+  filter:
+    saturate(1)
+    contrast(1.04)
+    brightness(1.01)
+    drop-shadow(0.45px 0.65px 0 rgba(76, 47, 22, 0.22));
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] .statusCharacterSprite {
+  /* Dimmed just enough to sit inside the night scene without losing the blue;
+     the monochrome build needed brightness(0.78), a colour character does not. */
+  filter:
+    saturate(0.92)
+    contrast(1.02)
+    brightness(0.92)
+    drop-shadow(0.45px 0.65px 0 rgba(0, 0, 0, 0.35));
+}
+
+body[data-dsh-orca-maid] .statusCharacterBubble {
+  position: absolute;
+  z-index: 2;
+  top: 2px;
+  right: 2px;
+  display: grid;
+  box-sizing: border-box;
+  width: 44px;
+  height: 35px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--maid-character-signal) 66%, transparent);
+  background: color-mix(in srgb, var(--maid-character-signal) 8%, rgba(255, 252, 246, 0.96));
+  box-shadow: 0 8px 18px rgba(26, 38, 55, 0.12);
+  color: var(--maid-character-signal);
+  font: 700 16px/1 ui-monospace, "SFMono-Regular", Consolas, monospace;
+  opacity: 0;
+  transform: translateY(4px) scale(0.94);
+  transform-origin: 30% 100%;
+  transition: opacity 120ms ease, transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body[data-dsh-orca-maid] .statusCharacterBubble::after {
+  position: absolute;
+  right: auto;
+  left: 8px;
+  bottom: -6px;
+  width: 9px;
+  height: 9px;
+  content: '';
+  border-left: 1px solid color-mix(in srgb, var(--maid-character-signal) 66%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--maid-character-signal) 66%, transparent);
+  background: inherit;
+  transform: skewY(-45deg);
+}
+
+body[data-dsh-orca-maid] .statusCharacter[data-orca-maid-status='input'],
+body[data-dsh-orca-maid] .statusCharacter[data-orca-maid-status='review'] {
+  --maid-character-signal: #8859d6;
+}
+
+body[data-dsh-orca-maid] .statusCharacter[data-orca-maid-status='approval'] {
+  --maid-character-signal: var(--maid-permission-write);
+}
+
+body[data-dsh-orca-maid] .statusCharacter[data-orca-maid-status='fault'] {
+  --maid-character-signal: #d14343;
+}
+
+body[data-dsh-orca-maid] .statusCharacter:is(
+  [data-orca-maid-status='approval'],
+  [data-orca-maid-status='input'],
+  [data-orca-maid-status='review'],
+  [data-orca-maid-status='fault']
+) .statusCharacterBubble {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+body[data-dsh-orca-maid] .statusCharacter[data-orca-maid-status='input'] [data-orca-maid-character-bubble-glyph]::before {
+  content: '...';
+  letter-spacing: 0.08em;
+}
+
+body[data-dsh-orca-maid] .statusCharacter[data-orca-maid-status='fault'] [data-orca-maid-character-bubble-glyph]::before {
+  content: '?';
+}
+
+body[data-dsh-orca-maid] .statusCharacter[data-orca-maid-status='approval'] [data-orca-maid-character-bubble-glyph] {
+  position: relative;
+  display: block;
+  width: 15px;
+  height: 17px;
+  border: 2px solid currentColor;
+  clip-path: polygon(50% 0, 100% 18%, 86% 76%, 50% 100%, 14% 76%, 0 18%);
+}
+
+body[data-dsh-orca-maid] .statusCharacter[data-orca-maid-status='approval'] [data-orca-maid-character-bubble-glyph]::before {
+  position: absolute;
+  top: 7px;
+  left: 6px;
+  width: 3px;
+  height: 6px;
+  content: '';
+  background: currentColor;
+}
+
+body[data-dsh-orca-maid] .statusCharacter[data-orca-maid-status='review'] [data-orca-maid-character-bubble-glyph] {
+  box-sizing: border-box;
+  width: 15px;
+  height: 18px;
+  border: 2px solid currentColor;
+  background: linear-gradient(currentColor, currentColor) 3px 5px / 7px 1px no-repeat,
+    linear-gradient(currentColor, currentColor) 3px 9px / 7px 1px no-repeat;
+}
+
+/* The stock wide New Session control keeps its layout slot and official
+   click handler, but its hit plane expands over the portrait stage. The rail
+   restores the visible control when collapsed. The plane is the portrait's
+   own box: the button stays static so its pseudo-elements resolve against
+   the sidebar root exactly like .statusCharacter, instead of riding the
+   button's flow slot, which the desktop hosts move (issue: hover frame and
+   portrait drifted apart and the frame covered the Plugins row). The
+   pseudo-elements carry the stacking rung the button used to hold. */
+html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] [data-orca-maid-brand] {
+  pointer-events: none;
+}
+
+html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *) {
+  position: static;
+  overflow: visible;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  color: transparent;
+}
+
+html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *) > * {
+  opacity: 0;
+  pointer-events: none;
+}
+
+html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *)::before {
+  position: absolute;
+  z-index: 2;
+  top: calc(58px + var(--maid-stage-top, 0px));
+  left: 22px;
+  width: calc(var(--maid-sidebar-art-width, 280px) - 30px);
+  height: calc(var(--maid-stage, 300px) - 66px);
+  content: '';
+  cursor: pointer;
+  opacity: 0;
+  background:
+    linear-gradient(var(--maid-blue), var(--maid-blue)) left top / 18px 1px no-repeat,
+    linear-gradient(var(--maid-blue), var(--maid-blue)) left top / 1px 18px no-repeat,
+    linear-gradient(var(--maid-blue), var(--maid-blue)) right top / 18px 1px no-repeat,
+    linear-gradient(var(--maid-blue), var(--maid-blue)) right top / 1px 18px no-repeat,
+    linear-gradient(var(--maid-blue), var(--maid-blue)) left bottom / 18px 1px no-repeat,
+    linear-gradient(var(--maid-blue), var(--maid-blue)) left bottom / 1px 18px no-repeat,
+    linear-gradient(var(--maid-blue), var(--maid-blue)) right bottom / 18px 1px no-repeat,
+    linear-gradient(var(--maid-blue), var(--maid-blue)) right bottom / 1px 18px no-repeat;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--maid-blue) 12%, transparent);
+  transition: opacity 160ms ease;
+}
+
+html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *)::after {
+  position: absolute;
+  z-index: 2;
+  /* Bottom-right corner of the plane above, 3px / 4px inside it. */
+  top: calc(58px + var(--maid-stage-top, 0px) + var(--maid-stage, 300px) - 66px - 12px);
+  left: calc(22px + var(--maid-sidebar-art-width, 280px) - 30px - 13px);
+  width: 9px;
+  height: 9px;
+  content: '';
+  background: var(--maid-blue);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  opacity: 0.36;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *):hover::before,
+html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *):focus-visible::before {
+  opacity: 0.62;
+}
+
+html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *):hover::after,
+html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *):focus-visible::after {
+  opacity: 0.92;
+  transform: translate(-2px, -2px);
+}
+
+html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *):focus-visible {
+  outline: none;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) > :first-child > button:not([data-dsh-part='sidebar-entry']) {
+  position: relative;
+  border-radius: 0;
+  clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) > :first-child > button:not([data-dsh-part='sidebar-entry']) > svg {
+  opacity: 0;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) > :first-child > button:not([data-dsh-part='sidebar-entry'])::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Painted with background layers, not border: CSS borders snap to whole
+     device pixels while the SVG icon strokes render subpixel-antialiased —
+     the same paint model here keeps the weight identical to the icon set.
+     Geometry is the 16-unit design grid at the rail's 0.875 scale: 13-unit
+     outer square, 1.5-unit (1.3px) stroke, 7-unit cross arms. */
+  box-sizing: border-box;
+  width: 11.4px;
+  height: 11.4px;
+  content: '';
+  background:
+    linear-gradient(currentColor, currentColor) left top / 11.4px 1.3px no-repeat,
+    linear-gradient(currentColor, currentColor) left bottom / 11.4px 1.3px no-repeat,
+    linear-gradient(currentColor, currentColor) left top / 1.3px 11.4px no-repeat,
+    linear-gradient(currentColor, currentColor) right top / 1.3px 11.4px no-repeat,
+    linear-gradient(currentColor, currentColor) center / 6.15px 1.3px no-repeat,
+    linear-gradient(currentColor, currentColor) center / 1.3px 6.15px no-repeat;
+  transform: translate(-50%, -50%);
+}
+
+/* Windows desktop caption controls. With `html[data-windows-titlebar]` a
+   collapsed sidebar is zero wide: the host hides the column's lists and pins
+   its toggle and New Session button into the caption row as two 28px icons
+   (ui-sidebar `.collapsed .toggle` / `.collapsed .newSession`, fixed at
+   left 12px / 48px). New Session is a direct child of the sidebar root, so
+   the stage rule above (`> :not(...) { position: relative }`) pulled it back
+   into the zero-wide, clipped column, and the wide stage's portrait hit plane
+   and transparent glyph came with it: the button vanished. The skin's
+   wide/rail flag also keeps its last non-zero value here, so a rail collapse
+   hid the toggle's glyph behind a wordmark the zero-wide column clips away.
+   Both controls take one caption treatment keyed on the host's own collapse
+   state; the host keeps position, size, hit area and no-drag. */
+html[data-windows-titlebar] body[data-dsh-orca-maid] [data-sidebar-collapsed]
+    [data-slot='sidebar'] > [class*='root'][class*='collapsed'] > button[class*='newSession'] {
+  position: fixed;
+  z-index: 30;
+  clip-path: none;
+  color: var(--dsw-alias-label-secondary);
+}
+
+html[data-windows-titlebar] body[data-dsh-orca-maid] [data-sidebar-collapsed]
+    [data-slot='sidebar'] > [class*='root'][class*='collapsed'] > button[class*='newSession'] > * {
+  opacity: 1;
+}
+
+html[data-windows-titlebar] body[data-dsh-orca-maid] [data-sidebar-collapsed]
+    [data-slot='sidebar'] > [class*='root'][class*='collapsed'] > button[class*='newSession']::before,
+html[data-windows-titlebar] body[data-dsh-orca-maid] [data-sidebar-collapsed]
+    [data-slot='sidebar'] > [class*='root'][class*='collapsed'] > button[class*='newSession']::after {
+  content: none;
+}
+
+html[data-windows-titlebar] body[data-dsh-orca-maid] [data-sidebar-collapsed]
+    [data-slot='sidebar'] > [class*='root'][class*='collapsed'] > [class*='logoRow'] > button[class*='toggle'] > svg,
+html[data-windows-titlebar] body[data-dsh-orca-maid] [data-sidebar-collapsed]
+    [data-slot='sidebar'] > [class*='root'][class*='collapsed'] > button[class*='newSession'] svg {
+  color: currentColor;
+  opacity: 1;
+}
+
+html[data-windows-titlebar] body[data-dsh-orca-maid] [data-sidebar-collapsed]
+    [data-slot='sidebar'] > [class*='root'][class*='collapsed'] > [class*='logoRow'] > button[class*='toggle']:is(:hover, :focus-visible),
+html[data-windows-titlebar] body[data-dsh-orca-maid] [data-sidebar-collapsed]
+    [data-slot='sidebar'] > [class*='root'][class*='collapsed'] > button[class*='newSession']:is(:hover, :focus-visible) {
+  background: color-mix(in srgb, var(--dsw-alias-label-secondary) 14%, transparent);
+}
+
+/* The rest of the Windows caption row follows the collapsed controls above.
+   The expanded column pins the same toggle at left 12px, but its hover was the
+   host icon button's 7% blue wash; the shell's 应用 / 编辑 menubar
+   (`[data-windows-menu]`, open shadow root) hovers with the same inherited
+   token. Both take the 14% graphite wash, and windows-menu.ts squares the
+   menubar's shadow-local 6px corner, so every caption control hovers alike. */
+html[data-windows-titlebar] body[data-dsh-orca-maid] > [data-windows-menu] {
+  --dsw-alias-interactive-bg-hover: color-mix(in srgb, var(--dsw-alias-label-secondary) 14%, transparent);
+}
+
+html[data-windows-titlebar] body[data-dsh-orca-maid]
+    [data-slot='sidebar'] > [class*='root']:not([class*='collapsed']) > [class*='logoRow'] > button[class*='toggle']:is(:hover, :focus-visible) {
+  background: color-mix(in srgb, var(--dsw-alias-label-secondary) 14%, transparent);
+}
+
+/* The Windows frame rounds the conversation column's top-left corner under
+   the caption (`--dsh-windows-content-radius`, 16px). MAID's shape contract
+   is square throughout. */
+html[data-windows-titlebar] body[data-dsh-orca-maid] [class*='centerCol'] {
+  border-radius: 0;
+}
+
+/* The stage pieces above are placed in the web sidebar's flow geometry: 6px
+   root padding, a 60px logo row and a 4px gap put New Session at 70px, so the
+   portrait, its hit plane and the first row under the stage share one seam.
+   The Windows caption frame shrinks the expanded logo row to 40px and adds an
+   8px gap above New Session, lifting every flow row 16px while the absolute
+   stage stays put: the Plugins row then slid under the portrait. The toggle
+   is pinned into the caption there, so restoring the web row keeps the rest
+   of the expanded column on the stage's seam. */
+html[data-windows-titlebar] body[data-dsh-orca-maid]
+    [data-slot='sidebar'] > [class*='root']:not([class*='collapsed']) > [class*='logoRow'] {
+  height: 60px;
+  margin-bottom: 4px;
+}
+
+html[data-windows-titlebar] body[data-dsh-orca-maid]
+    [data-slot='sidebar'] > [class*='root']:not([class*='collapsed']) > button[class*='newSession'] {
+  margin-top: 0;
+}
+
+/* macOS desktop: the host inserts a 52px draggable top strip for the system
+   close / minimize / zoom buttons and the sidebar toggle, then pulls the
+   logo row up by 12px (after the root's 6px padding): every flow row sits
+   34px lower. Move the absolute stage with it so the wordmark, pricing light
+   and scan line stay clear of the system buttons. The strip itself is the
+   root's first child there, so the wordmark scan line re-anchors to it. */
+html[data-platform='darwin'] body[data-dsh-orca-maid] {
+  --maid-stage-top: 34px;
+}
+
+html[data-platform='darwin'] body[data-dsh-orca-maid]
+    [data-slot='sidebar'] > :first-child > [class*='topStrip']:first-child::after {
+  top: calc(21px + var(--maid-stage-top));
+}
+
+/* On macOS the host brand is a plain span in the logo row, not the tagged
+   brand button of the web shell, so MAID's replacement wordmark would print
+   over "deepseek HARNESS". It has no action there; hide it in place. */
+html[data-platform='darwin'] body[data-dsh-orca-maid]
+    [data-slot='sidebar'] > :first-child > [class*='logoRow'] > [class*='brand'] {
+  visibility: hidden;
+}
+
+/* Official rail tooltips are rendered beside their anchors instead of through
+   a portal. Release only their collapsed-rail ancestor chain so fixed bubbles
+   can leave the 36px action cell and the 55px sidebar shell. */
+body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) > :first-child,
+body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) [class*='regionArea'],
+body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) [class*='sectionHeader'],
+body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) [class*='headerActions'] {
+  overflow: visible;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) [role='tooltip'] {
+  z-index: var(--maid-z-tooltip);
+}
+
+/* Alt+Tab may restore both the pointer hit and the previously focused
+   workspace control. Keep stale sidebar tooltips hidden until the user makes
+   a fresh pointer or keyboard gesture; keyboard focus behavior then resumes. */
+body[data-dsh-orca-maid][data-maid-window-resuming] [data-slot='sidebar'] [role='tooltip'] {
+  display: none;
+}
+
+/* Vertical identity label riding the stage's left edge (White Route language). */
+body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] :is([data-slot='sidebar'] > :first-child)::after {
+  content: 'ORCA MAID';
+  position: absolute;
+  z-index: 1;
+  top: calc(var(--maid-stage-top, 0px) + 76px + (var(--maid-stage, 300px) - 76px) / 2);
+  left: 9px;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  font: 600 8px/1 ui-monospace, "SFMono-Regular", Consolas, monospace;
+  letter-spacing: 0.42em;
+  color: var(--maid-muted);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+  pointer-events: none;
+}
+
+/* The browsing region becomes a frosted glass panel pushed below the stage:
+   the art never fights the session list for readability. The production
+   shell measures 120px from the pane top to the region's normal position. */
+body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] [class*='regionArea'] {
+  isolation: isolate;
+  margin-top: calc(var(--maid-stage, 300px) - 120px);
+  border-top: 1px solid var(--maid-line);
+  background: transparent;
+  backdrop-filter: none;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] [class*='regionArea']::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  background: rgba(253, 250, 244, 0.9);
+  backdrop-filter: blur(10px) saturate(1.03);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] :is([data-slot='sidebar'] > :first-child) {
+  background-color: rgba(8, 12, 19, 0.88);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] :is([data-slot='sidebar'] > :first-child)::before {
+  background-image:
+    linear-gradient(180deg, rgba(8, 12, 19, 0.68) 0%, rgba(8, 12, 19, 0.08) 76px),
+    linear-gradient(180deg,
+      rgba(8, 12, 19, 0.28) 0,
+      rgba(8, 12, 19, 0.34) calc(var(--maid-stage, 300px) - 1px),
+      rgba(8, 12, 19, 0.92) var(--maid-stage, 300px),
+      rgba(8, 12, 19, 0.95) 100%),
+    repeating-linear-gradient(90deg, rgba(180, 199, 226, 0.2) 0 1px, transparent 1px 7px);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] .statusCharacterBubble {
+  background: color-mix(in srgb, var(--maid-character-signal) 12%, rgba(12, 18, 27, 0.96));
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='sidebar'][data-maid-sidebar-wide] :is([data-slot='sidebar'] > :first-child)::after {
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='sidebar'][data-maid-sidebar-wide] [class*='regionArea']::before {
+  background: rgba(10, 15, 23, 0.88);
+}
+
+/* Settings is a thin-edged instrument row, not a rounded hover pill. */
+body[data-dsh-orca-maid] [data-slot='sidebar'] button[aria-haspopup='dialog'] {
+  position: relative;
+  border: 1px solid transparent;
+  border-radius: 0;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] button[aria-haspopup='dialog']::after {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 7px;
+  height: 7px;
+  content: '';
+  border-top: 1px solid var(--maid-blue);
+  border-right: 1px solid var(--maid-blue);
+  opacity: 0;
+  transform: translate(-3px, 3px);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] button[aria-haspopup='dialog']:hover {
+  border-color: color-mix(in srgb, var(--maid-blue) 28%, transparent);
+  background: color-mix(in srgb, var(--maid-blue) 5.5%, transparent);
+  box-shadow: inset 2px 0 0 var(--maid-blue);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] button[aria-haspopup='dialog']:hover::after,
+body[data-dsh-orca-maid] [data-slot='sidebar'] button[aria-haspopup='dialog']:focus-visible::after {
+  opacity: 0.72;
+  transform: translate(0, 0);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) button[aria-haspopup='dialog']::after {
+  top: auto;
+  right: 3px;
+  bottom: 3px;
+  width: 6px;
+  height: 6px;
+  border: none;
+  background: var(--maid-blue);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+/* Workspace/session browser: workspaces are quiet chapter rows and sessions
+   are compact entries on one structural guide. The hierarchy comes from
+   spacing, type, and one selected rail rather than a stack of rounded cards. */
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree'] {
+  --maid-tree-guide: rgba(43, 55, 72, 0.16);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='sidebar'] [role='tree'] {
+  --maid-tree-guide: rgba(180, 199, 226, 0.18);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree'] > div[data-maid-workspace-group] {
+  position: relative;
+  padding: 3px 0 5px;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree'] > div[data-maid-workspace-group]
+  + div[data-maid-workspace-group] {
+  margin-top: 2px;
+  border-top: 1px solid color-mix(in srgb, var(--maid-tree-guide) 72%, transparent);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree'] > div[data-maid-workspace-selectable]::before {
+  position: absolute;
+  z-index: 0;
+  top: 41px;
+  bottom: 7px;
+  left: 11px;
+  width: 1px;
+  content: '';
+  background: var(--maid-tree-guide);
+  pointer-events: none;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'] {
+  text-shadow: none;
+}
+
+/* Workspace chapter row: collapse the stock two-line 54px cell into a quiet
+   single-line index row while retaining its folder, count, menus, and toggle. */
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded] {
+  position: relative;
+  box-sizing: border-box;
+  height: 38px;
+  min-height: 38px;
+  padding: 0 8px;
+  align-items: center;
+  border-radius: 0;
+  background: transparent;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded]::before {
+  position: absolute;
+  left: 0;
+  content: '';
+  pointer-events: none;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='true'] {
+  border-left: 2px solid color-mix(in srgb, var(--maid-graphite) 34%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--maid-graphite) 6%, transparent), transparent 68%);
+  color: var(--maid-ink);
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--maid-graphite) 10%, transparent);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='true']::before {
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: color-mix(in srgb, var(--maid-graphite) 48%, transparent);
+  box-shadow: 3px 0 0 color-mix(in srgb, var(--maid-graphite) 12%, transparent);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='false'] {
+  border-left: 1px solid color-mix(in srgb, var(--maid-graphite) 18%, transparent);
+  color: color-mix(in srgb, var(--maid-graphite) 76%, var(--maid-muted));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--maid-graphite) 3%, transparent), transparent 58%);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='false']::before {
+  top: 16px;
+  width: 5px;
+  height: 5px;
+  border: 1px solid color-mix(in srgb, var(--maid-muted) 58%, transparent);
+  background: var(--maid-surface-strong);
+  transform: translateX(-3px);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='true']
+  svg[data-orca-maid-icon='folder-open'] {
+  color: color-mix(in srgb, var(--maid-graphite) 82%, var(--maid-muted));
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='false']
+  svg[data-orca-maid-icon='folder-closed'] {
+  color: var(--maid-muted);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded]
+  > span:nth-child(3) {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded]
+  > span:nth-child(3) > span:first-child {
+  font-weight: 600;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='true']
+  > span:nth-child(3) > span:first-child {
+  font-weight: 700;
+  letter-spacing: 0.015em;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='false']
+  > span:nth-child(3) > span:first-child {
+  font-weight: 500;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded]
+  > span:nth-child(3) > span:nth-child(2) {
+  flex: none;
+  margin-left: auto;
+  letter-spacing: 0.04em;
+  font: 500 10px/1 ui-monospace, "SFMono-Regular", Consolas, monospace;
+  color: var(--maid-muted);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded]:hover {
+  background: color-mix(in srgb, var(--maid-blue) 5.5%, transparent);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree']
+  > div[data-maid-workspace-current]
+  [role='treeitem'][aria-expanded] {
+  border-left-color: var(--maid-blue);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--maid-blue) 15%, transparent), color-mix(in srgb, var(--maid-blue) 3.5%, transparent) 72%, transparent);
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--maid-blue) 20%, transparent);
+}
+
+/* Folder geometry communicates open/closed; blue communicates the current
+   workspace. The small square is deliberately independent from the open
+   folder glyph, so an expanded inactive workspace cannot read as selected. */
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree']
+  > div[data-maid-workspace-current]
+  [role='treeitem'][aria-expanded]::before {
+  background: var(--maid-blue);
+  box-shadow: 3px 0 0 color-mix(in srgb, var(--maid-blue) 20%, transparent);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree']
+  > div[data-maid-workspace-current]
+  [role='treeitem'][aria-expanded]::after {
+  position: absolute;
+  top: 16px;
+  left: -1px;
+  width: 5px;
+  height: 5px;
+  content: '';
+  background: var(--maid-blue);
+  box-shadow: 3px 0 0 color-mix(in srgb, var(--maid-blue) 22%, transparent);
+  pointer-events: none;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree']
+  > div[data-maid-workspace-current]
+  [role='treeitem'][aria-expanded]
+  svg[data-orca-maid-icon^='folder-'] {
+  color: var(--maid-blue);
+}
+
+/* Session entry: keep the stock status slot and hover actions, but indent the
+   row from the workspace guide and reserve a stable right-aligned time cell. */
+body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selected] {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: calc(100% - 18px);
+  height: 34px;
+  margin-left: 18px;
+  padding: 0 7px 0 9px;
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selected]::before {
+  position: absolute;
+  top: 50%;
+  left: -7px;
+  width: 7px;
+  height: 1px;
+  content: '';
+  background: var(--maid-tree-guide);
+  pointer-events: none;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selected] > span:nth-child(2) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selected]
+  > span:nth-child(3):not(:has(button)) {
+  flex: 0 0 44px;
+  margin-left: auto;
+  text-align: right;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 11px;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selected]:hover {
+  background: color-mix(in srgb, var(--maid-blue) 5.5%, transparent);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selected='true'] {
+  background: color-mix(in srgb, var(--maid-blue) 10%, transparent);
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selected='true']::after {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 0;
+  width: 2px;
+  content: '';
+  background: var(--maid-blue);
+  pointer-events: none;
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='sidebar'] [role='treeitem'][aria-expanded]:hover {
+  background: rgba(77, 145, 255, 0.09);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='sidebar'] [role='tree']
+  > div[data-maid-workspace-current]
+  [role='treeitem'][aria-expanded] {
+  background: linear-gradient(90deg, rgba(77, 145, 255, 0.2), rgba(77, 145, 255, 0.06) 72%, transparent);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='sidebar'] div[role='treeitem'][aria-selected]:hover {
+  background: rgba(77, 145, 255, 0.09);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='sidebar'] div[role='treeitem'][aria-selected='true'] {
+  background: rgba(77, 145, 255, 0.16);
+}
+
+body[data-dsh-orca-maid]
+  :where(button, input, textarea, select, [role='dialog'], [role='menu']):not(
+    [data-slot='conversation.input.left'] *,
+    [data-slot='conversation.input.right'] *,
+    [data-slot='sidebar.footer.action'] *,
+    [data-slot='settings.section'] *
+  ) {
+  border-color: var(--maid-line);
+}
+
+body[data-dsh-orca-maid] :where(input, textarea, select):not(
+    [data-slot='conversation.input.left'] *,
+    [data-slot='conversation.input.right'] *,
+    [data-slot='sidebar.footer.action'] *,
+    [data-slot='settings.section'] *
+  ) {
+  background-color: var(--dsw-specific-input-major);
+  color: var(--maid-ink);
+  -webkit-text-fill-color: var(--maid-ink);
+  caret-color: var(--maid-blue);
+}
+
+body[data-dsh-orca-maid] [data-composer-card] :is(input, textarea, [data-composer-input]) {
+  background-color: transparent;
+}
+
+body[data-dsh-orca-maid] [data-composer-card] [data-composer-input] {
+  color: var(--maid-ink);
+  caret-color: var(--maid-blue);
+}
+
+body[data-dsh-orca-maid] :where(input, textarea):not(
+    [data-slot='conversation.input.left'] *,
+    [data-slot='conversation.input.right'] *,
+    [data-slot='sidebar.footer.action'] *,
+    [data-slot='settings.section'] *
+  )::placeholder {
+  color: color-mix(in srgb, var(--maid-muted) 62%, var(--maid-surface-strong));
+  -webkit-text-fill-color: color-mix(in srgb, var(--maid-muted) 62%, var(--maid-surface-strong));
+  opacity: 1;
+}
+
+body[data-dsh-orca-maid] :where(input, textarea, select):focus:not(
+    [data-slot='conversation.input.left'] *,
+    [data-slot='conversation.input.right'] *,
+    [data-slot='sidebar.footer.action'] *,
+    [data-slot='settings.section'] *
+  ),
+body[data-dsh-orca-maid] [data-composer-card]:focus-within {
+  background-color: var(--dsw-input-solid);
+}
+
+body[data-dsh-orca-maid] :where(button, [role='button']):not(
+    [data-slot='conversation.input.left'] *,
+    [data-slot='conversation.input.right'] *,
+    [data-slot='sidebar.footer.action'] *,
+    [data-slot='settings.section'] *
+  ) {
+  transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+body[data-dsh-orca-maid] :where(button:hover:not(:disabled), [role='button']:hover):not(
+    [data-slot='conversation.input.left'] *,
+    [data-slot='conversation.input.right'] *,
+    [data-slot='sidebar.footer.action'] *,
+    [data-slot='settings.section'] *
+  ) {
+  border-color: color-mix(in srgb, var(--maid-blue) 34%, transparent);
+}
+
+body[data-dsh-orca-maid] :focus-visible:not(
+    [data-slot='conversation.input.left'] *,
+    [data-slot='conversation.input.right'] *,
+    [data-slot='sidebar.footer.action'] *,
+    [data-slot='settings.section'] *
+  ) {
+  outline: 2px solid var(--maid-blue);
+  outline-offset: 2px;
+}
+
+/* The official question composer owns focus at the answer-row level. MAID's
+   generic accessibility outline would otherwise override its outline:none
+   input and draw the saturated blue rectangle inside that row. Keep the
+   keyboard cue, but move it to the rectilinear row with a calmer signal. */
+body[data-dsh-orca-maid] [data-question-key] :is(input, textarea):focus-visible {
+  outline: none;
+}
+
+body[data-dsh-orca-maid] [data-question-key] :has(> input:focus) {
+  border-color: var(--maid-question-focus);
+  box-shadow:
+    inset 3px 0 0 var(--maid-question-focus),
+    inset 0 0 0 1px var(--maid-question-focus-wash);
+}
+
+/* Inline answers keep the host's zero padding: `.field` shares one grid cell
+   between the mirror and the textarea, so text starts at the row's inner edge.
+   A bar drawn on the textarea itself therefore covers the first glyph. Draw it
+   on the row/block chrome instead — their own padding holds the indicator. */
+body[data-dsh-orca-maid] [data-question-key] :is([class*='_customRow'], [class*='_customBlock']):focus-within {
+  border-color: var(--maid-question-focus);
+  box-shadow:
+    inset 3px 0 0 var(--maid-question-focus),
+    inset 0 0 0 1px var(--maid-question-focus-wash);
+}
+
+body[data-dsh-orca-maid] [data-question-key] textarea:focus {
+  caret-color: var(--maid-question-focus);
+}
+
+/* The official question/plan-review/approval cards and the todo panel live
+   outside [data-chat-flow], so their section cards and span chips miss the
+   MAID shape contract. Square the cards, option index chips, custom rows,
+   checkbox glyphs, status dots and the recommendation badge. */
+body[data-dsh-orca-maid] [data-question-key] [class*='_card'],
+body[data-dsh-orca-maid] [data-plan-review-key] [class*='_card'],
+body[data-dsh-orca-maid] [data-approval-key] [class*='_card'],
+body[data-dsh-orca-maid] [data-testid='todo-panel'] {
+  border-radius: 0 !important;
+}
+
+body[data-dsh-orca-maid] [data-question-key] [class*='_number'],
+body[data-dsh-orca-maid] [data-question-key] [class*='_customRow'],
+body[data-dsh-orca-maid] [data-question-key] [class*='_badge'],
+body[data-dsh-orca-maid] [data-plan-review-key] [class*='_dot'],
+body[data-dsh-orca-maid] [data-approval-key] [class*='_dot'],
+body[data-dsh-orca-maid] [data-queue-dock] [class*='_panel'],
+body[data-dsh-orca-maid] [data-queue-dock] [class*='_row'],
+body[data-dsh-orca-maid] [data-composer-card] [class*='_notice']:not(
+    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *),
+body[data-dsh-orca-maid] [data-composer-card] [class*='_chip']:not(
+    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *),
+body[data-dsh-orca-maid] [data-composer-card] [class*='_hlSegment']:not(
+    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *),
+body[data-dsh-orca-maid] [data-composer-card] [class*='_pending']:not(
+    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *),
+body[data-dsh-orca-maid] [data-composer-card] [class*='_panel']:not(
+    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *),
+body[data-dsh-orca-maid] [data-composer-card] [class*='_bar']:not(
+    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *),
+body[data-dsh-orca-maid] [data-composer-card] [class*='_segment']:not(
+    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *),
+body[data-dsh-orca-maid] [data-composer-card] [class*='_swatch']:not(
+    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *) {
+  border-radius: 0 !important;
+}
+
+body[data-dsh-orca-maid] [data-question-key] [class*='_checkbox']::before {
+  border-radius: 0 !important;
+}
+
+/* Todo glyphs. DSH 0.1.7 draws each todo state with the shared StateDot (a
+   round dot, or a rotating ring while in progress) inside
+   `li[data-status] > .glyph`, so the SVG-path redraws in icons.ts that used
+   to catch the old todo icons no longer match anything. Hide the dot and
+   paint MAID's straight-line set on the glyph box itself, keyed on the host's
+   status attribute: corner brackets while pending, a ticked frame when done,
+   and in progress the context-usage pixel field, whose cells fill bottom-up
+   on a stepped 2.4s cycle (one 16px pseudo-element, clip-path steps only). */
+body[data-dsh-orca-maid] [data-testid='todo-panel'] li[data-status] > [class*='_glyph'] {
+  position: relative;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+body[data-dsh-orca-maid] [data-testid='todo-panel'] li[data-status] > [class*='_glyph'] > * {
+  display: none;
+}
+
+body[data-dsh-orca-maid] [data-testid='todo-panel'] li[data-status] > [class*='_glyph']::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='square' stroke-linejoin='miter'%3E%3Cpath d='M2.25 6V2.25H6M10 2.25h3.75V6M13.75 10v3.75H10M6 13.75H2.25V10'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='square' stroke-linejoin='miter'%3E%3Cpath d='M2.25 6V2.25H6M10 2.25h3.75V6M13.75 10v3.75H10M6 13.75H2.25V10'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+}
+
+body[data-dsh-orca-maid] [data-testid='todo-panel'] li[data-status='completed'] > [class*='_glyph'] {
+  color: var(--dsw-alias-label-secondary);
+}
+
+body[data-dsh-orca-maid] [data-testid='todo-panel'] li[data-status='completed'] > [class*='_glyph']::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='square' stroke-linejoin='miter'%3E%3Cpath d='M2.25 2.25h11.5v11.5H2.25z'/%3E%3Cpath d='M4.75 8.25 7 10.5l4.5-5'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='square' stroke-linejoin='miter'%3E%3Cpath d='M2.25 2.25h11.5v11.5H2.25z'/%3E%3Cpath d='M4.75 8.25 7 10.5l4.5-5'/%3E%3C/svg%3E");
+}
+
+body[data-dsh-orca-maid] [data-testid='todo-panel'] li[data-status='in_progress'] > [class*='_glyph'] {
+  color: var(--maid-blue);
+}
+
+body[data-dsh-orca-maid] [data-testid='todo-panel'] li[data-status='in_progress'] > [class*='_glyph']::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='square' stroke-linejoin='miter'%3E%3Cpath d='M2.25 2.25h11.5v11.5H2.25z'/%3E%3Crect x='4' y='10' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='7' y='10' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='10' y='10' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='4' y='7' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='7' y='7' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='10' y='7' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='4' y='4' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='7' y='4' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='10' y='4' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='square' stroke-linejoin='miter'%3E%3Cpath d='M2.25 2.25h11.5v11.5H2.25z'/%3E%3Crect x='4' y='10' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='7' y='10' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='10' y='10' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='4' y='7' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='7' y='7' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='10' y='7' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='4' y='4' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='7' y='4' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3Crect x='10' y='4' width='2' height='2' fill='black' fill-opacity='0.12' stroke='none'/%3E%3C/svg%3E");
+}
+
+body[data-dsh-orca-maid] [data-testid='todo-panel'] li[data-status='in_progress'] > [class*='_glyph']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='square' stroke-linejoin='miter'%3E%3Crect x='4' y='10' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='7' y='10' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='10' y='10' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='4' y='7' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='7' y='7' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='10' y='7' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='4' y='4' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='7' y='4' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='10' y='4' width='2' height='2' fill='black' stroke='none'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='square' stroke-linejoin='miter'%3E%3Crect x='4' y='10' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='7' y='10' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='10' y='10' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='4' y='7' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='7' y='7' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='10' y='7' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='4' y='4' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='7' y='4' width='2' height='2' fill='black' stroke='none'/%3E%3Crect x='10' y='4' width='2' height='2' fill='black' stroke='none'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+  clip-path: polygon(3.5px 12.5px, 12.5px 12.5px, 12.5px 12.5px, 3.5px 12.5px, 3.5px 9.5px, 3.5px 9.5px);
+  animation: maidTodoFill 2.4s step-end infinite;
+}
+
+@keyframes maidTodoFill {
+  0% { clip-path: polygon(3.5px 12.5px, 12.5px 12.5px, 12.5px 12.5px, 3.5px 12.5px, 3.5px 9.5px, 3.5px 9.5px); }
+  8% { clip-path: polygon(3.5px 12.5px, 12.5px 12.5px, 12.5px 12.5px, 6.5px 12.5px, 6.5px 9.5px, 3.5px 9.5px); }
+  16% { clip-path: polygon(3.5px 12.5px, 12.5px 12.5px, 12.5px 12.5px, 9.5px 12.5px, 9.5px 9.5px, 3.5px 9.5px); }
+  24% { clip-path: polygon(3.5px 12.5px, 12.5px 12.5px, 12.5px 9.5px, 3.5px 9.5px, 3.5px 6.5px, 3.5px 6.5px); }
+  32% { clip-path: polygon(3.5px 12.5px, 12.5px 12.5px, 12.5px 9.5px, 6.5px 9.5px, 6.5px 6.5px, 3.5px 6.5px); }
+  40% { clip-path: polygon(3.5px 12.5px, 12.5px 12.5px, 12.5px 9.5px, 9.5px 9.5px, 9.5px 6.5px, 3.5px 6.5px); }
+  48% { clip-path: polygon(3.5px 12.5px, 12.5px 12.5px, 12.5px 6.5px, 3.5px 6.5px, 3.5px 3.5px, 3.5px 3.5px); }
+  56% { clip-path: polygon(3.5px 12.5px, 12.5px 12.5px, 12.5px 6.5px, 6.5px 6.5px, 6.5px 3.5px, 3.5px 3.5px); }
+  64% { clip-path: polygon(3.5px 12.5px, 12.5px 12.5px, 12.5px 6.5px, 9.5px 6.5px, 9.5px 3.5px, 3.5px 3.5px); }
+  72% { clip-path: polygon(3.5px 12.5px, 12.5px 12.5px, 12.5px 3.5px, 3.5px 3.5px, 3.5px 0.5px, 3.5px 0.5px); }
+  90% { clip-path: polygon(3.5px 12.5px, 12.5px 12.5px, 12.5px 12.5px, 3.5px 12.5px, 3.5px 9.5px, 3.5px 9.5px); }
+  100% { clip-path: polygon(3.5px 12.5px, 12.5px 12.5px, 12.5px 12.5px, 3.5px 12.5px, 3.5px 9.5px, 3.5px 9.5px); }
+}
+
+/* Recommendation badge: the host dark palette would fill and ink the tag with
+   the same electric blue (#4d91ff on #4d91ff). Keep the accent fill and switch
+   the dark label to inverted brand ink; the light theme keeps its host pair,
+   which already separates beige fill from graphite ink. */
+body[data-dsh-orca-maid][data-ds-dark-theme] [data-question-key] [class*='_badge'] {
+  background: var(--dsw-specific-sidebar-nav-item-active-accent);
+  color: var(--dsw-alias-brand-primary-invert);
+}
+
+body[data-dsh-orca-maid]::selection { color: #fff; background: var(--maid-blue); }
+body[data-dsh-orca-maid] ::-webkit-scrollbar { width: 9px; height: 9px; }
+body[data-dsh-orca-maid] ::-webkit-scrollbar-track { background: transparent; }
+body[data-dsh-orca-maid] ::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 0;
+  background: rgba(87, 101, 121, 0.35);
+  background-clip: padding-box;
+}
+body[data-dsh-orca-maid] ::-webkit-scrollbar-thumb:hover { background-color: var(--maid-blue); }
+
+/* Signal chip riding the sidebar logo row, right of the replacement wordmark. */
+body[data-dsh-orca-maid] .signalChip {
+  --maid-signal-color: var(--maid-cyan);
+  --maid-signal-wash: color-mix(in srgb, var(--maid-signal-color) 8%, transparent);
+  position: absolute; z-index: 1; top: 50%; left: 136px;
+  transform: translateY(-50%);
+  display: flex; align-items: center; gap: 7px;
+  box-sizing: border-box;
+  min-height: 18px;
+  padding: 4px 7px 4px 6px;
+  border-left: 1px solid color-mix(in srgb, var(--maid-signal-color) 52%, transparent);
+  background: linear-gradient(90deg, var(--maid-signal-wash), transparent 90%);
+  color: color-mix(in srgb, var(--maid-signal-color) 70%, var(--maid-graphite));
+  white-space: nowrap; pointer-events: none;
+  font: 600 8px/1 ui-monospace, "SFMono-Regular", Consolas, monospace;
+  letter-spacing: 0.2em;
+  opacity: 0;
+  transition: opacity 220ms ease 90ms, color 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] .signalChip { opacity: 1; }
+body[data-dsh-orca-maid] .signalDot {
+  width: 6px; height: 6px; border-radius: 0;
+  flex: 0 0 6px;
+  background: var(--maid-signal-color);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--maid-signal-color) 70%, transparent);
+  animation: maidSignalPulse 2.6s ease-in-out infinite;
+}
+
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='syncing'],
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='working'] {
+  --maid-signal-color: var(--maid-blue);
+}
+
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='approval'] {
+  --maid-signal-color: var(--maid-permission-write);
+}
+
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='input'],
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='review'] {
+  --maid-signal-color: #8859d6;
+}
+
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='complete'] {
+  --maid-signal-color: #238a58;
+}
+
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='fault'] {
+  --maid-signal-color: #d14343;
+}
+
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='offline'] {
+  --maid-signal-color: #798394;
+}
+
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='ready'] {
+  --maid-signal-color: #5483a8;
+}
+
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='working'] .signalDot {
+  animation: maidSignalWork 920ms steps(2, end) infinite;
+}
+
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='approval'] .signalDot,
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='input'] .signalDot,
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='review'] .signalDot {
+  animation-duration: 740ms;
+}
+
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='complete'] .signalDot,
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='fault'] .signalDot,
+body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='offline'] .signalDot {
+  animation: none;
+}
+
+@keyframes maidSignalWork {
+  0%, 100% { opacity: 1; transform: scaleX(1); }
+  50% { opacity: 0.38; transform: scaleX(0.5); }
+}
+/* Opacity only: the dot's static glow fades with it. Animating box-shadow
+   here repainted the chip on every frame for as long as the sidebar was
+   wide, i.e. all the time; an opacity animation stays on the compositor. */
+@keyframes maidSignalPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* Pricing traffic light under the DSH wordmark: three lamps mirror the
+   DeepSeek peak/valley schedule (Beijing time). Red = peak, amber = the
+   20 minutes before valley switches to peak (early warning), green = valley
+   (half price; weekends run green all day at the flat valley rate). JS only
+   flips one data attribute per band; the active lamp, glow and label color
+   all ride --maid-price-signal. The unit stays visible on both the collapsed
+   rail and the expanded sidebar. On the collapsed rail the wordmark itself
+   rides the expand button, so the light parks in the seam directly below
+   that button, centered on the rail (still under the DSH mark, but clear of
+   every button's hit plane); hover stays disabled there so the rail keeps
+   its quiet glance-only behavior. The expanded sidebar parks it in the strip
+   right under the full wordmark, above the operator stage and the session
+   region, and restores the hover detail card. */
+body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > .pricingLight {
+  --maid-price-signal: #238a58;
+  --maid-price-glow: rgba(35, 138, 88, 0.72);
+  position: absolute;
+  z-index: 2;
+  top: calc(55px + var(--maid-stage-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 3px;
+  box-sizing: border-box;
+  width: auto;
+  padding: 1px 4px;
+  border: 1px solid color-mix(in srgb, var(--maid-price-signal) 42%, var(--maid-line));
+  background: color-mix(in srgb, var(--maid-price-signal) 7%, var(--maid-surface-strong));
+  box-shadow: 0 5px 12px rgba(27, 39, 58, 0.14);
+  color: var(--maid-price-signal);
+  font: 700 6px/1 ui-monospace, "SFMono-Regular", Consolas, monospace;
+  letter-spacing: 0.04em;
+  text-align: center;
+  cursor: default;
+  transition:
+    top 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+  will-change: transform, opacity;
+}
+
+body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > .pricingLight {
+  top: calc(46px + var(--maid-stage-top, 0px));
+  left: 4px;
+  transform: none;
+  gap: 4px;
+  padding: 1px 5px;
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  cursor: help;
+}
+
+/* Band rules must repeat the base selector chain: the base rule declares the
+   signal vars on the light element itself, and its specificity (0,4,1) would
+   otherwise beat a bare .pricingLight[data-orca-maid-price=...] rule (0,3,1),
+   freezing text/border/glow on the valley green while only the lamps moved. */
+body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > .pricingLight[data-orca-maid-price='high'] {
+  --maid-price-signal: #d14343;
+  --maid-price-glow: rgba(209, 67, 67, 0.72);
+}
+body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > .pricingLight[data-orca-maid-price='transition'] {
+  --maid-price-signal: #dfa02b;
+  --maid-price-glow: rgba(223, 160, 43, 0.8);
+}
+body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > .pricingLight[data-orca-maid-price='low'] {
+  --maid-price-signal: #238a58;
+  --maid-price-glow: rgba(35, 138, 88, 0.72);
+}
+
+/* DeepSeek's peak/valley schedule prices DeepSeek models only; pricing-light.ts
+   flags the light while the composer has another provider's model selected. */
+body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > .pricingLight[data-orca-maid-price-other-model] {
+  display: none;
+}
+
+/* Windows desktop: a collapsed sidebar is zero wide, so the light would be
+   clipped away with the column. Seat it in the caption row right after the
+   host's pinned toggle and New Session icons (left 12px / 48px, 28px each);
+   the caption menubar steps aside by the light's fixed width plus the same
+   8px gap. Glance-only like the web rail: no hover card, and pointer events
+   fall through to the caption drag strip. Keyed on the host's collapse state
+   so the stale wide/rail skin flag cannot restyle it. */
+html[data-windows-titlebar] body[data-dsh-orca-maid] [data-sidebar-collapsed]
+    [data-slot='sidebar'] > [class*='root'][class*='collapsed'] > .pricingLight {
+  position: fixed;
+  z-index: 30;
+  top: calc((var(--dsh-windows-titlebar-height, 40px) - 20px) / 2);
+  left: 84px;
+  justify-content: center;
+  gap: 4px;
+  width: 52px;
+  height: 20px;
+  padding: 0 5px;
+  transform: none;
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  transition: none;
+}
+
+html[data-windows-titlebar] body[data-dsh-orca-maid] [data-sidebar-collapsed]
+    [data-slot='sidebar'] > [class*='root'][class*='collapsed'] > .pricingLight .pricingLamp {
+  width: 5px;
+  height: 5px;
+}
+
+html[data-windows-titlebar] body[data-dsh-orca-maid][data-maid-price-caption] > [data-windows-menu] {
+  margin-left: 60px;
+}
+
+body[data-dsh-orca-maid] .pricingHousing {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+}
+body[data-dsh-orca-maid] .pricingLamp {
+  box-sizing: border-box;
+  width: 4px;
+  height: 4px;
+  border: 1px solid var(--maid-line);
+  border-radius: 0;
+  background: transparent;
+  opacity: 0.3;
+  transition: opacity 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] .pricingLamp {
+  width: 5px;
+  height: 5px;
+}
+body[data-dsh-orca-maid] .pricingLampRed { --maid-lamp-color: #d14343; }
+body[data-dsh-orca-maid] .pricingLampAmber { --maid-lamp-color: #dfa02b; }
+body[data-dsh-orca-maid] .pricingLampGreen { --maid-lamp-color: #238a58; }
+body[data-dsh-orca-maid] .pricingLight[data-orca-maid-price='high'] .pricingLampRed,
+body[data-dsh-orca-maid] .pricingLight[data-orca-maid-price='transition'] .pricingLampAmber,
+body[data-dsh-orca-maid] .pricingLight[data-orca-maid-price='low'] .pricingLampGreen {
+  border-color: var(--maid-lamp-color);
+  background: var(--maid-lamp-color);
+  box-shadow: 0 0 8px var(--maid-price-glow);
+  opacity: 1;
+}
+/* The amber lamp blinks like a real traffic light during the 20-minute early
+   warning, then hands the glow to the red lamp exactly at 09:00 / 14:00. */
+body[data-dsh-orca-maid] .pricingLight[data-orca-maid-price='transition'] .pricingLampAmber {
+  animation: maidPricePulse 1.3s ease-in-out infinite;
+}
+@keyframes maidPricePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+body[data-dsh-orca-maid] .pricingLabel {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Hover detail card. The card is a descendant of the light, so :hover on the
+   light stays true while the pointer reads the card; the top padding doubles
+   as the visual gap so the pointer never crosses a dead zone. */
+body[data-dsh-orca-maid] .pricingTooltip {
+  position: absolute;
+  z-index: 4;
+  top: 100%;
+  left: 0;
+  display: grid;
+  gap: 4px;
+  box-sizing: border-box;
+  width: 226px;
+  padding: 9px 9px 9px;
+  border: 1px solid var(--maid-line);
+  border-radius: 0;
+  background: var(--maid-surface-strong);
+  box-shadow: var(--maid-shadow);
+  color: var(--maid-graphite);
+  font: 600 9px/1.55 ui-monospace, "SFMono-Regular", Consolas, monospace;
+  letter-spacing: 0.02em;
+  text-align: left;
+  white-space: normal;
+  cursor: default;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 140ms ease, transform 140ms ease, visibility 0s linear 140ms;
+}
+/* The detail card opens on hover only in the expanded sidebar; the collapsed
+   rail keeps the light glance-only (no hover surface, default cursor). */
+body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] .pricingLight:hover .pricingTooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity 140ms ease 70ms, transform 140ms ease 70ms, visibility 0s linear 0s;
+}
+body[data-dsh-orca-maid] .pricingTooltipTitle {
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--maid-line);
+  color: var(--maid-muted);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+}
+body[data-dsh-orca-maid] .pricingTooltipRow {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 8px;
+}
+body[data-dsh-orca-maid] .pricingTooltipKey {
+  color: var(--maid-muted);
+  font-weight: 600;
+}
+body[data-dsh-orca-maid] .pricingTooltipValue {
+  color: var(--maid-ink);
+  font-weight: 700;
+}
+
+/* Sidebar seam ruler: a tick strip centered on the column boundary replaces
+   the old metal bar — mechanism through precision, not mass. */
+body[data-dsh-orca-maid] .spine {
+  position: fixed; top: 0; bottom: 0; left: 0;
+  z-index: 850; width: 9px;
+  /* Positioned by transform, not `left`: a compositor-only move that the
+     track clock can ease in step with the pane edge. A drag writes an inline
+     transform per pointer frame and drops the easing (see below). */
+  transform: translateX(calc(var(--maid-sidebar-width) - 4px));
+  transition: transform var(--maid-track-duration) var(--maid-track-ease);
+  will-change: transform;
+  pointer-events: none;
+  background: repeating-linear-gradient(180deg, var(--maid-line) 0 1px, transparent 1px 56px);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 56px, #000 calc(100% - 56px), transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 56px, #000 calc(100% - 56px), transparent);
+}
+
+/* Dragging the sidebar handle writes widths at pointer cadence; easing them
+   would detach the seam from the handle. */
+body[data-dsh-orca-maid][data-maid-sidebar-dragging] .spine { transition: none; }
+
+/* The seam is decorative in constrained layouts; retiring it avoids moving a
+   body-level fixed layer alongside the AppFrame track transition. */
+@media (max-width: 1099px) {
+  body[data-dsh-orca-maid] .spine { display: none; }
+}
+
+/* ---- Hero橱窗：空态是皮肤的展示窗口 -------------------------------------- */
+
+body[data-dsh-orca-maid] [data-phase='hero'] [class*='titleGroup'] > span:not([class*='previewBadge']) {
+  display: inline-block;
+  min-width: 8.2em;
+  color: var(--maid-ink);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: left;
+  white-space: nowrap;
+}
+body[data-dsh-orca-maid] [data-phase='hero'] [class*='titleGroup'] > span:not([class*='previewBadge'])::after {
+  content: '';
+  display: inline-block;
+  width: 9px; height: 9px; margin-left: 10px;
+  background: var(--maid-blue);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--maid-blue) 50%, transparent);
+  animation: maid-terminal-caret 1.05s steps(1, end) infinite;
+}
+
+@keyframes maid-terminal-caret {
+  0%, 48% { opacity: 1; }
+  49%, 100% { opacity: 0; }
+}
+body[data-dsh-orca-maid] [data-phase='hero'] [class*='previewBadge'] {
+  border: 1px solid var(--maid-line); border-radius: 0;
+  padding: 3px 8px 2px;
+  color: var(--maid-muted); background: var(--maid-surface);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 9px; letter-spacing: 0.22em;
+}
+
+/* Hero and active phases share one signature terminal: squared corners, a
+   stronger frame, and mechanical side arms bracketing the card. */
+body[data-dsh-orca-maid] [data-composer-card] {
+  position: relative;
+  container-name: maid-composer;
+  container-type: inline-size;
+  border-radius: 0;
+  border-style: solid;
+  border-color: var(--maid-line);
+  background-color: var(--dsw-specific-input-major);
+  box-shadow: var(--maid-shadow);
+}
+body[data-dsh-orca-maid] [data-composer-card][class*='cardWorkspaceTrigger']::after {
+  content: none;
+  -webkit-mask: none;
+  mask: none;
+}
+body[data-dsh-orca-maid] :is([role='menu'], [role='listbox']) {
+  overscroll-behavior: contain;
+}
+body[data-dsh-orca-maid] [data-composer-card]:focus-within {
+  border-color: color-mix(in srgb, var(--maid-blue) 45%, transparent);
+  box-shadow: var(--maid-shadow), 0 0 0 3px color-mix(in srgb, var(--maid-blue) 10%, transparent);
+}
+body[data-dsh-orca-maid] [data-composer-card]:not([class*='cardWorkspaceTrigger'])::before,
+body[data-dsh-orca-maid] [data-composer-card]:not([class*='cardWorkspaceTrigger'])::after {
+  position: absolute;
+  z-index: 5;
+  top: 22%;
+  bottom: 22%;
+  width: 7px;
+  content: '';
+  border: 1px solid color-mix(in srgb, var(--maid-graphite) 46%, transparent);
+  pointer-events: none;
+}
+
+body[data-dsh-orca-maid] [data-composer-card]:not([class*='cardWorkspaceTrigger'])::before {
+  left: -10px;
+  border-right: 0;
+}
+
+body[data-dsh-orca-maid] [data-composer-card]:not([class*='cardWorkspaceTrigger'])::after {
+  right: -10px;
+  border-left: 0;
+}
+
+/* The stock bracket artwork remains untouched. These transparent controls
+   only turn its existing left and right hit planes into drag surfaces. */
+body[data-dsh-orca-maid] [data-maid-composer-handle] {
+  position: absolute;
+  z-index: 6;
+  top: 50%;
+  width: 20px;
+  height: 64px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: transparent;
+  cursor: ew-resize;
+  touch-action: none;
+  transform: translateY(-50%);
+}
+
+body[data-dsh-orca-maid] [data-maid-composer-handle='left'] { left: -16px; }
+body[data-dsh-orca-maid] [data-maid-composer-handle='right'] { right: -16px; }
+
+body[data-dsh-orca-maid][data-ds-dark-theme]
+  [data-composer-card]:not([class*='cardWorkspaceTrigger'])::before,
+body[data-dsh-orca-maid][data-ds-dark-theme]
+  [data-composer-card]:not([class*='cardWorkspaceTrigger'])::after {
+  border-color: color-mix(in srgb, var(--maid-graphite) 34%, transparent);
+}
+
+body[data-dsh-orca-maid] [data-phase='active'] [data-composer-seat] {
+  transition:
+    opacity 300ms ease,
+    transform 340ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Promote the seat only while one of its own transitions is in flight. A seat
+   that stays promoted keeps its subtree — the goal dock's 13px text included —
+   on the scaled compositor raster instead of the crisp 1:1 one. */
+body[data-dsh-orca-maid] [data-phase='active'] [data-composer-seat]:is(
+    [data-maid-composer-motion],
+    [data-maid-composer-collapsing],
+    [data-maid-composer-collapse-rebounding],
+    [data-maid-composer-restoring]
+  ) {
+  will-change: opacity, transform;
+}
+
+body[data-dsh-orca-maid][data-maid-composer-handle-dragging] {
+  cursor: ew-resize;
+  user-select: none;
+}
+
+body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-collapse-dragging] {
+  transition: none !important;
+}
+
+/* Transform the intact card: its editor and container queries retain their
+   layout width throughout a drag, so the transcript keeps its original seat. */
+body[data-dsh-orca-maid] [data-composer-seat]:is(
+  [data-maid-composer-collapse-dragging],
+  [data-maid-composer-collapse-rebounding],
+  [data-maid-composer-collapsing],
+  [data-maid-composer-restoring]
+) [data-composer-card] {
+  transform-origin: center;
+  will-change: transform, opacity;
+  transition: none !important;
+}
+
+body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-collapse-dragging] [data-composer-card] {
+  transform: scale(var(--maid-composer-scale, 1));
+}
+
+body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-collapse-rebounding] [data-composer-card] {
+  animation: maidComposerRebound 400ms linear both;
+}
+
+body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-manual-hidden] {
+  pointer-events: none;
+}
+
+body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-manual-hidden]:not([data-maid-composer-collapsing]) {
+  opacity: 0;
+  transition: none;
+}
+
+body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-collapsing] [data-composer-card] {
+  animation: maidComposerFold 420ms cubic-bezier(0.32, 0, 0.2, 1) both;
+}
+
+body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-restoring] [data-composer-card] {
+  animation: maidComposerManualRestore 500ms linear both;
+}
+
+@keyframes maidComposerRebound {
+  0% { transform: scale(var(--maid-composer-scale, 1)); animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+  65% { transform: scale(1.018); }
+  82% { transform: scale(0.996); }
+  100% { transform: none; }
+}
+
+@keyframes maidComposerFold {
+  0% { opacity: 1; transform: scale(var(--maid-composer-scale, 1)); }
+  75% { opacity: 0.85; }
+  100% {
+    opacity: 0;
+    transform: translate(var(--maid-composer-dock-x, 0px), var(--maid-composer-dock-y, 0px)) scale(var(--maid-composer-dock-scale, 0.05));
+  }
+}
+
+/* The host permission control starts hiding its label at a fairly generous
+   width. Keep all wording intact until the controls genuinely run out of
+   room, then let the card's real inline size drive the compact states. */
+body[data-dsh-orca-maid] [data-composer-card] :is([class*='triggerLabel'], [class*='triggerEffort']) {
+  display: block !important;
+}
+
+@container maid-composer (max-width: 260px) {
+  body[data-dsh-orca-maid] [data-composer-card] :is([class*='triggerLabel'], [class*='triggerEffort']) {
+    display: none !important;
+  }
+
+  body[data-dsh-orca-maid]
+    [data-composer-card]
+    :is([class*='_row'], [class*='_tools'], [class*='_modes'], [class*='_trailing']) {
+    gap: 2px;
+  }
+}
+
+@container maid-composer (max-width: 200px) {
+  body[data-dsh-orca-maid] [data-composer-card] [class*='_row'] {
+    justify-content: center;
+    padding-inline: 4px;
+  }
+
+  body[data-dsh-orca-maid]
+    [data-composer-card]
+    :is(button[aria-haspopup='listbox'], button[aria-label*='上下文'], button[aria-label*='Context']) {
+    display: none;
+  }
+}
+
+body[data-dsh-orca-maid] [data-maid-composer-restore] {
+  position: fixed;
+  z-index: var(--maid-z-restore);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--maid-graphite) 46%, transparent);
+  background: color-mix(in srgb, var(--maid-surface-strong) 96%, transparent);
+  box-shadow: 5px 7px 0 rgba(27, 39, 58, 0.08), 0 10px 28px rgba(27, 39, 58, 0.14);
+  color: var(--maid-graphite);
+  cursor: pointer;
+  animation: maidComposerRestoreControlIn 240ms linear 260ms both;
+}
+
+body[data-dsh-orca-maid] [data-maid-composer-restore][hidden] { display: none; }
+
+body[data-dsh-orca-maid] [data-maid-composer-restore]::before,
+body[data-dsh-orca-maid] [data-maid-composer-restore]::after {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  width: 4px;
+  content: '';
+  border: 1px solid currentColor;
+}
+
+body[data-dsh-orca-maid] [data-maid-composer-restore]::before {
+  left: -6px;
+  border-right: 0;
+}
+
+body[data-dsh-orca-maid] [data-maid-composer-restore]::after {
+  right: -6px;
+  border-left: 0;
+}
+
+body[data-dsh-orca-maid] [data-maid-composer-restore-core] {
+  width: 10px;
+  height: 10px;
+  border: 1px solid currentColor;
+  background: color-mix(in srgb, var(--maid-blue) 10%, transparent);
+  box-shadow: inset 3px 0 0 var(--maid-blue);
+}
+
+body[data-dsh-orca-maid] [data-maid-composer-restore]:is(:hover, :focus-visible) {
+  border-color: var(--maid-blue);
+  color: var(--maid-blue);
+  outline: 1px solid color-mix(in srgb, var(--maid-blue) 40%, transparent);
+  outline-offset: 2px;
+  transform: translateY(-1px);
+}
+
+body[data-dsh-orca-maid] [data-maid-composer-restore][data-maid-composer-restore-exiting] {
+  pointer-events: none;
+  animation: maidComposerRestoreControlOut 160ms ease-out both;
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] [data-maid-composer-restore] {
+  border-color: color-mix(in srgb, var(--maid-graphite) 34%, transparent);
+  background: #111925;
+  box-shadow: 5px 7px 0 rgba(0, 0, 0, 0.2), 0 12px 30px rgba(0, 0, 0, 0.34);
+}
+
+@keyframes maidComposerRestoreControlIn {
+  0% { opacity: 0; transform: scale(0.65); }
+  65% { opacity: 1; transform: scale(1.12); }
+  82% { transform: scale(0.97); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes maidComposerRestoreControlOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.65); }
+}
+
+@keyframes maidComposerManualRestore {
+  0% {
+    opacity: 0;
+    transform: translate(var(--maid-composer-dock-x, 0px), var(--maid-composer-dock-y, 0px)) scale(var(--maid-composer-dock-scale, 0.05));
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  68% { opacity: 1; transform: translateY(-3px) scale(1.012); }
+  82% { transform: translateY(1.5px) scale(0.997); }
+  92% { transform: translateY(-0.6px) scale(1); }
+  100% { opacity: 1; transform: none; }
+}
+
+body[data-dsh-orca-maid] [data-phase='active'] [data-composer-seat][data-maid-composer-interactive] {
+  opacity: 1;
+  /* `none`, not translateY(0): any non-none transform makes the seat the
+     containing block for fixed descendants, which re-homes the host tooltip
+     bubble (position: fixed, no portal) to the seat instead of the viewport. */
+  transform: none;
+  transition: none;
+}
+
+body[data-dsh-orca-maid] [data-phase='active'] [data-composer-seat][data-maid-composer-interactive] [data-composer-card] {
+  background-color: var(--dsw-specific-input-major);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] [data-phase='active'] [data-composer-seat][data-maid-composer-interactive] [data-composer-card] {
+  background-color: var(--dsw-specific-input-major);
+}
+
+body[data-dsh-orca-maid] [data-phase='active'] [data-composer-seat][data-maid-composer-interactive] [data-composer-card]:focus-within,
+body[data-dsh-orca-maid][data-ds-dark-theme] [data-phase='active'] [data-composer-seat][data-maid-composer-interactive] [data-composer-card]:focus-within {
+  background-color: var(--dsw-input-solid);
+}
+
+body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-hidden] {
+  opacity: 0;
+  transform: translateY(28px);
+  pointer-events: none;
+}
+
+body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-outside-chat] {
+  display: none !important;
+}
+
+/* Clip the moving card inside its stationary seat so the transformed footer
+   cannot extend the transcript's scroll range and be chased by auto-follow. */
+body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-entering] {
+  overflow: clip;
+  overflow-clip-margin: 12px;
+}
+
+body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-entering] [data-composer-card] {
+  will-change: transform, opacity;
+  animation: maidComposerDockIn 700ms linear 100ms both;
+}
+
+body[data-dsh-orca-maid] [data-maid-composer-ghost] {
+  position: fixed;
+  z-index: var(--maid-z-ghost);
+  box-sizing: border-box;
+  margin: 0;
+  pointer-events: none;
+  animation: maidComposerGhostOut 180ms ease-out both;
+}
+
+@keyframes maidComposerGhostOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(0); }
+}
+
+@keyframes maidComposerDockIn {
+  0% { opacity: 0; transform: translateY(var(--maid-composer-enter-distance, 100vh)); animation-timing-function: cubic-bezier(0.22, 0.78, 0.2, 1); }
+  18% { opacity: 1; }
+  74.286% { opacity: 1; transform: translateY(-6px); }
+  84% { transform: translateY(2.5px); }
+  92% { transform: translateY(-1px); }
+  96% { transform: translateY(0.4px); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* Standby telemetry lives only under the hero橱窗 — an instrument reading,
+   not floating chrome. */
+body[data-dsh-orca-maid] .standby {
+  position: fixed; bottom: 18px; left: calc(50% + 9vw); z-index: 900;
+  display: none; align-items: center; gap: 14px; width: min(420px, 38vw);
+  transform: translateX(-50%); color: var(--maid-muted);
+  font: 500 8px/1 ui-monospace, "SFMono-Regular", Consolas, monospace;
+  letter-spacing: 0.2em; pointer-events: none;
+}
+body[data-dsh-orca-maid][data-maid-scene='hero'] .standby { display: flex; }
+body[data-dsh-orca-maid] .standbyLine {
+  flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--maid-line));
+}
+body[data-dsh-orca-maid] .standbyLine:last-child {
+  background: linear-gradient(90deg, var(--maid-line), transparent);
+}
+
+body[data-dsh-orca-maid] [data-aionui-explorer-col],
+body[data-dsh-orca-maid] [data-aionui-preview-col],
+body[data-dsh-orca-maid] [data-gitgraph-dialog] {
+  border-color: var(--maid-line); background: var(--maid-surface); box-shadow: var(--maid-shadow);
+}
+
+/* Icon redraw: matched host glyphs keep their element, sizing and React
+   ownership, but the original drawing is retired while the MAID art group
+   (see icons.ts) carries the visible rectilinear geometry instead. */
+body[data-dsh-orca-maid] [data-orca-maid-icon] > :not([data-orca-maid-icon-art]) {
+  display: none;
+}
+
+body[data-dsh-orca-maid] {
+  --aion-bg-base: var(--maid-surface-strong);
+  --aion-bg-1: var(--maid-surface);
+  --aion-bg-2: rgba(240, 236, 229, 0.72);
+  --aion-bg-hover: color-mix(in srgb, var(--maid-blue) 8%, transparent);
+  --aion-bg-active: color-mix(in srgb, var(--maid-blue) 14%, transparent);
+  --aion-text-primary: var(--maid-ink);
+  --aion-text-secondary: var(--maid-graphite);
+  --aion-text-tertiary: var(--maid-muted);
+  --aion-primary: var(--maid-blue);
+  --aion-brand: var(--maid-cyan);
+  --aion-border-base: var(--maid-line);
+  --aion-overlay-shadow: var(--maid-shadow);
+}
+
+@media (max-width: 900px) {
+  body[data-dsh-orca-maid] .lightScene { display: none; }
+  body[data-dsh-orca-maid][data-ds-dark-theme] .darkScene { display: none; }
+  body[data-dsh-orca-maid] :is([data-slot='sidebar'] > :first-child)::before,
+  body[data-dsh-orca-maid] :is([data-slot='sidebar'] > :first-child)::after { display: none; }
+  body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] [class*='regionArea'] {
+    margin-top: 0;
+    border-top: none;
+    background: transparent;
+    backdrop-filter: none;
+  }
+  /* The portrait stage is retired in this layout, so the entries' stage-sized
+     offset would leave a blank band above the plugin rows; reset it with the
+     rest of the stage chrome. The official panel row rides the same offset. */
+  body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide]
+    > :first-child
+    > :is(button[data-dsh-part='sidebar-entry'], [data-plugin-entry], nav[class*='panelList']) {
+    margin-top: 0;
+  }
+  body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] [class*='regionArea']::before { display: none; }
+  body[data-dsh-orca-maid] .spine,
+  body[data-dsh-orca-maid] .signalChip,
+  body[data-dsh-orca-maid] .statusCharacter { display: none; }
+  /* Match the light's base selector specificity so this also hides its fixed
+     Windows caption placement at narrow widths. */
+  body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > .pricingLight { display: none; }
+  body[data-dsh-orca-maid][data-maid-scene='hero'] .standby { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-manual-hidden] { opacity: 0; }
+  body[data-dsh-orca-maid] button,
+  body[data-dsh-orca-maid] [role='button'],
+  body[data-dsh-orca-maid] .dshWordmark,
+  body[data-dsh-orca-maid] .statusCharacter,
+  body[data-dsh-orca-maid] .spine,
+  body[data-dsh-orca-maid] .statusCharacterBubble,
+  body[data-dsh-orca-maid] .pricingLight,
+  body[data-dsh-orca-maid] .pricingLamp,
+  body[data-dsh-orca-maid] .pricingTooltip,
+  body[data-dsh-orca-maid] :is([data-slot='sidebar'] > :first-child)::before { transition: none; }
+  body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > :first-child::after,
+  body[data-dsh-orca-maid] .signalDot,
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > :first-child,
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'],
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog']::before,
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog']::after,
+  body[data-dsh-orca-maid] [data-phase='hero'] [class*='titleGroup'] > span:not([class*='previewBadge'])::after,
+  body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-entering] [data-composer-card],
+  body[data-dsh-orca-maid] [data-maid-composer-ghost],
+  body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-restoring] [data-composer-card],
+  body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-collapse-rebounding] [data-composer-card],
+  body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-collapsing] [data-composer-card],
+  body[data-dsh-orca-maid] [data-maid-composer-restore] { animation: none; }
+  body[data-dsh-orca-maid] [data-phase='active'] [data-composer-seat],
+  body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-collapse-rebounding],
+  body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-collapsing],
+  body[data-dsh-orca-maid] [data-maid-composer-restore],
+  body[data-dsh-orca-maid] .lightSceneLayer,
+  body[data-dsh-orca-maid] .darkSceneLayer,
+  body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > button:not([data-dsh-part='sidebar-entry'])::before,
+  body[data-dsh-orca-maid] [role='switch'] > [class*='thumb'],
+  body[data-dsh-orca-maid] [data-slot='sidebar'] button[aria-haspopup='dialog']::after { transition: none; }
+  body[data-dsh-orca-maid] .statusCharacterBubble { transition: none; }
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog']::before,
+  body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog']::after { display: none; }
+  body[data-dsh-orca-maid] .statusCharacterFrame { animation: none; }
+  body[data-dsh-orca-maid] .pricingLight[data-orca-maid-price='transition'] .pricingLampAmber { animation: none; }
+}
+
+@keyframes maidGateWeave {
+  0%   { transform: translate(-0.090px, 0.062px) scaleX(var(--maid-character-mirror)); }
+  14%  { transform: translate(0.090px, -0.062px) scaleX(var(--maid-character-mirror)); }
+  29%  { transform: translate(0.032px, 0.062px) scaleX(var(--maid-character-mirror)); }
+  43%  { transform: translate(-0.041px, -0.016px) scaleX(var(--maid-character-mirror)); }
+  58%  { transform: translate(0.059px, 0.011px) scaleX(var(--maid-character-mirror)); }
+  72%  { transform: translate(-0.018px, -0.062px) scaleX(var(--maid-character-mirror)); }
+  86%  { transform: translate(0.090px, 0.034px) scaleX(var(--maid-character-mirror)); }
+  100% { transform: translate(-0.090px, 0.062px) scaleX(var(--maid-character-mirror)); }
+}
+
+/* The semantic handles are siblings of the conversation scrollport inside the
+   host body wrapper. Anchor the rule to that relationship without depending
+   on generated class names. */
+body[data-dsh-orca-maid]
+  [data-phase='active']
+  > :has(> [data-conversation-scroll])
+  > [data-width-handle][data-side]::after {
+  width: 3px;
+  /* The host bar keeps a 2px radius; the signal rail is a hard line. */
+  border-radius: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent calc(var(--dsh-width-handle-pointer-y, 50%) - 50px),
+    rgba(115, 88, 63, 0.18) calc(var(--dsh-width-handle-pointer-y, 50%) - 40px),
+    #9b8061 calc(var(--dsh-width-handle-pointer-y, 50%) - 24px),
+    #73583f calc(var(--dsh-width-handle-pointer-y, 50%) - 6px),
+    #73583f calc(var(--dsh-width-handle-pointer-y, 50%) + 6px),
+    #9b8061 calc(var(--dsh-width-handle-pointer-y, 50%) + 24px),
+    rgba(115, 88, 63, 0.18) calc(var(--dsh-width-handle-pointer-y, 50%) + 40px),
+    transparent calc(var(--dsh-width-handle-pointer-y, 50%) + 50px)
+  );
+  filter:
+    drop-shadow(0 0 1px rgba(255, 252, 246, 0.9))
+    drop-shadow(0 0 3px rgba(115, 88, 63, 0.42));
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme]
+  [data-phase='active']
+  > :has(> [data-conversation-scroll])
+  > [data-width-handle][data-side]::after {
+  background: linear-gradient(
+    to bottom,
+    transparent calc(var(--dsh-width-handle-pointer-y, 50%) - 52px),
+    var(--maid-blue) calc(var(--dsh-width-handle-pointer-y, 50%) - 36px),
+    var(--maid-cyan) calc(var(--dsh-width-handle-pointer-y, 50%) - 10px),
+    #f7fbff var(--dsh-width-handle-pointer-y, 50%),
+    var(--maid-cyan) calc(var(--dsh-width-handle-pointer-y, 50%) + 10px),
+    var(--maid-blue) calc(var(--dsh-width-handle-pointer-y, 50%) + 36px),
+    transparent calc(var(--dsh-width-handle-pointer-y, 50%) + 52px)
+  );
+  filter:
+    drop-shadow(0 0 1px rgba(7, 16, 31, 0.98))
+    drop-shadow(0 0 6px rgba(69, 217, 244, 0.78));
+}
+
+body[data-dsh-orca-maid]
+  [data-phase='active']
+  > :has(> [data-conversation-scroll])
+  > [data-width-handle][data-side]:is(:hover, [data-dragging])::after {
+  transform-origin: center;
+  animation: orcaMaidWidthHandleSignal 920ms steps(4, end) infinite;
+}
+
+/* The rail precedes the transcript root; root > scroll > flow stays present
+   even when data-chat-following-tail is removed while reading history. */
+body[data-dsh-orca-maid]:not([data-ds-dark-theme]) [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label]::before {
+  border-radius: 0;
+  background: rgba(115, 88, 63, 0.56);
+}
+
+body[data-dsh-orca-maid]:not([data-ds-dark-theme]) [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label]:is(:hover, :focus-visible)::before {
+  background: #9b8061;
+  box-shadow: 0 0 5px rgba(115, 88, 63, 0.46);
+}
+
+body[data-dsh-orca-maid]:not([data-ds-dark-theme]) [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label][aria-current='true']::before {
+  background: #73583f;
+  box-shadow:
+    0 0 0 1px rgba(255, 252, 246, 0.92),
+    0 0 5px rgba(115, 88, 63, 0.38);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label]::before {
+  background: color-mix(in srgb, var(--maid-muted) 74%, transparent);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label]:is(:hover, :focus-visible)::before {
+  background: var(--maid-cyan);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--maid-cyan) 72%, transparent);
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label][aria-current='true']::before {
+  background: var(--maid-cyan);
+  box-shadow:
+    0 0 0 1px #f7fbff,
+    0 0 7px color-mix(in srgb, var(--maid-cyan) 76%, transparent);
+}
+
+@keyframes orcaMaidWidthHandleSignal {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scaleX(0.76);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scaleX(1.24);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-manual-hidden] { opacity: 0; }
+  body[data-dsh-orca-maid]
+    [data-phase='active']
+    > :has(> [data-conversation-scroll])
+    > [data-width-handle][data-side]::after {
+    animation: none;
+  }
+  body[data-dsh-orca-maid] [data-testid='todo-panel'] li[data-status='in_progress'] > [class*='_glyph']::after {
+    animation: none;
+    clip-path: none;
+    opacity: 0.55;
+  }
+}
+
+/* Agent preset id captions keep the official light caption colour, which the
+   MAID backdrop turns illegible (light text on the cream surface). Pin them
+   to the ink ramp so the id stays readable in both themes. */
+body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'], [role='dialog']:where([data-shortcut-modal='settings'])) [class$='_cardId'] {
+  color: var(--maid-graphite);
+}
+body[data-dsh-orca-maid][data-ds-dark-theme] :is([data-slot='sidebar.settings'], [role='dialog']:where([data-shortcut-modal='settings'])) [class$='_cardId'] {
+  color: var(--maid-muted);
+}
+

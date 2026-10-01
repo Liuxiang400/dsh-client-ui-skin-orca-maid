@@ -1,0 +1,182 @@
+// @vitest-environment jsdom
+import { readFileSync } from 'node:fs'
+import { describe, expect, it } from 'vitest'
+import { hasMutationOutsideTerminal } from '../src/client/mutation-filter.ts'
+import { installMaidSettingsOverlay } from '../src/client/settings-overlay.ts'
+import { installMaidTerminalPerformance } from '../src/client/terminal-performance.ts'
+
+const css = readFileSync(
+  'src/client/orca-maid.module.css',
+  'utf8',
+)
+
+describe('ORCA MAID performance guards', () => {
+  it('does not apply the shape contract to every descendant and pseudo-element', () => {
+    expect(css).not.toContain('body[data-dsh-orca-maid] *,')
+    expect(css).not.toContain('body[data-dsh-orca-maid] *::before')
+    expect(css).not.toContain('body[data-dsh-orca-maid] *::after')
+  })
+
+  it('promotes the composer seat only while one of its own transitions runs', () => {
+    expect(css).not.toMatch(/\[data-composer-seat\]\s*\{[^}]*will-change/)
+    expect(css).toContain('[data-composer-seat]:is(')
+    expect(css).toContain('[data-maid-composer-motion]')
+  })
+
+  it('leaves the interactive composer seat free of a fixed-position containing block', () => {
+    // The host tooltip bubble is position: fixed and not portaled, so any
+    // non-none transform on the seat re-homes it to the seat's box.
+    const interactiveSeat = css.match(
+      /\[data-composer-seat\]\[data-maid-composer-interactive\]\s*\{([^}]*)\}/,
+    )?.[1] ?? ''
+    expect(interactiveSeat).not.toBe('')
+    expect(interactiveSeat).toContain('transform: none')
+    expect(interactiveSeat).not.toMatch(/transform:\s*translate/)
+  })
+
+  it('uses the stable scene attribute instead of a body-wide phase query', () => {
+    expect(css).toContain("body[data-dsh-orca-maid][data-maid-scene='hero'] .standby")
+    expect(css).not.toContain("body[data-dsh-orca-maid]:has([data-phase='hero'])")
+    const handleOwner = String.raw`\[data-phase='active'\]\s*>\s*:has\(> \[data-conversation-scroll\]\)\s*>\s*\[data-width-handle\]\[data-side\]`
+    expect(css).toMatch(new RegExp(`${handleOwner}::after\\s*\\{`))
+    expect(css).toMatch(new RegExp(`${handleOwner}:is\\(:hover, \\[data-dragging\\]\\)::after\\s*\\{`))
+    expect(css).not.toMatch(/\[data-phase='active'\]\s*>\s*\[data-width-handle\]/)
+  })
+
+  it('contains terminal paint and locks only its measured width during layout motion', () => {
+    expect(css).toContain('[data-dsh-better-sidebar] :global(.xterm)')
+    expect(css).toContain('contain: layout paint style;')
+    expect(css).toContain("[data-dsh-better-sidebar] [class*='_bottomPanel']")
+    expect(css).toContain('[data-maid-terminal-width-locked]')
+    expect(css).toContain('width: var(--maid-terminal-locked-width) !important;')
+    expect(css).not.toContain('#root >')
+    expect(css).not.toContain('[data-maid-terminal-mounted]')
+  })
+
+  it('filters mutations generated inside xterm while retaining host changes', async () => {
+    const terminal = document.createElement('div')
+    terminal.className = 'xterm'
+    const rows = document.createElement('div')
+    terminal.append(rows)
+    document.body.append(terminal)
+
+    const batches: MutationRecord[][] = []
+    const observer = new MutationObserver(records => { batches.push(records) })
+    observer.observe(document.body, { childList: true, subtree: true })
+
+    rows.append(document.createElement('span'))
+    await Promise.resolve()
+    expect(hasMutationOutsideTerminal(batches.pop() ?? [])).toBe(false)
+
+    document.body.append(document.createElement('main'))
+    await Promise.resolve()
+    expect(hasMutationOutsideTerminal(batches.pop() ?? [])).toBe(true)
+    observer.disconnect()
+  })
+
+  it('filters Lexical edits while retaining composer-root replacements', async () => {
+    const composer = document.createElement('div')
+    const input = document.createElement('div')
+    input.setAttribute('data-composer-input', '')
+    composer.append(input)
+    document.body.append(composer)
+
+    const batches: MutationRecord[][] = []
+    const observer = new MutationObserver(records => { batches.push(records) })
+    observer.observe(document.body, { childList: true, subtree: true })
+
+    input.textContent = 'draft'
+    await Promise.resolve()
+    expect(hasMutationOutsideTerminal(batches.pop() ?? [])).toBe(false)
+
+    const replacement = document.createElement('div')
+    replacement.setAttribute('data-composer-input', '')
+    replacement.textContent = 'next draft'
+    input.replaceWith(replacement)
+    await Promise.resolve()
+    expect(hasMutationOutsideTerminal(batches.pop() ?? [])).toBe(true)
+
+    composer.append(document.createElement('button'))
+    await Promise.resolve()
+    expect(hasMutationOutsideTerminal(batches.pop() ?? [])).toBe(true)
+
+    const hostText = document.createTextNode('host text')
+    composer.append(hostText)
+    await Promise.resolve()
+    batches.pop()
+    hostText.remove()
+    await Promise.resolve()
+    expect(hasMutationOutsideTerminal(batches.pop() ?? [])).toBe(true)
+    observer.disconnect()
+  })
+
+  it('holds the terminal width until the AppFrame track transition ends', async () => {
+    document.body.innerHTML = `
+      <div id="root"><div data-slot="root"><div style="grid-template-columns: 280px 1fr 0px"></div></div></div>
+      <div data-dsh-better-sidebar><div class="terminal"><div class="xterm"></div></div></div>
+    `
+    const host = document.querySelector<HTMLElement>('.terminal')!
+    host.getBoundingClientRect = () => ({ width: 640 } as DOMRect)
+    const frame = document.querySelector<HTMLElement>("[id='root'] > div[data-slot='root'] > div")!
+    const dispose = installMaidTerminalPerformance(document.body)
+
+    frame.style.gridTemplateColumns = '72px 1fr 320px'
+    await Promise.resolve()
+    expect(host.hasAttribute('data-maid-terminal-width-locked')).toBe(true)
+    expect(host.style.getPropertyValue('--maid-terminal-locked-width')).toBe('640px')
+
+    const transitionEnd = new Event('transitionend')
+    Object.defineProperty(transitionEnd, 'propertyName', { value: 'grid-template-columns' })
+    frame.dispatchEvent(transitionEnd)
+    expect(host.hasAttribute('data-maid-terminal-width-locked')).toBe(false)
+    dispose()
+  })
+
+  it('raises the app root only while the settings dialog is open', async () => {
+    expect(css).toContain("body[data-dsh-orca-maid][data-maid-settings-open] [id='root']")
+    expect(css).not.toContain("body[data-dsh-orca-maid]:has([data-slot='sidebar.settings']")
+    document.body.innerHTML = '<div id="root"><div data-slot="sidebar.settings"></div></div>'
+    const dispose = installMaidSettingsOverlay(document.body)
+    const settings = document.querySelector<HTMLElement>("[data-slot='sidebar.settings']")!
+    expect(document.body.hasAttribute('data-maid-settings-open')).toBe(false)
+
+    const dialog = document.createElement('div')
+    dialog.setAttribute('role', 'dialog')
+    settings.append(dialog)
+    await Promise.resolve()
+    expect(document.body.hasAttribute('data-maid-settings-open')).toBe(true)
+    expect(document.body.hasAttribute('data-maid-settings-in-sidebar')).toBe(true)
+
+    dialog.remove()
+    await Promise.resolve()
+    expect(document.body.hasAttribute('data-maid-settings-open')).toBe(false)
+    dispose()
+  })
+
+  it('follows the DSH 0.1.7-rc.2 settings panel portaled beside #root', async () => {
+    // rc.2 SettingsRoot: createPortal(<overlay role=presentation><mask/><panel
+    // role=dialog data-shortcut-modal="settings"/></overlay>, document.body).
+    document.body.innerHTML = '<div id="root"><div data-slot="sidebar.settings"><div><button aria-expanded="false"></button></div></div></div>'
+    const dispose = installMaidSettingsOverlay(document.body)
+    expect(document.body.hasAttribute('data-maid-settings-open')).toBe(false)
+
+    const overlay = document.createElement('div')
+    overlay.setAttribute('role', 'presentation')
+    overlay.innerHTML = '<div aria-hidden="true"></div><div role="dialog" aria-modal="true" data-shortcut-modal="settings"><nav></nav></div>'
+    document.body.append(overlay)
+    await Promise.resolve()
+    expect(document.body.hasAttribute('data-maid-settings-open')).toBe(true)
+    // The portal is outside the sidebar chain: no stacking or clipping release.
+    expect(document.body.hasAttribute('data-maid-settings-in-sidebar')).toBe(false)
+
+    // Other body-level modals share the overlay shape but not the settings name.
+    overlay.remove()
+    const shortcuts = document.createElement('div')
+    shortcuts.setAttribute('role', 'presentation')
+    shortcuts.innerHTML = '<div role="dialog" aria-modal="true" data-shortcut-modal="shortcuts"></div>'
+    document.body.append(shortcuts)
+    await Promise.resolve()
+    expect(document.body.hasAttribute('data-maid-settings-open')).toBe(false)
+    dispose()
+  })
+})

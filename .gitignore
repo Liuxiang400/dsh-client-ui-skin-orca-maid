@@ -1,0 +1,6 @@
+# 构建依赖
+node_modules/
+# 构建产物：*.js.map 不入库（lib/client.js 与 lib/index.js 是提交型产物，保留）
+*.js.map
+*.tsbuildinfo
+.DS_Store

@@ -1,0 +1,123 @@
+/**
+ * Page icons — the tab favicon and the web app manifest that names the icon of
+ * the installed app (taskbar, start menu, pinned shortcut). The host declares
+ * both as static head links (`link[rel="icon"]` → /favicon.svg,
+ * `link[rel="manifest"]` → /manifest.webmanifest) and a browser honours the
+ * first usable declaration, so appending a skin link would leave the host icons
+ * in charge. Both host nodes are replaced instead, each pinned to a comment
+ * anchor so disposal puts the original back where it was.
+ *
+ * The replacement manifest travels as a data: URL, where relative paths cannot
+ * resolve: the identity fields reuse the host values and start_url/scope are
+ * made absolute against the runtime origin.
+ *
+ * The manifest declares bitmap icons only. Windows builds the installed app,
+ * taskbar and start-menu icons from bitmap manifest icons, and a `sizes: "any"`
+ * SVG entry — which matches every size — makes Edge's icon-update path pick an
+ * icon it cannot rasterise, so the app falls back to the site's initial letter
+ * or a stale site icon. The tab favicon uses the same 192 px PNG as the
+ * manifest, so both surfaces show the current whale-girl artwork.
+ */
+import { PAGE_ICON_192, PAGE_ICON_512 } from './page-icon-art.generated.ts'
+
+/** The skin's web icon, shared by the tab favicon and the web app manifest. */
+const PAGE_ICON = PAGE_ICON_192
+const MANIFEST_NAME = 'DeepSeek Harness'
+const MANIFEST_SHORT_NAME = 'DSH'
+const MANIFEST_DISPLAY = 'fullscreen'
+const HOST_PAGE_ICON_SELECTOR = 'link[rel~="icon"], link[rel="manifest"]'
+const HOST_PAGE_ICON_ANCHOR = 'orca-maid: host page icon'
+
+interface PageIconInstallation {
+  users: number
+  restore: () => void
+}
+
+/**
+ * One installation per document, reference counted: a second activation must
+ * not capture the first activation's links as if they were the host's, or the
+ * last disposal would leave a skin link behind.
+ */
+const installations = new WeakMap<Document, PageIconInstallation>()
+
+function mountPageIcons(doc: Document): () => void {
+  const replaced: Array<{ node: HTMLLinkElement, anchor: Comment }> = []
+  const owned: HTMLLinkElement[] = []
+  const restore = (): void => {
+    for (const node of owned) node.remove()
+    for (const { node, anchor } of replaced) {
+      // Restore only when the original is still detached: a host that swapped
+      // its own link while the skin was active keeps its newer node.
+      if (anchor.parentNode !== null && !node.isConnected) anchor.replaceWith(node)
+      else anchor.remove()
+    }
+  }
+
+  try {
+    for (const node of doc.head.querySelectorAll<HTMLLinkElement>(HOST_PAGE_ICON_SELECTOR)) {
+      const anchor = doc.createComment(HOST_PAGE_ICON_ANCHOR)
+      replaced.push({ node, anchor })
+      node.before(anchor)
+      node.remove()
+    }
+
+    const favicon = doc.createElement('link')
+    favicon.rel = 'icon'
+    favicon.type = 'image/png'
+    // Set the attribute rather than poking the `sizes` DOMTokenList: jsdom does
+    // not implement `HTMLLinkElement.sizes`, and the serialised attribute is
+    // exactly what the browser and the test read back.
+    favicon.setAttribute('sizes', '192x192')
+    favicon.href = PAGE_ICON
+    favicon.dataset.skinChrome = 'favicon'
+    doc.head.append(favicon)
+    owned.push(favicon)
+
+    // Identity fields follow the host manifest so an installed app keeps its
+    // name, scope and display mode; only the icons change.
+    const root = new URL('/', doc.location.href).href
+    const manifest = {
+      id: root,
+      name: MANIFEST_NAME,
+      short_name: MANIFEST_SHORT_NAME,
+      start_url: root,
+      scope: root,
+      display: MANIFEST_DISPLAY,
+      icons: [
+        { src: PAGE_ICON_192, sizes: '192x192', type: 'image/png', purpose: 'any' },
+        { src: PAGE_ICON_512, sizes: '512x512', type: 'image/png', purpose: 'any' },
+      ],
+    }
+    const manifestLink = doc.createElement('link')
+    manifestLink.rel = 'manifest'
+    manifestLink.type = 'application/manifest+json'
+    manifestLink.href = `data:application/manifest+json,${encodeURIComponent(JSON.stringify(manifest))}`
+    manifestLink.dataset.skinChrome = 'manifest'
+    doc.head.append(manifestLink)
+    owned.push(manifestLink)
+  } catch (error) {
+    restore()
+    throw error
+  }
+  return restore
+}
+
+/** Replace the host page icons with the skin's; returns a counted disposer. */
+export function installMaidPageIcons(): () => void {
+  const doc = document
+  let installation = installations.get(doc)
+  if (installation === undefined) {
+    installation = { users: 0, restore: mountPageIcons(doc) }
+    installations.set(doc, installation)
+  }
+  const current = installation
+  current.users += 1
+  let active = true
+  return () => {
+    if (!active) return
+    active = false
+    if (--current.users > 0) return
+    current.restore()
+    installations.delete(doc)
+  }
+}

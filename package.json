@@ -1,0 +1,75 @@
+{
+  "name": "@bendix400/dsh-client-ui-skin-orca-maid",
+  "description": "ORCA LINK re-skinned as a little black-whale maid: same rectilinear chrome and straight-line icons.",
+  "icon": "assets/plugin-icon.svg",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./skin.json": "./skin.json",
+    "./locale/*.json": "./locale/*.json",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [],
+      "platform": "web"
+    }
+  },
+  "scripts": {
+    "build": "node scripts/prepare-skin-assets.mjs . && tsdown && node scripts/write-skin-build.mjs . bendix400/dsh-client-ui-skin-orca-maid",
+    "test": "vitest run"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bendix400/dsh-client-ui-skin-orca-maid.git"
+  },
+  "homepage": "https://github.com/bendix400/dsh-client-ui-skin-orca-maid#readme",
+  "bugs": {
+    "url": "https://github.com/bendix400/dsh-client-ui-skin-orca-maid/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh": ">=0.1.7-rc.1 <0.3.0-0"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/dsh": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "jsdom": "29.1.1",
+    "lightningcss": "^1.32.0",
+    "tsdown": "^0.22.2",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.8"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "cordis.patch.yml",
+    "skin.json",
+    "skin.build.json",
+    "preview",
+    "assets/icons/*.ico",
+    "LICENSE",
+    "LICENSE-ARTWORK",
+    "NOTICE",
+    "README.md",
+    "assets/runtime",
+    "locale/*.json",
+    "assets/plugin-icon.svg"
+  ],
+  "author": "bendix400"
+}
