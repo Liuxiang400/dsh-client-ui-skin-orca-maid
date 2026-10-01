@@ -10,10 +10,10 @@ import { installSkinAssets } from '../src/vendor/skin-assets.ts'
 import { hashSkinAssets } from '../scripts/skin-asset-inputs.mjs'
 
 describe('packaged skin artwork', () => {
-  // 独立仓库里只有本皮肤；上游 monorepo 版本会同时遍历 maid-atelier。
+  // 独立仓库里只有本皮肤，且包根就是仓库根（不是 monorepo 里的 <id>/ 子目录）。
   const id = 'orca-maid'
   it(`${id}: serves exact packaged bytes and releases the route`, async () => {
-    const directory = new URL(`../../${id}/assets/runtime/`, import.meta.url)
+    const directory = new URL('../assets/runtime/', import.meta.url)
     const files: string[] = JSON.parse(readFileSync(new URL('manifest.json', directory), 'utf8'))
     let route: { handler(req: IncomingMessage, res: ServerResponse): Promise<void> } | undefined
     const ctx = new Context()
