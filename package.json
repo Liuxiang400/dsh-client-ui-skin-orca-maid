@@ -1,7 +1,7 @@
 {
   "name": "@bendix400/dsh-client-ui-skin-orca-maid",
-  "description": "ORCA LINK re-skinned as a little black-whale maid: same rectilinear chrome and straight-line icons.",
-  "icon": "assets/plugin-icon.svg",
+  "description": "A deep-blue whale-girl maid on rectilinear, straight-line-redrawn chrome; functional by day, soothing by night.",
+  "icon": "assets/plugin-icon.png",
   "version": "0.1.0",
   "type": "module",
   "main": "lib/index.js",
@@ -69,7 +69,7 @@
     "README.md",
     "assets/runtime",
     "locale/*.json",
-    "assets/plugin-icon.svg"
+    "assets/plugin-icon.png"
   ],
   "author": "bendix400"
 }

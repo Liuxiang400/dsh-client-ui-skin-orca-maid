@@ -1,53 +1,59 @@
-orca-link (ORCA LINK · 虎鲸链路)
-====================================================
+ORCA MAID（@bendix400/dsh-client-ui-skin-orca-maid）
+=====================================================
 
-Third-party derivative notice (CC BY-NC-SA 4.0 attribution chain)
+美术素材署名链 / Artwork attribution chain（CC BY-NC-SA 4.0）
 
-This skin's artwork is a derivative of 上善's whale-girl character. Per the
-ShareAlike and Attribution requirements of CC BY-NC-SA 4.0, every upstream
-author in the chain is credited:
+本包的全部美术素材（十态角色图集、四张场景、应用图标、启动失败页插画）是三方衍生作品。
+依 CC BY-NC-SA 4.0 的署名（BY）、非商业（NC）、相同方式共享（SA）条款，
+必须完整保留以下创作链：
 
-1. 一创 (initial creation): 上善 —— 鲸鱼娘 (whale-girl) 角色形象的原作者。
-   个人主页 (profile): https://www.pixiv.net/users/62155430
-   The original whale-girl character design.
+1. 一创 / original character —— 上善无形
+   鲸鱼娘「溟月」原创 OC。2026-08-02 公开声明「溟月」为其原创 OC，
+   并以 CC BY-NC-SA 4.0 开放二次创作。
+   Pixiv:    https://www.pixiv.net/users/62155430
+   Bilibili: https://b23.tv/8h5L4xz
 
-2. 二创 (this skin): Small-tailqwq (Small-tailqwq/dsh-deep-whale) —— 基于上善
-   原作角色身份的 ORCA LINK 皮肤场景、状态角色图集与 UI 素材的衍生设计。
-   个人主页 (profile): https://github.com/Small-tailqwq
-   The skin scenes, status-character atlas and UI assets derived from 上善's
-   original character design.
+2. 二创 / secondary design —— ZipZipPipe
+   女仆装鲸鱼娘：在上善无形原创 OC「溟月」基础上融入 DeepSeek 元素的二次设计。
+   遵守同一协议，并明确禁止商业使用。
+   来源：萌娘百科「DeepSeek娘」 https://zh.moegirl.org.cn/DeepSeek娘
 
-   The boot-repair chibi illustration was generated with OpenAI ImageGen from
-   the same character reference. The maintenance references informed only the
-   pose and simple presentation; no MIUI or Blue Archive artwork is bundled.
+3. 三创 / this package —— bendix400
+   以 ZipZipPipe 的女仆装鲸鱼娘为造型参考，用 OpenAI ImageGen 二次生成：
+   十态角色图集（8 列 × 10 行）、四张 16:9 场景、192/512 应用图标与启动失败页插画。
+   生成时以用户提供的参考图为造型依据；参考图上的水印与文字未被复制到成图。
 
-   The desktop shortcut icon assets/icons/orca-link.ico is derived from the
-   512 px page icon (assets/runtime/<sha256>.png referenced as PAGE_ICON_512)
-   by scripts/build-orca-desktop-icon.py, and keeps the attribution chain above.
+Artwork usage terms（LICENSE-ARTWORK 正文）：CC BY-NC-SA 4.0
+  - 署名（BY）          必须保留以上完整创作链
+  - 非商业性（NC）      禁止任何商业用途
+  - 相同方式共享（SA）  衍生作品必须以相同协议发布
 
-Artwork usage terms (LICENSE-ARTWORK): CC BY-NC-SA 4.0 —— 署名 (attribution) 必须保留以上完整创作链；
-非商业性使用 (non-commercial only)；衍生作品必须以相同方式共享 (share-alike)。
-
-Software code is covered by LICENSE (MIT). Artwork copyright remains with the
-respective authors above, including embedded and transformed copies.
-
-The host SVG test fixtures in tests/fixtures/dsh-0.1.7-alpha.1-icons.json are
-rendered from deepseek-ai/deepseek-harness at commit
-c36a83ff6bb95e3f82cf79f9be7c724270a8aa61, copyright (c) 2026 DeepSeek,
-under the MIT License reproduced in tests/fixtures/DSH-LICENSE. These test
-fixtures are separate from the character artwork licensed above.
+> 第 1、2 项是本包素材的**来源链**：本包已不再包含 ORCA LINK 的原始美术
+> （其角色图集、场景、概念图与图标已于 2026-10-01 全部替换或删除），
+> 但第 3 项正是建立在它们的角色设计之上，因此这两环仍须署名。
 
 
-## 派生声明
+软件代码 / Software code
+------------------------
 
-本包由 ORCA LINK（`orca-link`，Small-tailqwq）派生：代码与美术资源均来自上游同一提交，只做了包名 / 皮肤 id / CSS 作用域改名与亮色主题强调色调整。
-MIT 代码许可与 CC BY-NC-SA 4.0 美术许可、以及上方完整署名链对派生包继续适用。
+本包代码派生自 ORCA LINK（Small-tailqwq/dsh-deep-whale，commit 42ecc2a），
+依 MIT 许可发布。上游的共享代码按字节内联于 `src/vendor/`：
 
-2026-10-01 local artwork update:
-The boot-failure illustration and tab/Web App portrait icons were generated
-with OpenAI ImageGen from the user's adult whale-girl (大鲸鱼娘) reference.
-They depict the same whale-girl character identity in an ankle-length maid
-costume. The portrait was scaled to 192 and 512 px for the packaged icons.
-The reference watermark was not included in the generated artwork. These
-derivative assets retain the complete attribution chain and CC BY-NC-SA 4.0
-artwork terms above; software code remains MIT.
+  - shared/skin-assets.ts          → src/vendor/skin-assets.ts
+  - shared/relational-markers.ts   → src/vendor/relational-markers.ts
+  - skin-manager/src/protocol.ts   → src/vendor/protocol.ts
+
+构建脚本内联于 `scripts/`。上述代码版权归原作者所有，许可正文见 LICENSE。
+代码与美术分别授权，二者边界以本文件为准。
+
+Code license: MIT（见 LICENSE）。Artwork copyright remains with the creators
+listed above; code and artwork are licensed separately.
+
+
+测试夹具 / Test fixtures
+------------------------
+
+`tests/fixtures/dsh-0.1.7-alpha.1-icons.json` 渲染自
+deepseek-ai/deepseek-harness @ c36a83ff6bb95e3f82cf79f9be7c724270a8aa61，
+版权 (c) 2026 DeepSeek，MIT 许可，正文见 `tests/fixtures/DSH-LICENSE`。
+该测试夹具与上面的人物美术无关。

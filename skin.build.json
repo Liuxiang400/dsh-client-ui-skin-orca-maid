@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "fingerprint": "db1b778696d5b56d31d33f4ca19363e76b6c207210ceb3be0310311b276d9fac",
-  "sourceCommit": "662c400595e1e924a89921432eb6966bf37f7c35",
+  "fingerprint": "47b08606565cc486c916fe6cc81c6f3d8b23627834cc291c9bc7878bcb02752b",
+  "sourceCommit": "e2c0ebd5d5552b7746eab596d012c32209b4434e",
   "repository": "bendix400/dsh-client-ui-skin-orca-maid",
   "path": "orca-maid"
 }
