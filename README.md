@@ -32,7 +32,7 @@ dsh plugin --profile desktop add <本目录绝对路径>
 ```sh
 npm install
 npm run build   # scripts/prepare-skin-assets.mjs -> tsdown -> scripts/write-skin-build.mjs
-npm test        # vitest，203 个用例
+npm test        # vitest，210 个用例
 ```
 
 `lib/`、`assets/runtime/manifest.json` 与 `skin.build.json` 是**提交型产物**：
