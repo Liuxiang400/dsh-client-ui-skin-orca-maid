@@ -22,17 +22,18 @@
     }
   },
   "scripts": {
-    "build": "node scripts/prepare-skin-assets.mjs . && tsdown && node scripts/write-skin-build.mjs . bendix400/dsh-client-ui-skin-orca-maid",
-    "test": "vitest run"
+    "build": "node scripts/prepare-skin-assets.mjs . && tsdown && node scripts/write-skin-build.mjs . Liuxiang400/dsh-client-ui-skin-orca-maid",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build && npm test"
   },
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bendix400/dsh-client-ui-skin-orca-maid.git"
+    "url": "git+https://github.com/Liuxiang400/dsh-client-ui-skin-orca-maid.git"
   },
-  "homepage": "https://github.com/bendix400/dsh-client-ui-skin-orca-maid#readme",
+  "homepage": "https://github.com/Liuxiang400/dsh-client-ui-skin-orca-maid#readme",
   "bugs": {
-    "url": "https://github.com/bendix400/dsh-client-ui-skin-orca-maid/issues"
+    "url": "https://github.com/Liuxiang400/dsh-client-ui-skin-orca-maid/issues"
   },
   "publishConfig": {
     "access": "public",
