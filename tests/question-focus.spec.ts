@@ -17,7 +17,7 @@ describe('question composer focus styling', () => {
     expect(css).toContain("[data-question-key] :has(> input:focus)")
     expect(css).toContain('border-color: var(--maid-question-focus)')
     expect(css).toContain('inset 3px 0 0 var(--maid-question-focus)')
-    expect(css).toContain('--maid-question-focus: #2563eb')
+    expect(css).toContain('--maid-question-focus: #2e86f7')
   })
 
   it('keeps the focus bar off the zero-padding inline answer field', () => {
@@ -31,7 +31,7 @@ describe('question composer focus styling', () => {
   })
 
   it('keeps question recommendation text readable in dark mode', () => {
-    expect(css).toContain('--dsw-alias-button-info-fill: #4d91ff !important;')
+    expect(css).toContain('--dsw-alias-button-info-fill: #5b9cf8 !important;')
   })
 
   it('anchors every status bubble tail on the left', () => {

@@ -26,8 +26,8 @@ describe('MAID panel pages', () => {
     expect(sheet).toMatch(/backdrop-filter: blur\(\d+px\)/)
     expect(sheet).toContain('pointer-events: none')
     expect(block(`${GATE}\n  ${COLUMN}`)).toContain('position: relative')
-    expect(css).toMatch(/--maid-reading-surface: rgba\(251, 247, 239, [\d.]+\);/);
-    expect(css).toMatch(/\[data-ds-dark-theme\] \{[\s\S]*?--maid-reading-surface: rgba\(14, 20, 30, [\d.]+\);/)
+    expect(css).toMatch(/--maid-reading-surface: rgba\(255, 255, 255, [\d.]+\);/);
+    expect(css).toMatch(/\[data-ds-dark-theme\] \{[\s\S]*?--maid-reading-surface: rgba\(26, 27, 31, [\d.]+\);/)
   })
 
   it('keeps the filter off the page root and lifts it above the sheet', () => {
