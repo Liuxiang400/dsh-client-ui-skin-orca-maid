@@ -77,10 +77,16 @@ body[data-dsh-orca-maid] [data-maid-work-light='sidebar'] [data-maid-light-part=
   display: none;
 }
 
+body[data-dsh-orca-maid] [data-maid-work-light='sidebar'] [data-maid-light-illumination] {
+  /* The sidebar rig is only a depth cue behind the character; it used to read
+     as a white haze above her head. Keep it cool and mostly transparent. */
+  opacity: .28;
+}
+
 body[data-dsh-orca-maid] [data-maid-work-light='sidebar'] [data-maid-light-part='beam'] {
   inset: 0;
   background:
-    radial-gradient(ellipse at 46% 5%, #fff0c84a, #ffdfad1c 42%, transparent 76%);
+    radial-gradient(ellipse at 46% 5%, rgba(150, 170, 200, .08), rgba(110, 130, 160, .03) 42%, transparent 76%);
 }
 
 body[data-dsh-orca-maid][data-maid-lamp='flicker']
