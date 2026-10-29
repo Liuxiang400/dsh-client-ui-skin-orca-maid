@@ -31,7 +31,7 @@ body[data-dsh-orca-maid] [data-maid-boot-error] > div {
   padding: clamp(22px, 3vw, 40px);
   border: 1px solid var(--maid-line);
   border-top: 3px solid var(--maid-blue);
-  border-radius: 0;
+  border-radius: var(--dsw-radius-xl);
   background: var(--dsw-input-solid);
   box-shadow: 0 12px 40px #141d2b0c;
   overflow-wrap: anywhere;

@@ -9,8 +9,9 @@ const css = readFileSync(
 // The `main` outlet renders the conversation inside the host's own
 // `main.conversation` slot, or a keyed panel page as its direct child. That
 // split is the one seat test every panel-page rule shares.
-// State the client projects from the `main` outlet; every panel-page rule is gated on it, so a
-// whole-subtree `*` rule is fast-rejected by the ancestor filter while no panel page is open.
+// State the client projects from the `main` outlet. The rounded build styles
+// the page sheet itself, not a whole-subtree radius pass, so no `*` rule has
+// to be gated here anymore.
 const GATE = 'body[data-dsh-orca-maid][data-maid-panel-page]'
 const PAGE = "[data-slot='main'] > :not([data-slot='main.conversation'])"
 const COLUMN = "[class*='centerCol']"
@@ -25,7 +26,7 @@ describe('MAID panel pages', () => {
     expect(sheet).toMatch(/backdrop-filter: blur\(\d+px\)/)
     expect(sheet).toContain('pointer-events: none')
     expect(block(`${GATE}\n  ${COLUMN}`)).toContain('position: relative')
-    expect(css).toMatch(/--maid-reading-surface: rgba\(251, 247, 239, [\d.]+\);/)
+    expect(css).toMatch(/--maid-reading-surface: rgba\(251, 247, 239, [\d.]+\);/);
     expect(css).toMatch(/\[data-ds-dark-theme\] \{[\s\S]*?--maid-reading-surface: rgba\(14, 20, 30, [\d.]+\);/)
   })
 
@@ -37,13 +38,11 @@ describe('MAID panel pages', () => {
     expect(root).not.toContain('backdrop-filter')
   })
 
-  it('squares the whole page subtree, whatever plugin draws it', () => {
-    const rule = css.match(
-      new RegExp(`(body\\[data-dsh-orca-maid\\] \\[data-tone\\],[\\s\\S]*?)\\{\\s*border-radius: 0 !important;`),
-    )?.[1] ?? ''
-    for (const selector of [PAGE, `${PAGE} *`, `${PAGE} *::before`, `${PAGE} *::after`]) {
-      expect(rule).toContain(`${GATE} ${selector}`)
-    }
+  it('leaves the host radius scale to panel pages, whatever plugin draws them', () => {
+    // The old whole-subtree zeroing is gone: plugin cards, rows and chips keep
+    // their own official curvature, and the skin only paints the page sheet.
+    expect(css).not.toMatch(/\[data-tone\][^{}]*\{[^}]*border-radius: 0/)
+    expect(css).not.toMatch(new RegExp(`${escape(PAGE)}\\s*\\*[^{}]*\\{[^}]*border-radius: 0`))
   })
 
   it('does not scan the transcript to tell a panel page from the conversation', () => {
@@ -51,18 +50,15 @@ describe('MAID panel pages', () => {
     expect(css).not.toContain(":has(> [data-slot='main'] >")
   })
 
-  it('gates every whole-subtree rule on state that exists only while it applies', () => {
-    // A rule whose rightmost compound is `*` is evaluated on every element in the
-    // document; Chromium's ancestor filter rejects it in one step only when an
-    // ancestor compound names an attribute that is absent. Measured over six
-    // right-panel toggles on a 4000-row page: 155ms ungated, 6.6ms gated.
+  it('keeps no whole-subtree radius rule that could scan the page', () => {
+    // A rule whose rightmost compound is `*` is evaluated on every element in
+    // the document; the rounded build removes the rectilinear subtree pass, so
+    // neither the panel page nor the settings dialog can reintroduce one.
     const ungated = css.match(
       /^body\[data-dsh-orca-maid\](?!\[data-maid-panel-page\])\s+\[data-slot='main'\] > :not\(\[data-slot='main\.conversation'\]\) \*/m,
     )
     expect(ungated).toBeNull()
-    const settings = css.match(/^body\[data-dsh-orca-maid\](\[[^\]]+\])? :is\(\[data-slot='sidebar\.settings'\] \[role='dialog'\], \[role='dialog'\]\[data-shortcut-modal='settings'\]\) \*/gm) ?? []
-    expect(settings.length).toBeGreaterThanOrEqual(3)
-    for (const selector of settings) expect(selector).toContain('[data-maid-settings-open]')
+    expect(css).not.toMatch(/\[data-slot='sidebar\.settings'\][^{}]*\*[^{}]*\{\s*border-radius:/)
   })
 
   it('styles ::selection on the body so it inherits, not on every element', () => {
@@ -99,7 +95,8 @@ describe('MAID right panel', () => {
     const sheet = block(`${RIGHT}${NOT_FULLSCREEN}\n  ${DOCK}`)
     expect(sheet).toContain('background-color: var(--maid-reading-surface)')
     expect(sheet).toMatch(/backdrop-filter: blur\(\d+px\)/)
-    expect(sheet).toContain('border-radius: 0 !important')
+    // The sheet keeps the host's own radius instead of squaring the dock.
+    expect(sheet).not.toContain('border-radius')
   })
 
   it('slides the panel on a near-opaque stand-in floor instead of a per-frame blur', () => {

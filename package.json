@@ -1,6 +1,6 @@
 {
   "name": "@bendix400/dsh-client-ui-skin-orca-maid",
-  "description": "A deep-blue whale-girl maid on rectilinear, straight-line-redrawn chrome; functional by day, soothing by night.",
+  "description": "A deep-blue whale-girl maid on official-radius chrome with straight-line-redrawn icons; functional by day, soothing by night.",
   "icon": "assets/plugin-icon.png",
   "version": "0.1.0",
   "type": "module",

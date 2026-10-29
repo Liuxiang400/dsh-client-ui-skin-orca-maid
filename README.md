@@ -1,11 +1,11 @@
 # ORCA MAID · 虎鲸女仆
 
-DeepSeek Harness Web GUI 的皮肤：深海蓝鲸鱼娘女仆，配上直角机能框架。
+DeepSeek Harness Web GUI 的皮肤：深海蓝鲸鱼娘女仆，配上官方圆角的机能框架。
 
 - **十态状态角色**：待机 / 同步 / 工作中 / 待授权 / 待输入 / 审阅 / 完成 / 失败 / 离线 / 就绪，
   常驻侧栏顶部，透明图集随状态切换
 - **四组 16:9 场景**：亮色「白色工坊」与暗色「夜间书房」各一对，空态 ↔ 工作态 640ms 交叉淡化
-- **直角契约**：按钮、输入框、卡片、菜单、弹窗、标签、滚动条圆角归零，宿主图标在运行时重绘为直线图形
+- **圆角契约**：沿用宿主官方半径尺度（4 / 8 / 12 / 16 / 20 / 28px），按钮、输入框、卡片、菜单、弹窗、标签、滚动条保持官方圆润；宿主图标仍在运行时重绘为直线图形
 - 峰谷定价红绿灯（北京时间）、侧栏舞台、输入框拖拽收起与上滚隐藏、首页标题打字机
 - 亮色强调色为蓝 `#2563eb`，暗色为 `#4d91ff`
 - **纯展示层**：不注入服务、不发 Cordis 事件、不触达模型请求；effect 销毁器还原全部 CSS/DOM 写入
@@ -32,7 +32,7 @@ dsh plugin --profile desktop add <本目录绝对路径>
 ```sh
 npm install
 npm run build   # scripts/prepare-skin-assets.mjs -> tsdown -> scripts/write-skin-build.mjs
-npm test        # vitest，210 个用例
+npm test        # vitest，211 个用例
 ```
 
 `lib/`、`assets/runtime/manifest.json` 与 `skin.build.json` 是**提交型产物**：

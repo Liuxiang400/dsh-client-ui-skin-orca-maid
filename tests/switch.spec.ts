@@ -2,14 +2,12 @@
 /**
  * ORCA MAID switch contract.
  *
- * The host switch is a capsule with a round thumb. The shape contract squares
- * the track but never reaches the thumb, so an MAID surface showed a round
- * white ball floating in a hard rectangle, and in the light palette — whose
- * accent IS graphite — the ON state was a dark block that read like the OFF
- * one. These specs pin the replacement form: rectilinear in both parts, the
- * host's 36x20 geometry and 16px travel unchanged, ON carried by the accent
- * fill of track and thumb, and state read from `aria-checked` rather than any
- * parallel class. Rule blocks are matched loosely so the specs hold under both
+ * The host switch is a capsule with a round thumb. The skin used to square
+ * both parts; the rounded build keeps the host capsule and restores the round
+ * thumb while retaining the MAID palette. These specs pin that form: the
+ * host's 36x20 geometry and 16px travel unchanged, capsule and thumb round,
+ * ON carried by the accent fill of track and thumb, and state read from
+ * `aria-checked` rather than any parallel class. Rule blocks are matched loosely so the specs hold under both
  * LF and CRLF checkouts, and every block is asserted non-empty.
  */
 import { readFileSync } from 'node:fs'
@@ -54,9 +52,9 @@ describe('ORCA MAID switch', () => {
     expect(THUMB_ON?.body).toContain('transform: translateX(16px);')
   })
 
-  it('rectifies both parts instead of leaving the host thumb round', () => {
-    expect(TRACK?.body).toContain('border-radius: 0 !important;')
-    expect(THUMB?.body).toContain('border-radius: 0 !important;')
+  it('keeps the host capsule and round thumb', () => {
+    expect(TRACK?.body).toContain('border-radius: 999px !important;')
+    expect(THUMB?.body).toContain('border-radius: 50% !important;')
     expect(THUMB?.body).toContain('border: 1px solid var(--maid-muted);')
   })
 
@@ -76,8 +74,8 @@ describe('ORCA MAID switch', () => {
   })
 
   it('reaches the settings dialog but keeps the hands-off seats native', () => {
-    // The settings dialog already zeroes every radius inside it, so excluding
-    // the section would give one control two different designs.
+    // The settings dialog now keeps the host radius scale, so the MAID switch
+    // can dress the section without giving it a second geometry language.
     expect(TRACK?.selector).not.toContain("[data-slot='settings.section'] *")
     for (const seat of [
       "[data-slot='conversation.input.left'] *",

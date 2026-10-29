@@ -3,15 +3,16 @@ const OWNED_STYLE_ATTRIBUTE = 'data-maid-windows-menu'
 
 // The desktop shell draws its 应用 / 编辑 caption menubar inside an open shadow
 // root with 6px rounded buttons. Colours arrive through inherited tokens and
-// are handled in CSS; the corner is shadow-local, so MAID's square shape
-// contract has to be carried in as a skin-owned stylesheet.
+// are handled in CSS; the corner is shadow-local, so the host radius has to be
+// carried into the skin-owned stylesheet to keep the caption row consistent
+// with the rounded MAID surfaces.
 const MENU_CSS = `
-  button { border-radius: 0; corner-shape: square; }
+  button { border-radius: 6px; }
 `
 
 /**
- * Square the Windows caption menubar so it hovers like the neighbouring
- * caption toggle. Only the <style> node this activation appended is removed on
+ * Keep the Windows caption menubar at the host's 6px radius so it hovers like
+ * the neighbouring caption toggle. Only the <style> node this activation appended is removed on
  * disposal; the shell's own menubar, shadow root and styles are never touched.
  */
 export function installMaidWindowsMenu(body: HTMLElement): () => void {

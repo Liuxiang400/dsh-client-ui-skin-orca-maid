@@ -120,7 +120,6 @@ html[data-platform='darwin'] body[data-dsh-orca-maid]
 
 body[data-dsh-orca-maid] [data-turn-trigger] {
   border-color: var(--maid-line);
-  border-radius: 0;
   background: var(--maid-surface-strong);
 }
 
@@ -128,130 +127,15 @@ body[data-dsh-orca-maid] [data-turn-trigger]:hover {
   border-color: var(--maid-blue);
 }
 
-/* MAID shape contract: keep interactive surfaces and skin chrome rectilinear
-   without matching every generated DOM node. The former universal descendant
-   and pseudo-element rules made xterm's high-churn row renderer repeatedly
-   resolve MAID styles for thousands of terminal spans. */
-body[data-dsh-orca-maid],
-body[data-dsh-orca-maid] :where(
-  button,
-  input,
-  textarea,
-  select,
-  [role='button'],
-  [role='checkbox'],
-  [role='combobox'],
-  [role='dialog'],
-  [role='listbox'],
-  [role='menu'],
-  [role='menuitem'],
-  [role='menuitemradio'],
-  [role='option'],
-  [role='radio'],
-  [role='switch'],
-  [role='tab'],
-  [role='tooltip'],
-  [role='treeitem'],
-  [data-composer-card],
-  [data-composer-input],
-  [data-skin-chrome]
-):not(
-  [data-slot='conversation.input.left'] *,
-  [data-slot='conversation.input.right'] *,
-  [data-slot='sidebar.footer.action'] *,
-  [data-slot='settings.section'] *
-),
-body[data-dsh-orca-maid] :where(
-  button,
-  [role='button'],
-  [role='dialog'],
-  [role='menu'],
-  [role='menuitem'],
-  [role='menuitemradio'],
-  [role='tooltip'],
-  [data-composer-card],
-  [data-skin-chrome]
-):not(
-  [data-slot='conversation.input.left'] *,
-  [data-slot='conversation.input.right'] *,
-  [data-slot='sidebar.footer.action'] *,
-  [data-slot='settings.section'] *
-)::before,
-body[data-dsh-orca-maid] :where(
-  button,
-  [role='button'],
-  [role='dialog'],
-  [role='menu'],
-  [role='menuitem'],
-  [role='menuitemradio'],
-  [role='tooltip'],
-  [data-composer-card],
-  [data-skin-chrome]
-):not(
-  [data-slot='conversation.input.left'] *,
-  [data-slot='conversation.input.right'] *,
-  [data-slot='sidebar.footer.action'] *,
-  [data-slot='settings.section'] *
-)::after {
-  border-radius: 0 !important;
-}
+/* MAID shape contract: the skin no longer flattens the host radius scale or
+   forces generated surfaces square. The official ui-theme values
+   (--dsw-radius-xs 4 / sm 8 / md 12 / lg 16 / xl 20 / panel 28) now reach
+   buttons, cards, menus, dialogs and chat bubbles unchanged; only the chrome
+   the skin paints itself opts into a radius below. */
 
-/* The element list above only reaches interactive roles, so host surfaces
-   drawn as plain divs from the radius scale kept their curves: cards, panels,
-   and component variables derived from it, such as the side panel's guide
-   entries (`--dsl-guide-entry-radius: var(--dsw-radius-xl)`), where the
-   split-menu "New terminal" entry is a div beside two square buttons.
-   Zeroing the scale itself squares every token-drawn surface, present and
-   future, with no per-node selector cost. The hands-off seats of the element
-   contract get the host scale back (ui-theme 0.1.7 values) so plugin controls
-   there keep their own geometry. */
-body[data-dsh-orca-maid] {
-  --dsw-radius-xs: 0px;
-  --dsw-radius-sm: 0px;
-  --dsw-radius-md: 0px;
-  --dsw-radius-lg: 0px;
-  --dsw-radius-xl: 0px;
-  --dsw-radius-panel: 0px;
-}
-
-body[data-dsh-orca-maid] :is(
-  [data-slot='conversation.input.left'],
-  [data-slot='conversation.input.right'],
-  [data-slot='sidebar.footer.action'],
-  [data-slot='settings.section']
-) {
-  --dsw-radius-xs: 4px;
-  --dsw-radius-sm: 8px;
-  --dsw-radius-md: 12px;
-  --dsw-radius-lg: 16px;
-  --dsw-radius-xl: 20px;
-  --dsw-radius-panel: 28px;
-}
-
-/* Keep chat bubbles rectilinear in every theme, matching the MAID shape
-   contract even when the host ships rounded user-message bubbles. */
-body[data-dsh-orca-maid] [data-chat-flow] *,
-body[data-dsh-orca-maid] [data-chat-flow] *::before,
-body[data-dsh-orca-maid] [data-chat-flow] *::after {
-  border-radius: 0 !important;
-}
-
-/* Switch: a machined breaker slot instead of the host's capsule with a ball.
-   The shape contract squares the track but never reaches the thumb, so the
-   control shipped as a round white ball floating in a hard rectangle — and
-   because the light palette's accent IS graphite, the ON state was a dark
-   block that read like the OFF one. Both parts are rectilinear here: OFF is a
-   hollow block resting in a recessed slot, ON is the same block travelled
-   right, filled with the accent, in an accent-tinted slot behind an accent
-   frame. Geometry stays the host's 36x20 with a 1px frame and a 1px inset, so
-   the 16px travel, hit box, layout and the `aria-checked` state source are all
-   unchanged.
-
-   Unlike the shape contract this deliberately reaches into the settings
-   dialog: that dialog already carries its own universal rectilinear zeroing
-   (`[role='dialog'][data-shortcut-modal='settings'] *`), so the switch inside it
-   is square either way and excluding the section would give one control two
-   designs. Only the hands-off seats keep the host's own switch. */
+/* Switch: the host capsule, retuned to the MAID palette. Geometry stays the
+   host's 36x20 with a 1px frame and a 1px inset, so the 16px travel, hit box,
+   layout and the `aria-checked` state source are all unchanged. */
 body[data-dsh-orca-maid] :where([role='switch']):not(
   [data-slot='conversation.input.left'] *,
   [data-slot='conversation.input.right'] *,
@@ -262,7 +146,7 @@ body[data-dsh-orca-maid] :where([role='switch']):not(
   height: 20px;
   padding: 1px;
   border: 1px solid var(--maid-line);
-  border-radius: 0 !important;
+  border-radius: 999px !important;
   background: color-mix(in srgb, var(--maid-ink) 7%, var(--dsw-input-solid));
   transition: background-color 140ms ease, border-color 140ms ease;
 }
@@ -286,7 +170,7 @@ body[data-dsh-orca-maid] :where([role='switch']):not(
   width: 16px;
   height: 16px;
   border: 1px solid var(--maid-muted);
-  border-radius: 0 !important;
+  border-radius: 50% !important;
   background: var(--maid-surface-strong);
   transition: transform 140ms ease, background-color 140ms ease, border-color 140ms ease;
 }
@@ -305,12 +189,12 @@ body[data-dsh-orca-maid] :where([role='switch'][aria-checked='true']):not(
    above reaches. The host toast is `body > [role='alert']` driven by its own
    `--dsh-toast-hold`, the hover card carries `--dsh-hover-preview-fade`; both
    inline properties are the components' timing contracts, so they identify
-   the surfaces without generated class names. The toast becomes a squared
+   the surfaces without generated class names. The toast becomes a rounded
    MAID panel with the signal edge the menus use; its fade and position stay
    the host's. */
 body[data-dsh-orca-maid] > [role='alert'][style*='--dsh-toast-hold'] {
   border: 1px solid var(--maid-line);
-  border-radius: 0 !important;
+  border-radius: var(--dsw-radius-md);
   background: #fbf7ef;
   color: var(--maid-ink);
   box-shadow: inset 2px 0 var(--maid-blue), var(--maid-shadow);
@@ -326,42 +210,7 @@ body[data-dsh-orca-maid] > [role='alert'][style*='--dsh-toast-hold'] button {
 
 body[data-dsh-orca-maid] > [style*='--dsh-hover-preview-fade'] {
   border: 1px solid var(--maid-line);
-  border-radius: 0 !important;
-}
-
-/* The shared StateDot (session rows, todo, approval, plugin states) paints its
-   6px core on `::after` with a hard-coded 50% radius, and the numbered step
-   variant is a round badge; neither is a token surface. Both are an
-   aria-hidden span carrying `data-state`, so square that pair locally; the
-   ongoing spinner is an SVG glyph and keeps its ring. */
-body[data-dsh-orca-maid] :where(span[data-state][aria-hidden='true']):not(
-  [data-slot='conversation.input.left'] *,
-  [data-slot='conversation.input.right'] *,
-  [data-slot='sidebar.footer.action'] *
-),
-body[data-dsh-orca-maid] :where(span[data-state][aria-hidden='true']):not(
-  [data-slot='conversation.input.left'] *,
-  [data-slot='conversation.input.right'] *,
-  [data-slot='sidebar.footer.action'] *
-)::after {
-  border-radius: 0 !important;
-}
-
-/* Status tags (Tag's `data-tone`) are pills in the host. A panel page — the
-   plugin manager, a conversation manager, whatever the next plugin ships — is
-   a management surface with no high-churn content, and plugin pages draw
-   their cards and rows from their own hard-coded radii (a 10px card no token
-   reaches), so it takes the same whole-subtree rectilinear pass the settings
-   dialog already has. The `main` outlet renders either the conversation, which
-   the host wraps in its own `main.conversation` slot, or a keyed panel page as
-   the outlet's direct child; that split is the seat test every panel-page rule
-   below shares, and it needs no `:has()` scan of the transcript. */
-body[data-dsh-orca-maid] [data-tone],
-body[data-dsh-orca-maid][data-maid-panel-page] [data-slot='main'] > :not([data-slot='main.conversation']),
-body[data-dsh-orca-maid][data-maid-panel-page] [data-slot='main'] > :not([data-slot='main.conversation']) *,
-body[data-dsh-orca-maid][data-maid-panel-page] [data-slot='main'] > :not([data-slot='main.conversation']) *::before,
-body[data-dsh-orca-maid][data-maid-panel-page] [data-slot='main'] > :not([data-slot='main.conversation']) *::after {
-  border-radius: 0 !important;
+  border-radius: var(--dsw-radius-lg);
 }
 
 /* Command shells own their rounded frame outside the listbox. Keep the
@@ -371,7 +220,7 @@ body[data-dsh-orca-maid] [data-slot='conversation.input.overlay']
   div[aria-label]:has(> input):has(> [role='listbox']) {
   box-sizing: border-box;
   border: 1px solid var(--maid-line);
-  border-radius: 0 !important;
+  border-radius: var(--dsw-radius-lg);
   background: var(--dsw-input-solid);
   box-shadow: var(--maid-shadow);
   color: var(--maid-ink);
@@ -386,7 +235,6 @@ body[data-dsh-orca-maid] [data-slot='conversation.input.overlay']
    launch/menu behavior, separator, disabled state and error feedback. */
 body[data-dsh-orca-maid] [data-slot='conversation.session.header.utilities']
   div[class$='_split']:has(> button[aria-haspopup='menu']) {
-  border-radius: 0 !important;
   border-color: var(--maid-line);
   background: var(--maid-surface-strong);
 }
@@ -413,7 +261,6 @@ body[data-dsh-orca-maid] [data-sidebar-right-panel]:not([data-sidebar-right-pane
   backdrop-filter: blur(6px) saturate(0.95);
   transition: background-color 220ms ease-out;
   border-color: var(--maid-line);
-  border-radius: 0 !important;
 }
 
 /* The blur is recomputed every frame on a 344px x full-height layer that is
@@ -446,7 +293,6 @@ body[data-dsh-orca-maid] [data-sidebar-right-panel='fullscreen']
 body[data-dsh-orca-maid] [data-sidebar-right-panel] [data-dockkit-float] {
   background: var(--dsw-input-solid);
   border-color: var(--maid-line);
-  border-radius: 0 !important;
 }
 
 body[data-dsh-orca-maid] [data-sidebar-right-panel] [data-dockkit-float] {
@@ -555,7 +401,7 @@ body[data-dsh-orca-maid] [data-slot='settings.launcher'] button[data-collapsed][
 /* Stats include noninteractive span pills as well as buttons. Their own
    reading surface keeps small figures distinct from the scene behind them. */
 body[data-dsh-orca-maid] [data-composer-stats] [class$='_pill'] {
-  border-radius: 0 !important;
+  border-radius: 999px !important;
   background: var(--dsw-input-solid);
   color: var(--maid-graphite);
 }
@@ -1022,19 +868,6 @@ body[data-dsh-orca-maid][data-maid-cordis-panel-open] [data-cordis-panel] {
   z-index: var(--maid-z-cordis);
 }
 
-/* The settings surface is an owned instrument panel. Its inner cards, tag
-   chips, badges, status dots and toggle knobs are divs/spans that miss the
-   shape contract (which only covers interactive elements), so the settings
-   dialog subtree gets the same universal rectilinear zeroing as the chat
-   flow. The dialog's own mask and decorations live outside this subtree, and
-   scrollbar pseudo-elements are not matched by `*` — the global square
-   scrollbar styling keeps governing them. */
-body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) *,
-body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) *::before,
-body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) *::after {
-  border-radius: 0 !important;
-}
-
 @keyframes maidSettingsMaskIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -1183,7 +1016,6 @@ body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [ro
 
 body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) > nav button + button {
   border-top: 2px solid color-mix(in srgb, var(--maid-blue) 28%, transparent);
-  border-radius: 0;
 }
 
 /* Desktop shells keep a window strip above the page. Windows paints its
@@ -1523,7 +1355,7 @@ body[data-dsh-orca-maid]
   width: min(276px, calc(100vw - 32px));
   padding: 4px;
   border: 1px solid color-mix(in srgb, var(--maid-graphite) 34%, transparent);
-  border-radius: 0;
+  border-radius: var(--dsw-radius-lg);
   background:
     linear-gradient(90deg, color-mix(in srgb, var(--maid-blue) 7%, transparent), transparent 42%),
     #fbf7ef;
@@ -1576,7 +1408,7 @@ body[data-dsh-orca-maid]
   padding: 6px 8px;
   border: 0;
   border-left: 2px solid transparent;
-  border-radius: 0;
+  border-radius: var(--dsw-radius-sm);
   background: transparent;
 }
 
@@ -1628,7 +1460,7 @@ body[data-dsh-orca-maid]
 
 body[data-dsh-orca-maid]
   [class$='_menu'][data-maid-menu-cells] [role='menuitem'] {
-  border-radius: 0;
+  border-radius: var(--dsw-radius-sm);
 }
 
 body[data-dsh-orca-maid]
@@ -1668,7 +1500,7 @@ body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > :first-child::af
   left: 4px;
   width: 2px;
   height: 30px;
-  border-radius: 0;
+  border-radius: 999px;
   background: linear-gradient(180deg, transparent, rgba(0, 126, 255, 0.9) 24%, #c9f5ff 52%, rgba(0, 126, 255, 0.82) 76%, transparent);
   box-shadow: 0 0 5px rgba(0, 126, 255, 0.55), 0 0 12px rgba(0, 126, 255, 0.28);
   opacity: 0;
@@ -1963,6 +1795,7 @@ body[data-dsh-orca-maid] .statusCharacterBubble {
   height: 35px;
   place-items: center;
   border: 1px solid color-mix(in srgb, var(--maid-character-signal) 66%, transparent);
+  border-radius: var(--dsw-radius-sm);
   background: color-mix(in srgb, var(--maid-character-signal) 8%, rgba(255, 252, 246, 0.96));
   box-shadow: 0 8px 18px rgba(26, 38, 55, 0.12);
   color: var(--maid-character-signal);
@@ -2128,8 +1961,7 @@ html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [dat
 
 body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) > :first-child > button:not([data-dsh-part='sidebar-entry']) {
   position: relative;
-  border-radius: 0;
-  clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%);
+  border-radius: var(--dsw-radius-md);
 }
 
 body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) > :first-child > button:not([data-dsh-part='sidebar-entry']) > svg {
@@ -2222,10 +2054,9 @@ html[data-windows-titlebar] body[data-dsh-orca-maid]
 }
 
 /* The Windows frame rounds the conversation column's top-left corner under
-   the caption (`--dsh-windows-content-radius`, 16px). MAID's shape contract
-   is square throughout. */
+   the caption; keep the host's own radius so the two corners agree. */
 html[data-windows-titlebar] body[data-dsh-orca-maid] [class*='centerCol'] {
-  border-radius: 0;
+  border-radius: var(--dsh-windows-content-radius, var(--dsw-radius-lg));
 }
 
 /* The stage pieces above are placed in the web sidebar's flow geometry: 6px
@@ -2360,8 +2191,7 @@ body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='sidebar'][data-maid-sid
 body[data-dsh-orca-maid] [data-slot='sidebar'] button[aria-haspopup='dialog'] {
   position: relative;
   border: 1px solid transparent;
-  border-radius: 0;
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+  border-radius: var(--dsw-radius-md);
 }
 
 body[data-dsh-orca-maid] [data-slot='sidebar'] button[aria-haspopup='dialog']::after {
@@ -2448,7 +2278,7 @@ body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded] 
   min-height: 38px;
   padding: 0 8px;
   align-items: center;
-  border-radius: 0;
+  border-radius: var(--dsw-radius-md);
   background: transparent;
 }
 
@@ -2585,7 +2415,7 @@ body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selecte
   height: 34px;
   margin-left: 18px;
   padding: 0 7px 0 9px;
-  border-radius: 0;
+  border-radius: var(--dsw-radius-md);
   background: transparent;
   backdrop-filter: none;
   box-shadow: none;
@@ -2766,47 +2596,6 @@ body[data-dsh-orca-maid] [data-question-key] textarea:focus {
   caret-color: var(--maid-question-focus);
 }
 
-/* The official question/plan-review/approval cards and the todo panel live
-   outside [data-chat-flow], so their section cards and span chips miss the
-   MAID shape contract. Square the cards, option index chips, custom rows,
-   checkbox glyphs, status dots and the recommendation badge. */
-body[data-dsh-orca-maid] [data-question-key] [class*='_card'],
-body[data-dsh-orca-maid] [data-plan-review-key] [class*='_card'],
-body[data-dsh-orca-maid] [data-approval-key] [class*='_card'],
-body[data-dsh-orca-maid] [data-testid='todo-panel'] {
-  border-radius: 0 !important;
-}
-
-body[data-dsh-orca-maid] [data-question-key] [class*='_number'],
-body[data-dsh-orca-maid] [data-question-key] [class*='_customRow'],
-body[data-dsh-orca-maid] [data-question-key] [class*='_badge'],
-body[data-dsh-orca-maid] [data-plan-review-key] [class*='_dot'],
-body[data-dsh-orca-maid] [data-approval-key] [class*='_dot'],
-body[data-dsh-orca-maid] [data-queue-dock] [class*='_panel'],
-body[data-dsh-orca-maid] [data-queue-dock] [class*='_row'],
-body[data-dsh-orca-maid] [data-composer-card] [class*='_notice']:not(
-    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *),
-body[data-dsh-orca-maid] [data-composer-card] [class*='_chip']:not(
-    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *),
-body[data-dsh-orca-maid] [data-composer-card] [class*='_hlSegment']:not(
-    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *),
-body[data-dsh-orca-maid] [data-composer-card] [class*='_pending']:not(
-    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *),
-body[data-dsh-orca-maid] [data-composer-card] [class*='_panel']:not(
-    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *),
-body[data-dsh-orca-maid] [data-composer-card] [class*='_bar']:not(
-    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *),
-body[data-dsh-orca-maid] [data-composer-card] [class*='_segment']:not(
-    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *),
-body[data-dsh-orca-maid] [data-composer-card] [class*='_swatch']:not(
-    [data-slot='conversation.input.left'] *, [data-slot='conversation.input.right'] *) {
-  border-radius: 0 !important;
-}
-
-body[data-dsh-orca-maid] [data-question-key] [class*='_checkbox']::before {
-  border-radius: 0 !important;
-}
-
 /* Todo glyphs. DSH 0.1.7 draws each todo state with the shared StateDot (a
    round dot, or a rotating ring while in progress) inside
    `li[data-status] > .glyph`, so the SVG-path redraws in icons.ts that used
@@ -2891,7 +2680,7 @@ body[data-dsh-orca-maid] ::-webkit-scrollbar { width: 9px; height: 9px; }
 body[data-dsh-orca-maid] ::-webkit-scrollbar-track { background: transparent; }
 body[data-dsh-orca-maid] ::-webkit-scrollbar-thumb {
   border: 2px solid transparent;
-  border-radius: 0;
+  border-radius: 999px;
   background: rgba(87, 101, 121, 0.35);
   background-clip: padding-box;
 }
@@ -2908,6 +2697,7 @@ body[data-dsh-orca-maid] .signalChip {
   min-height: 18px;
   padding: 4px 7px 4px 6px;
   border-left: 1px solid color-mix(in srgb, var(--maid-signal-color) 52%, transparent);
+  border-radius: 6px;
   background: linear-gradient(90deg, var(--maid-signal-wash), transparent 90%);
   color: color-mix(in srgb, var(--maid-signal-color) 70%, var(--maid-graphite));
   white-space: nowrap; pointer-events: none;
@@ -2918,7 +2708,7 @@ body[data-dsh-orca-maid] .signalChip {
 }
 body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] .signalChip { opacity: 1; }
 body[data-dsh-orca-maid] .signalDot {
-  width: 6px; height: 6px; border-radius: 0;
+  width: 6px; height: 6px; border-radius: 50%;
   flex: 0 0 6px;
   background: var(--maid-signal-color);
   box-shadow: 0 0 10px color-mix(in srgb, var(--maid-signal-color) 70%, transparent);
@@ -3012,6 +2802,7 @@ body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > .pricingLight {
   width: auto;
   padding: 1px 4px;
   border: 1px solid color-mix(in srgb, var(--maid-price-signal) 42%, var(--maid-line));
+  border-radius: 6px;
   background: color-mix(in srgb, var(--maid-price-signal) 7%, var(--maid-surface-strong));
   box-shadow: 0 5px 12px rgba(27, 39, 58, 0.14);
   color: var(--maid-price-signal);
@@ -3108,7 +2899,7 @@ body[data-dsh-orca-maid] .pricingLamp {
   width: 4px;
   height: 4px;
   border: 1px solid var(--maid-line);
-  border-radius: 0;
+  border-radius: 50%;
   background: transparent;
   opacity: 0.3;
   transition: opacity 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
@@ -3159,7 +2950,7 @@ body[data-dsh-orca-maid] .pricingTooltip {
   width: 226px;
   padding: 9px 9px 9px;
   border: 1px solid var(--maid-line);
-  border-radius: 0;
+  border-radius: var(--dsw-radius-md);
   background: var(--maid-surface-strong);
   box-shadow: var(--maid-shadow);
   color: var(--maid-graphite);
@@ -3256,20 +3047,21 @@ body[data-dsh-orca-maid] [data-phase='hero'] [class*='titleGroup'] > span:not([c
   49%, 100% { opacity: 0; }
 }
 body[data-dsh-orca-maid] [data-phase='hero'] [class*='previewBadge'] {
-  border: 1px solid var(--maid-line); border-radius: 0;
+  border: 1px solid var(--maid-line); border-radius: var(--dsw-radius-sm);
   padding: 3px 8px 2px;
   color: var(--maid-muted); background: var(--maid-surface);
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
   font-size: 9px; letter-spacing: 0.22em;
 }
 
-/* Hero and active phases share one signature terminal: squared corners, a
-   stronger frame, and mechanical side arms bracketing the card. */
+/* Hero and active phases share one signature terminal: the host's 28px
+   composer radius, a stronger frame, and mechanical side arms bracketing
+   the card. */
 body[data-dsh-orca-maid] [data-composer-card] {
   position: relative;
   container-name: maid-composer;
   container-type: inline-size;
-  border-radius: 0;
+  border-radius: var(--dsw-radius-panel);
   border-style: solid;
   border-color: var(--maid-line);
   background-color: var(--dsw-specific-input-major);
@@ -3743,8 +3535,7 @@ body[data-dsh-orca-maid]
   > :has(> [data-conversation-scroll])
   > [data-width-handle][data-side]::after {
   width: 3px;
-  /* The host bar keeps a 2px radius; the signal rail is a hard line. */
-  border-radius: 0;
+  border-radius: 999px;
   background: linear-gradient(
     to bottom,
     transparent calc(var(--dsh-width-handle-pointer-y, 50%) - 50px),
@@ -3791,7 +3582,7 @@ body[data-dsh-orca-maid]
 /* The rail precedes the transcript root; root > scroll > flow stays present
    even when data-chat-following-tail is removed while reading history. */
 body[data-dsh-orca-maid]:not([data-ds-dark-theme]) [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label]::before {
-  border-radius: 0;
+  border-radius: var(--dsw-radius-sm);
   background: rgba(115, 88, 63, 0.56);
 }
 

@@ -23,12 +23,12 @@ afterEach(() => {
 })
 
 describe('ORCA MAID Windows caption menubar', () => {
-  it('squares the shell menubar and removes only its own stylesheet', () => {
+  it('keeps the host caption radius and removes only its own stylesheet', () => {
     const shadow = mountShellMenu()
     const dispose = installMaidWindowsMenu(document.body)
     const owned = shadow.querySelectorAll('style[data-maid-windows-menu]')
     expect(owned).toHaveLength(1)
-    expect(owned[0]!.textContent).toContain('border-radius: 0')
+    expect(owned[0]!.textContent).toContain('border-radius: 6px')
 
     dispose()
     expect(shadow.querySelectorAll('style[data-maid-windows-menu]')).toHaveLength(0)
@@ -54,7 +54,7 @@ describe('ORCA MAID Windows caption menubar', () => {
       /\[class\*='root'\]:not\(\[class\*='collapsed'\]\) > \[class\*='logoRow'\] > button\[class\*='toggle'\]:is\(:hover, :focus-visible\)\s*\{\s*background: color-mix\(in srgb, var\(--dsw-alias-label-secondary\) 14%, transparent\);/,
     )
     expect(CSS).toMatch(
-      /html\[data-windows-titlebar\] body\[data-dsh-orca-maid\] \[class\*='centerCol'\]\s*\{\s*border-radius: 0;/,
+      /html\[data-windows-titlebar\] body\[data-dsh-orca-maid\] \[class\*='centerCol'\]\s*\{\s*border-radius: var\(--dsh-windows-content-radius, var\(--dsw-radius-lg\)\);/,
     )
   })
 })

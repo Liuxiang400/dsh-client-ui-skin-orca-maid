@@ -6,16 +6,16 @@ import { describe, expect, it } from 'vitest'
 const CSS = readFileSync(resolve(process.cwd(), 'src/client/orca-maid.module.css'), 'utf8').replaceAll('\r\n', '\n')
 const ICONS = readFileSync(resolve(process.cwd(), 'src/client/icons.ts'), 'utf8')
 
-describe('ORCA MAID shape contract at the token level', () => {
-  it('zeroes the host radius scale so token-drawn divs square up too', () => {
-    const rule = CSS.match(/body\[data-dsh-orca-maid\] \{\n  --dsw-radius-xs: 0px;([^}]*)\}/)?.[0] ?? ''
-    for (const token of ['xs', 'sm', 'md', 'lg', 'xl', 'panel']) expect(rule).toContain(`--dsw-radius-${token}: 0px`)
+describe('ORCA MAID rounded shape contract at the token level', () => {
+  it('hands token-drawn surfaces the host radius scale instead of zeroing it', () => {
+    expect(CSS).not.toMatch(/--dsw-radius-(xs|sm|md|lg|xl|panel): 0px/)
+    expect(CSS).not.toContain('border-radius: 0')
   })
 
-  it('hands the host scale back to the hands-off seats', () => {
-    const rule = CSS.match(/\[data-slot='settings\.section'\]\n\) \{([^}]*)\}/)?.[1] ?? ''
-    expect(rule).toContain('--dsw-radius-md: 12px')
-    expect(rule).toContain('--dsw-radius-xl: 20px')
+  it('rounds skin-owned chrome explicitly with the host tokens', () => {
+    for (const token of ['--dsw-radius-md', '--dsw-radius-lg', '--dsw-radius-panel']) {
+      expect(CSS).toContain(`border-radius: var(${token})`)
+    }
   })
 })
 
