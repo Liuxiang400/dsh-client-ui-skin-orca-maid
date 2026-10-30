@@ -38,14 +38,6 @@ describe('ORCA MAID sidebar motion', () => {
     expect(css).not.toContain('transition-duration: 200ms;')
   })
 
-  it('moves the seam ruler by transform on the track clock and stops easing during a drag', () => {
-    const spine = css.match(/.spine {([^}]*)}/s)?.[1] ?? ''
-    expect(spine).toContain('left: 0;')
-    expect(spine).toContain('transform: translateX(calc(var(--maid-sidebar-width) - 4px));')
-    expect(spine).toContain('transition: transform var(--maid-track-duration) var(--maid-track-ease);')
-    expect(css).toContain('body[data-dsh-orca-maid][data-maid-sidebar-dragging] .spine { transition: none; }')
-  })
-
   it('hides stale sidebar tooltips during WebApp window resume', () => {
     expect(css).toContain("[data-maid-window-resuming] [data-slot='sidebar'] [role='tooltip']")
     expect(css).toContain('display: none;')

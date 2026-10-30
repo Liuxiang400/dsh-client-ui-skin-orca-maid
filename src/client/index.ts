@@ -12,7 +12,6 @@ import { installMaidComposerCollapse } from './composer-collapse.ts'
 import { installMaidComposerMotion } from './composer-motion.ts'
 import { installMaidCustomization } from './customization.ts'
 import { installMaidHeadlineTypewriter } from './headline-typewriter.ts'
-import { installMaidIcons } from './icons.ts'
 import { installOrcaMaidStatus } from './link-status.ts'
 import { hasMutationOutsideTranscript } from './mutation-filter.ts'
 import { installMaidPageIcons } from './page-icons.ts'
@@ -35,7 +34,6 @@ const LIGHT_HERO_ART_PROPERTY = '--orca-maid-light-hero-art'
 const LIGHT_ACTIVE_ART_PROPERTY = '--orca-maid-light-active-art'
 const DARK_HERO_ART_PROPERTY = '--orca-maid-dark-hero-art'
 const DARK_ACTIVE_ART_PROPERTY = '--orca-maid-dark-active-art'
-const SIDEBAR_WIDTH_PROPERTY = '--maid-sidebar-width'
 const SIDEBAR_ART_WIDTH_PROPERTY = '--maid-sidebar-art-width'
 const SIDEBAR_WIDE_ATTRIBUTE = 'data-maid-sidebar-wide'
 // The settings overlay is a body-level portal, outside the sidebar slot that
@@ -156,7 +154,6 @@ export function apply(ctx: Context): void {
   const disposeComposerMotion = installMaidComposerMotion(body)
   const disposeComposerCollapse = installMaidComposerCollapse(body)
   const disposeHeadlineTypewriter = installMaidHeadlineTypewriter(body)
-  const disposeIcons = installMaidIcons(body)
   const disposeRailSearch = installMaidRailSearch(body)
   const disposeWindowResume = installMaidWindowResume(body)
   const disposeTerminalPerformance = installMaidTerminalPerformance(body)
@@ -195,11 +192,6 @@ export function apply(ctx: Context): void {
   })
   wordmarkObserver.observe(body, { childList: true, subtree: true })
 
-  const spine = document.createElement('div')
-  spine.className = cls('spine')
-  spine.dataset.skinChrome = 'spine'
-  spine.setAttribute('aria-hidden', 'true')
-
   let observedSidebar: Element | null = null
   let observedFrame: Element | null = null
   let originalArtWidth = ''
@@ -228,8 +220,6 @@ export function apply(ctx: Context): void {
     if (width > 0 && width !== lastSidebarWidth) {
       lastSidebarWidth = width
       syncSettingsSidebarState()
-      // The seam ruler is a body child, so it carries its own copy.
-      if (!dragging) spine.style.setProperty(SIDEBAR_WIDTH_PROPERTY, `${width}px`)
     }
     if (width <= 96) return
     // The stage keeps the last wide width while the track collapses (the
@@ -239,7 +229,6 @@ export function apply(ctx: Context): void {
     if (pane instanceof HTMLElement && pane.style.getPropertyValue(SIDEBAR_ART_WIDTH_PROPERTY) !== `${width}px`) {
       pane.style.setProperty(SIDEBAR_ART_WIDTH_PROPERTY, `${width}px`)
     }
-    if (dragging) spine.style.transform = `translateX(${width - 4}px)`
   }
   const frameObserver = new MutationObserver(() => {
     const dragging = observedFrame?.hasAttribute('data-dragging') === true
@@ -253,9 +242,7 @@ export function apply(ctx: Context): void {
     }
     body.toggleAttribute(SIDEBAR_DRAGGING_ATTRIBUTE, dragging)
     if (dragging) return
-    // Drop: hand the seam back to the stylesheet and commit the final width.
-    spine.style.removeProperty('transform')
-    if (lastSidebarWidth > 0) spine.style.setProperty(SIDEBAR_WIDTH_PROPERTY, `${lastSidebarWidth}px`)
+    // Drop: commit the final width; the pane itself carries the value.
     if (observedSidebar) syncObservedSidebar(observedSidebar)
   })
   const restoreArtWidth = (pane: HTMLElement): void => {
@@ -321,16 +308,8 @@ export function apply(ctx: Context): void {
   darkActiveScene.className = `${cls('darkSceneLayer')} ${cls('darkSceneActive')}`
   darkScene.append(darkHeroScene, darkActiveScene)
 
-  const standby = document.createElement('div')
-  standby.className = cls('standby')
-  standby.dataset.skinChrome = 'standby'
-  standby.setAttribute('aria-hidden', 'true')
-  standby.append(text('span', cls('standbyLine'), ''))
-  standby.append(text('span', cls('standbyCopy'), 'ORCA MAID STANDBY'))
-  standby.append(text('span', cls('standbyLine'), ''))
-
   document.title = SKIN_TITLE
-  body.append(lightScene, darkScene, spine, standby)
+  body.append(lightScene, darkScene)
 
   ctx.effect(() => () => {
     disposeScene()
@@ -340,7 +319,6 @@ export function apply(ctx: Context): void {
     disposeHeadlineTypewriter()
     disposeComposerCollapse()
     disposeComposerMotion()
-    disposeIcons()
     disposeRailSearch()
     disposeWindowResume()
     disposeTerminalPerformance()
@@ -357,8 +335,6 @@ export function apply(ctx: Context): void {
     body.toggleAttribute(SIDEBAR_DRAGGING_ATTRIBUTE, originalSidebarDragging)
     lightScene.remove()
     darkScene.remove()
-    spine.remove()
-    standby.remove()
     wordmarkObserver.disconnect()
     document.querySelectorAll('[data-orca-maid-wordmark]').forEach((wordmark) => wordmark.remove())
     document.querySelectorAll('[data-orca-maid-signal]').forEach((chip) => chip.remove())

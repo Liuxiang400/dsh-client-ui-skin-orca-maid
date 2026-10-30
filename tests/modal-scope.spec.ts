@@ -63,7 +63,7 @@ describe('MAID modal style boundaries', () => {
   })
 
   it('keeps non-settings animations disabled for reduced-motion users', () => {
-    expect(css).toContain("body[data-dsh-orca-maid] [data-phase='hero'] [class*='titleGroup'] > span:not([class*='previewBadge'])::after")
+    expect(css).not.toContain("[class*='titleGroup'] > span:not([class*='previewBadge'])::after")
     expect(css).toContain("body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-entering]")
     expect(css).not.toContain("[data-maid-settings-open] [data-phase='hero']")
     expect(css).not.toContain("[data-maid-settings-open] [data-composer-seat]")

@@ -54,6 +54,16 @@ function lastFlowRow(flow: HTMLElement, skipTail = false): HTMLElement | null {
   return null
 }
 
+/**
+ * The host composer paints its stop control as a filled rounded square inside
+ * the primary button (`rect x=3 y=3 width=10 height=10 rx=3`). That shape is
+ * the structural signal for a running turn now that the skin no longer tags
+ * host icons; `[data-state='running']` only covers reasoning/tool rows.
+ */
+function hasStopControl(root: HTMLElement): boolean {
+  return root.querySelector("button svg > rect[x='3'][y='3'][width='10'][height='10']") !== null
+}
+
 function resolveStatus(root: HTMLElement | null): LinkStatus {
   if (root === null) return 'standby'
   const phase = root.dataset.phase ?? ''
@@ -67,10 +77,7 @@ function resolveStatus(root: HTMLElement | null): LinkStatus {
 
   const input = root.querySelector<HTMLElement>('[data-composer-input][data-phase]')
   if (input?.dataset.phase === 'submitting' || input?.dataset.phase === 'adjudicating') return 'syncing'
-  if (
-    root.querySelector("svg[data-orca-maid-icon='stop']") !== null
-    || root.querySelector("[data-state='running']") !== null
-  ) return 'working'
+  if (hasStopControl(root) || root.querySelector("[data-state='running']") !== null) return 'working'
   if (input?.getAttribute('aria-disabled') === 'true') return 'offline'
 
   const flow = root.querySelector<HTMLElement>('[data-chat-flow]')
@@ -128,7 +135,6 @@ export function installOrcaMaidStatus(body: HTMLElement): () => void {
       'aria-selected',
       'data-phase',
       'data-state',
-      'data-orca-maid-icon',
       'aria-disabled',
     ],
   })

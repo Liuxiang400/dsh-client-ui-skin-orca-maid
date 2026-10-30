@@ -9,14 +9,14 @@ const css = readFileSync(
 describe('question composer focus styling', () => {
   it('keeps the global accessibility outline while exempting question inputs', () => {
     expect(css).toContain("body[data-dsh-orca-maid] :focus-visible:not(")
-    expect(css).toContain('outline: 2px solid var(--maid-blue)')
+    expect(css).toContain('outline: 2px solid color-mix(in srgb, var(--maid-blue) 62%, transparent)')
     expect(css).toContain("[data-question-key] :is(input, textarea):focus-visible {\n  outline: none;")
   })
 
-  it('moves question focus to a muted rectilinear row indicator', () => {
+  it('moves question focus to a soft rounded row ring', () => {
     expect(css).toContain("[data-question-key] :has(> input:focus)")
-    expect(css).toContain('border-color: var(--maid-question-focus)')
-    expect(css).toContain('inset 3px 0 0 var(--maid-question-focus)')
+    expect(css).toContain('border-color: color-mix(in srgb, var(--maid-question-focus) 55%, var(--maid-line))')
+    expect(css).toContain('box-shadow: 0 0 0 2px var(--maid-question-focus-wash)')
     expect(css).toContain('--maid-question-focus: #2e86f7')
   })
 

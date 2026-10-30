@@ -35,7 +35,6 @@ describe('ORCA MAID performance guards', () => {
   })
 
   it('uses the stable scene attribute instead of a body-wide phase query', () => {
-    expect(css).toContain("body[data-dsh-orca-maid][data-maid-scene='hero'] .standby")
     expect(css).not.toContain("body[data-dsh-orca-maid]:has([data-phase='hero'])")
     const handleOwner = String.raw`\[data-phase='active'\]\s*>\s*:has\(> \[data-conversation-scroll\]\)\s*>\s*\[data-width-handle\]\[data-side\]`
     expect(css).toMatch(new RegExp(`${handleOwner}::after\\s*\\{`))

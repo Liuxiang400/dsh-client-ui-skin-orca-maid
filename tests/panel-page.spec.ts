@@ -121,6 +121,6 @@ describe('MAID right panel', () => {
 
   it('tints the tab strip over whatever floor is behind it instead of painting its own', () => {
     const strip = block(`${RIGHT} [data-dockkit-strip],\n${RIGHT} [data-dockkit-float-grip]`)
-    expect(strip).toContain('color-mix(in srgb, var(--maid-blue) 5%, transparent)')
+    expect(strip).toContain('background: transparent')
   })
 })

@@ -2,7 +2,7 @@ body[data-dsh-orca-maid] {
   --maid-sidebar-width: clamp(258px, 20.2vw, 326px);
   /* The host eases its sidebar track for 0.3s on this curve; every skin layer
      that moves with the track borrows the same clock instead of keeping a
-     private duration, so the stage, the wordmark and the seam ruler arrive
+     private duration, so the stage and the wordmark arrive
      together with the pane edge rather than ahead of or behind it. */
   --maid-track-duration: var(--ds-transition-duration-slow, 300ms);
   --maid-track-ease: var(--ds-ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));
@@ -19,6 +19,10 @@ body[data-dsh-orca-maid] {
   --maid-muted: #7a7a7a;
   --maid-question-focus: #2e86f7;
   --maid-question-focus-wash: rgba(46, 134, 247, 0.11);
+  --maid-approval: #b07820;
+  --maid-hover: color-mix(in srgb, var(--maid-ink) 5%, transparent);
+  --maid-selected: color-mix(in srgb, var(--maid-blue) 9%, transparent);
+  --maid-ease: 160ms cubic-bezier(0.2, 0, 0, 1);
   --maid-line: rgba(23, 23, 23, 0.09);
   --maid-surface: rgba(255, 255, 255, 0.78);
   --maid-surface-strong: rgba(255, 255, 255, 0.92);
@@ -32,7 +36,6 @@ body[data-dsh-orca-maid] {
      Modal/menu overlays always win, while the settings surface (the top MAID
      band) still clears ordinary body-level plugin chrome. */
   --maid-z-seam: 850;
-  --maid-z-standby: 900;
   --maid-z-tooltip: 950;
   --maid-z-restore: 955;
   --maid-z-ghost: 965;
@@ -114,7 +117,7 @@ body[data-dsh-orca-maid] {
    passive chrome; native and skin-owned controls keep their no-drag regions.
    !important outranks the host rule's :not(#root) specificity. */
 html[data-platform='darwin'] body[data-dsh-orca-maid]
-  > :is([data-skin-chrome='light-scene'], [data-skin-chrome='dark-scene'], [data-skin-chrome='spine'], [data-skin-chrome='standby']) {
+  > :is([data-skin-chrome='light-scene'], [data-skin-chrome='dark-scene']) {
   -webkit-app-region: initial !important;
 }
 
@@ -197,7 +200,7 @@ body[data-dsh-orca-maid] > [role='alert'][style*='--dsh-toast-hold'] {
   border-radius: var(--dsw-radius-md);
   background: #ffffff;
   color: var(--maid-ink);
-  box-shadow: inset 2px 0 var(--maid-blue), var(--maid-shadow);
+  box-shadow: var(--maid-shadow);
 }
 
 body[data-dsh-orca-maid][data-ds-dark-theme] > [role='alert'][style*='--dsh-toast-hold'] {
@@ -228,7 +231,8 @@ body[data-dsh-orca-maid] [data-slot='conversation.input.overlay']
 
 body[data-dsh-orca-maid] [data-slot='conversation.input.overlay']
   [role='option'][aria-selected='true'] {
-  box-shadow: inset 2px 0 var(--maid-blue);
+  background: var(--maid-selected);
+  border-radius: var(--dsw-radius-sm);
 }
 
 /* The open-in-app split frame is a div; its two native buttons retain their
@@ -301,13 +305,14 @@ body[data-dsh-orca-maid] [data-sidebar-right-panel] [data-dockkit-float] {
 
 body[data-dsh-orca-maid] [data-sidebar-right-panel] [data-dockkit-strip],
 body[data-dsh-orca-maid] [data-sidebar-right-panel] [data-dockkit-float-grip] {
-  background: color-mix(in srgb, var(--maid-blue) 5%, transparent);
+  background: transparent;
   border-bottom-color: var(--maid-line);
 }
 
 body[data-dsh-orca-maid] [data-sidebar-right-panel]
   [data-dockkit-tab][aria-selected='true'] {
-  box-shadow: inset 0 -2px var(--maid-blue);
+  background: var(--maid-selected);
+  border-radius: var(--dsw-radius-sm);
 }
 
 body[data-dsh-orca-maid] [data-dockkit-tab-menu] {
@@ -378,13 +383,14 @@ body[data-dsh-orca-maid][data-maid-panel-page]
 /* Process groups have their own disclosure title outside DisclosureRow. */
 body[data-dsh-orca-maid] [data-step-process] > div > button[data-process-activity] {
   padding: 5px 8px;
-  border-left: 2px solid var(--maid-line);
-  background: var(--maid-surface-strong);
+  border-radius: var(--dsw-radius-sm);
+  background: transparent;
   color: var(--maid-graphite);
+  transition: background-color var(--maid-ease), color var(--maid-ease);
 }
 
 body[data-dsh-orca-maid] [data-step-process] > div > button[data-process-activity]:is(:hover, :focus-visible, [aria-expanded='true']) {
-  border-left-color: var(--maid-blue);
+  background: var(--maid-hover);
   color: var(--maid-ink);
 }
 
@@ -457,6 +463,9 @@ body[data-dsh-orca-maid][data-ds-dark-theme] {
   --maid-muted: #8e8f94;
   --maid-question-focus: #7bb5ff;
   --maid-question-focus-wash: rgba(123, 181, 255, 0.14);
+  --maid-approval: #da9b36;
+  --maid-hover: rgba(255, 255, 255, 0.06);
+  --maid-selected: rgba(91, 156, 248, 0.14);
   --maid-line: rgba(255, 255, 255, 0.1);
   --maid-surface: rgba(23, 24, 27, 0.82);
   --maid-surface-strong: rgba(26, 27, 31, 0.94);
@@ -686,11 +695,6 @@ html[data-dsh-whale-maid-character='hidden'] body[data-dsh-orca-maid] {
   --maid-stage: 120px;
 }
 
-html[data-dsh-whale-maid-character='hidden'] body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide]
-  :is([data-slot='sidebar'] > :first-child)::after {
-  content: none;
-}
-
 /* Settings and menu surfaces must be fully opaque: the left nav and the row
    menus are the settings interface's secondary level, and a translucent card
    lets the conversation show through and reads as click-through.
@@ -725,7 +729,7 @@ html[data-dsh-whale-maid-character='hidden'] body[data-dsh-orca-maid] [data-slot
 body[data-dsh-orca-maid][data-maid-settings-open] [id='root'] {
   z-index: var(--maid-settings-overlay-z) !important;
 }
-/* Cordis is also mounted below #root while the seam ruler is body-owned.
+/* Cordis is also mounted below #root while body-level chrome exists.
    Promote the app root to the Cordis rung so the escaped fixed panel can
    outrank every skin decoration without crossing the official Modal ceiling. */
 body[data-dsh-orca-maid][data-maid-cordis-panel-open] [id='root'] {
@@ -766,7 +770,7 @@ body[data-dsh-orca-maid][data-maid-settings-in-sidebar]
 /* Full-screen settings owns the complete viewport. Host window toggles and
    MAID's body-level telemetry are unrelated chrome, so remove them from both
    painting and hit testing until the dialog closes. */
-body[data-dsh-orca-maid][data-maid-settings-open] :is(.spine, .signalChip, .standby, .statusCharacter, .pricingLight) {
+body[data-dsh-orca-maid][data-maid-settings-open] :is(.signalChip, .statusCharacter, .pricingLight) {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -925,8 +929,9 @@ body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] > [role='presentatio
   width: 10px;
   height: 10px;
   box-sizing: border-box;
-  border: solid var(--maid-blue);
-  border-width: 0 2px 2px 0;
+  border: solid var(--maid-muted);
+  border-width: 0 1px 1px 0;
+  opacity: 0.7;
   transform: rotate(45deg);
   pointer-events: none;
 }
@@ -1007,15 +1012,15 @@ body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] > [role='presentatio
   }
 }
 
-/* Settings nav: active section uses a slightly deeper brown emphasis, and
-   adjacent section cells are separated by a same-color hairline. */
+/* Settings nav: the active section uses the shared soft-blue surface and
+   adjacent sections are separated by a hairline. */
 body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) > nav button[aria-current='true'] {
-  background: color-mix(in srgb, var(--maid-blue) 18%, transparent);
+  background: var(--maid-selected);
   color: var(--maid-ink);
 }
 
 body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) > nav button + button {
-  border-top: 2px solid color-mix(in srgb, var(--maid-blue) 28%, transparent);
+  border-top: 1px solid var(--maid-line);
 }
 
 /* Desktop shells keep a window strip above the page. Windows paints its
@@ -1152,48 +1157,6 @@ body[data-dsh-orca-maid][data-ds-dark-theme] [role='menu'] {
   background: #1b1c20;
 }
 
-/* Permission modes use three independent equipment glyphs and risk colors.
-   The selector keys off MAID's semantic icon marker, not localized labels or
-   generated CSS-module class names, so the hero and active composer agree. */
-body[data-dsh-orca-maid] {
-  --maid-permission-read: #168aa6;
-  --maid-permission-write: #b07820;
-  --maid-permission-full: #c94f4f;
-}
-
-body[data-dsh-orca-maid][data-ds-dark-theme] {
-  --maid-permission-read: #7bb5ff;
-  --maid-permission-write: #da9b36;
-  --maid-permission-full: #ff8a84;
-}
-
-body[data-dsh-orca-maid] :is([data-composer-seat] button, [role='menuitem'])[data-maid-permission='read'] {
-  color: var(--maid-permission-read);
-}
-
-body[data-dsh-orca-maid] :is([data-composer-seat] button, [role='menuitem'])[data-maid-permission='write'] {
-  color: var(--maid-permission-write);
-}
-
-body[data-dsh-orca-maid] :is([data-composer-seat] button, [role='menuitem'])[data-maid-permission='full'] {
-  color: var(--maid-permission-full);
-}
-
-body[data-dsh-orca-maid] [data-composer-seat] button:not([role='menuitem'])[data-maid-permission] {
-  border-left: 1px solid color-mix(in srgb, currentColor 34%, transparent);
-  background: color-mix(in srgb, currentColor 5%, transparent);
-}
-
-body[data-dsh-orca-maid] [role='menuitem'][data-maid-permission] {
-  border-left: 2px solid transparent;
-}
-
-body[data-dsh-orca-maid] [role='menuitem'][data-maid-permission]:hover,
-body[data-dsh-orca-maid] [role='menuitem'][data-maid-permission]:has(> svg[data-orca-maid-icon='check']) {
-  border-left-color: color-mix(in srgb, currentColor 64%, transparent);
-  background: color-mix(in srgb, currentColor 7%, transparent);
-}
-
 /* Appearance choices use the same compact equipment-marker language as the
    provider picker. Keep the glyph and label on one centered axis so missing
    or narrow icon artwork cannot leave the copy sitting low in the tile. */
@@ -1297,11 +1260,9 @@ body[data-dsh-orca-maid]
     max-height: min(420px, 62vh);
     margin-block: 4px;
     padding: 4px;
-    border: 1px solid color-mix(in srgb, var(--maid-graphite) 34%, transparent);
-    background:
-      linear-gradient(90deg, color-mix(in srgb, var(--maid-blue) 7%, transparent), transparent 42%),
-      color-mix(in srgb, var(--maid-surface-strong) 98%, transparent);
-    box-shadow: 8px 10px 0 rgba(0, 0, 0, 0.08), 0 18px 42px rgba(0, 0, 0, 0.16);
+    border: 1px solid var(--maid-line);
+    background: var(--dsw-specific-menu);
+    box-shadow: var(--maid-shadow);
     color: var(--maid-ink);
     scrollbar-color: color-mix(in srgb, var(--maid-graphite) 42%, transparent) transparent;
   }
@@ -1310,11 +1271,10 @@ body[data-dsh-orca-maid]
     align-items: center;
     min-height: 30px;
     padding: 7px 30px 7px 10px;
-    border-left: 2px solid transparent;
+    border-radius: var(--dsw-radius-sm);
     background: transparent;
     color: var(--maid-graphite);
-    font: 500 12px/1.3 ui-monospace, "SFMono-Regular", Consolas, monospace;
-    letter-spacing: 0.01em;
+    font: 500 13px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     /* Keep long labels on one line (truncated by the picker's own clip). */
     white-space: nowrap;
     overflow: hidden;
@@ -1323,27 +1283,24 @@ body[data-dsh-orca-maid]
 
   body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) select option:hover,
   body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) select option:focus-visible {
-    border-left-color: color-mix(in srgb, var(--maid-blue) 48%, transparent);
-    background: color-mix(in srgb, var(--maid-blue) 7%, transparent);
+    background: var(--maid-hover);
     color: var(--maid-ink);
   }
 
   body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) select option:checked {
-    border-left-color: var(--maid-blue);
-    background:
-      linear-gradient(90deg, color-mix(in srgb, var(--maid-blue) 16%, transparent), transparent 74%);
-    color: var(--maid-blue);
-    font-weight: 700;
+    background: var(--maid-selected);
+    color: var(--maid-ink);
   }
 
   body[data-dsh-orca-maid] :is([data-slot='sidebar.settings'] [role='dialog'], [role='dialog'][data-shortcut-modal='settings']) select option::checkmark {
-    content: '';
-    width: 7px;
-    height: 7px;
+    content: '✓';
+    width: auto;
+    height: auto;
     margin-left: auto;
-    border: 1px solid currentColor;
-    background: currentColor;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 58% 100%, 58% 42%, 0 42%);
+    border: 0;
+    background: none;
+    color: var(--maid-blue);
+    font-size: 12px;
   }
 }
 
@@ -1354,19 +1311,15 @@ body[data-dsh-orca-maid]
   [class$='_menu'][data-maid-model-menu] {
   width: min(276px, calc(100vw - 32px));
   padding: 4px;
-  border: 1px solid color-mix(in srgb, var(--maid-graphite) 34%, transparent);
+  border: 1px solid var(--maid-line);
   border-radius: var(--dsw-radius-lg);
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--maid-blue) 7%, transparent), transparent 42%),
-    #ffffff;
-  box-shadow: 8px 10px 0 rgba(0, 0, 0, 0.08), 0 18px 42px rgba(0, 0, 0, 0.16);
+  background: var(--dsw-specific-menu);
+  box-shadow: var(--maid-shadow);
 }
 
 body[data-dsh-orca-maid][data-ds-dark-theme]
   [class$='_menu'][data-maid-model-menu] {
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--maid-blue) 10%, transparent), transparent 42%),
-    #1b1c20;
+  background: var(--dsw-specific-menu);
 }
 
 /* 0.2.0-rc.2 moves `role='menu'` onto the scroll list inside the menu surface.
@@ -1382,24 +1335,11 @@ body[data-dsh-orca-maid]
   align-items: center;
   gap: 6px;
   padding: 7px 8px 5px;
-  border-bottom: 1px solid color-mix(in srgb, var(--maid-graphite) 16%, transparent);
-  background: #ffffff;
+  border-bottom: 1px solid var(--maid-line);
+  background: transparent;
   color: var(--maid-muted);
-  font: 600 10px/1.4 ui-monospace, "SFMono-Regular", Consolas, monospace;
-  letter-spacing: 0.08em;
-}
-
-body[data-dsh-orca-maid][data-ds-dark-theme]
-  [class$='_menu'][data-maid-menu-groups] :is([class$='_groupTitle'], [data-menu-group-heading]) {
-  background: #1b1c20;
-}
-
-body[data-dsh-orca-maid]
-  [class$='_menu'][data-maid-menu-groups] :is([class$='_groupTitle'], [data-menu-group-heading])::before {
-  width: 4px;
-  height: 4px;
-  content: '';
-  border: 1px solid currentColor;
+  font: 600 11px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0.02em;
 }
 
 body[data-dsh-orca-maid]
@@ -1407,31 +1347,28 @@ body[data-dsh-orca-maid]
   min-height: 38px;
   padding: 6px 8px;
   border: 0;
-  border-left: 2px solid transparent;
   border-radius: var(--dsw-radius-sm);
   background: transparent;
+  transition: background-color var(--maid-ease), color var(--maid-ease);
 }
 
 body[data-dsh-orca-maid]
   [class$='_menu'][data-maid-menu-models]
   [role='menuitemradio']:is(:hover, :focus-visible) {
-  border-left-color: color-mix(in srgb, var(--maid-blue) 48%, transparent);
-  background: color-mix(in srgb, var(--maid-blue) 7%, transparent);
+  background: var(--maid-hover);
 }
 
 body[data-dsh-orca-maid]
   [class$='_menu'][data-maid-menu-models]
   [role='menuitemradio'][aria-checked='true'] {
-  border-left-color: var(--maid-blue);
-  background: linear-gradient(90deg, color-mix(in srgb, var(--maid-blue) 16%, transparent), transparent 74%);
-  color: var(--maid-blue);
+  background: var(--maid-selected);
+  color: var(--maid-ink);
 }
 
 body[data-dsh-orca-maid]
   [class$='_menu'][data-maid-menu-models]
   [role='menuitemradio'] [class$='_modelName'] {
-  font: 600 12px/1.4 ui-monospace, "SFMono-Regular", Consolas, monospace;
-  letter-spacing: 0.01em;
+  font: 600 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 body[data-dsh-orca-maid]
@@ -1450,12 +1387,13 @@ body[data-dsh-orca-maid]
 body[data-dsh-orca-maid]
   [class$='_menu'][data-maid-menu-models]
   [role='menuitemradio'][aria-checked='true'] [class$='_check']::before {
-  width: 7px;
-  height: 7px;
-  content: '';
-  border: 1px solid currentColor;
-  background: currentColor;
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 58% 100%, 58% 42%, 0 42%);
+  content: '✓';
+  width: auto;
+  height: auto;
+  border: 0;
+  background: none;
+  color: var(--maid-blue);
+  font-size: 12px;
 }
 
 body[data-dsh-orca-maid]
@@ -1466,13 +1404,12 @@ body[data-dsh-orca-maid]
 body[data-dsh-orca-maid]
   [class$='_menu'][data-maid-menu-cells] [class$='_cell'] {
   min-height: 40px;
-  border-left: 2px solid transparent;
+  border-radius: var(--dsw-radius-sm);
 }
 
 body[data-dsh-orca-maid]
   [class$='_menu'][data-maid-menu-cells] [class$='_cell']:hover {
-  border-left-color: color-mix(in srgb, var(--maid-blue) 48%, transparent);
-  background: color-mix(in srgb, var(--maid-blue) 7%, transparent);
+  background: var(--maid-hover);
 }
 
 /* Replace the production shell wordmark while preserving its new-session button.
@@ -1491,22 +1428,6 @@ body[data-dsh-orca-maid] [data-orca-maid-brand] {
 }
 body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > :first-child {
   position: relative;
-}
-body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > :first-child::after {
-  content: '';
-  position: absolute;
-  z-index: 2;
-  top: 15px;
-  left: 4px;
-  width: 2px;
-  height: 30px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, transparent, rgba(46, 134, 247, 0.9) 24%, #cfe4ff 52%, rgba(46, 134, 247, 0.82) 76%, transparent);
-  box-shadow: 0 0 5px rgba(46, 134, 247, 0.55), 0 0 12px rgba(46, 134, 247, 0.28);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(0) scaleY(0.72);
-  will-change: transform, opacity;
 }
 body[data-dsh-orca-maid] .dshWordmark {
   display: block;
@@ -1535,30 +1456,14 @@ body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] .dshWordm
   opacity: 1;
   transform: translateX(16px) scale(1);
 }
-body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > :first-child::after {
-  animation: maidWordmarkScan 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
 body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) > :first-child > :first-child > button:first-of-type > svg,
 body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) > :first-child > :first-child > button:first-of-type [data-slot='sidebar.brand.mark'] svg {
   opacity: 0;
 }
 body[data-dsh-orca-maid][data-ds-dark-theme] .dshWordmark { color: #ededf0; }
 
-@keyframes maidWordmarkScan {
-  0% {
-    opacity: 0;
-    transform: translateX(0) scaleY(0.72);
-  }
-  18% { opacity: 0.92; }
-  72% { opacity: 0.58; }
-  100% {
-    opacity: 0;
-    transform: translateX(116px) scaleY(1);
-  }
-}
-
 /* The operator stage belongs to the sidebar only; its state actor is mounted as
-   live chrome while this pseudo-element keeps the scrim and seam ruler. */
+   live chrome while this pseudo-element keeps the scrim. */
 body[data-dsh-orca-maid] :is([data-slot='sidebar'] > :first-child) {
   position: relative;
   isolation: isolate;
@@ -1574,21 +1479,17 @@ body[data-dsh-orca-maid] :is([data-slot='sidebar'] > :first-child)::before {
   content: '';
   pointer-events: none;
   /* The actor owns a dedicated stage at the top of the column, hard-stopped at
-     the seam by an opaque surface, with a ruler tick band just above it. */
+     the seam by an opaque surface. */
   background-image:
     linear-gradient(180deg, rgba(246, 246, 246, 0.55) 0%, rgba(246, 246, 246, 0) 76px),
     linear-gradient(180deg,
       rgba(246, 246, 246, 0) 0,
       rgba(246, 246, 246, 0) calc(var(--maid-stage, 300px) - 1px),
       rgba(246, 246, 246, 0.9) var(--maid-stage, 300px),
-      rgba(246, 246, 246, 0.94) 100%),
-    repeating-linear-gradient(90deg, rgba(23, 23, 23, 0.22) 0 1px, transparent 1px 7px);
-  background-position:
-    0 0,
-    0 0,
-    0 calc(var(--maid-stage, 300px) - 10px);
+      rgba(246, 246, 246, 0.94) 100%);
+  background-position: 0 0, 0 0;
   background-repeat: no-repeat;
-  background-size: 100% 100%, 100% 100%, 100% 8px;
+  background-size: 100% 100%, 100% 100%;
   opacity: 0;
   transition: opacity var(--maid-track-duration) var(--maid-track-ease);
   will-change: opacity;
@@ -1746,7 +1647,6 @@ body[data-dsh-orca-maid] .statusCharacterFrame {
   margin-inline: auto;
   overflow: hidden;
   transform: scaleX(var(--maid-character-mirror));
-  animation: maidGateWeave 1.06s steps(8, end) infinite;
   will-change: transform;
 }
 
@@ -1826,7 +1726,7 @@ body[data-dsh-orca-maid] .statusCharacter[data-orca-maid-status='review'] {
 }
 
 body[data-dsh-orca-maid] .statusCharacter[data-orca-maid-status='approval'] {
-  --maid-character-signal: var(--maid-permission-write);
+  --maid-character-signal: var(--maid-approval);
 }
 
 body[data-dsh-orca-maid] .statusCharacter[data-orca-maid-status='fault'] {
@@ -1906,6 +1806,10 @@ html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [dat
   pointer-events: none;
 }
 
+/* The stock wide New Session control keeps its layout slot and official click
+   handler; its hit plane is the portrait box so the artwork itself starts a
+   new session. The plane is invisible chrome: the old corner brackets and
+   hover triangle were decoration and have been removed. */
 html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *)::before {
   position: absolute;
   z-index: 2;
@@ -1915,80 +1819,11 @@ html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [dat
   height: calc(var(--maid-stage, 300px) - 66px);
   content: '';
   cursor: pointer;
-  opacity: 0;
-  background:
-    linear-gradient(var(--maid-blue), var(--maid-blue)) left top / 18px 1px no-repeat,
-    linear-gradient(var(--maid-blue), var(--maid-blue)) left top / 1px 18px no-repeat,
-    linear-gradient(var(--maid-blue), var(--maid-blue)) right top / 18px 1px no-repeat,
-    linear-gradient(var(--maid-blue), var(--maid-blue)) right top / 1px 18px no-repeat,
-    linear-gradient(var(--maid-blue), var(--maid-blue)) left bottom / 18px 1px no-repeat,
-    linear-gradient(var(--maid-blue), var(--maid-blue)) left bottom / 1px 18px no-repeat,
-    linear-gradient(var(--maid-blue), var(--maid-blue)) right bottom / 18px 1px no-repeat,
-    linear-gradient(var(--maid-blue), var(--maid-blue)) right bottom / 1px 18px no-repeat;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--maid-blue) 12%, transparent);
-  transition: opacity 160ms ease;
-}
-
-html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *)::after {
-  position: absolute;
-  z-index: 2;
-  /* Bottom-right corner of the plane above, 3px / 4px inside it. */
-  top: calc(58px + var(--maid-stage-top, 0px) + var(--maid-stage, 300px) - 66px - 12px);
-  left: calc(22px + var(--maid-sidebar-art-width, 280px) - 30px - 13px);
-  width: 9px;
-  height: 9px;
-  content: '';
-  background: var(--maid-blue);
-  clip-path: polygon(100% 0, 100% 100%, 0 100%);
-  opacity: 0.36;
-  transition: opacity 160ms ease, transform 160ms ease;
-}
-
-html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *):hover::before,
-html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *):focus-visible::before {
-  opacity: 0.62;
-}
-
-html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *):hover::after,
-html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *):focus-visible::after {
-  opacity: 0.92;
-  transform: translate(-2px, -2px);
-}
-
-html:not([data-dsh-whale-maid-character='hidden']) body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > button:not([data-dsh-part='sidebar-entry'], [data-plugin-entry] *):focus-visible {
-  outline: none;
 }
 
 body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) > :first-child > button:not([data-dsh-part='sidebar-entry']) {
   position: relative;
   border-radius: var(--dsw-radius-md);
-}
-
-body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) > :first-child > button:not([data-dsh-part='sidebar-entry']) > svg {
-  opacity: 0;
-}
-
-body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) > :first-child > button:not([data-dsh-part='sidebar-entry'])::before {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  /* Painted with background layers, not border: CSS borders snap to whole
-     device pixels while the SVG icon strokes render subpixel-antialiased —
-     the same paint model here keeps the weight identical to the icon set.
-     Geometry is the 16-unit design grid at the rail's 0.875 scale: 13-unit
-     outer square, 1.5-unit (1.3px) stroke, 7-unit cross arms. */
-  box-sizing: border-box;
-  width: 11.4px;
-  height: 11.4px;
-  content: '';
-  background:
-    linear-gradient(currentColor, currentColor) left top / 11.4px 1.3px no-repeat,
-    linear-gradient(currentColor, currentColor) left bottom / 11.4px 1.3px no-repeat,
-    linear-gradient(currentColor, currentColor) left top / 1.3px 11.4px no-repeat,
-    linear-gradient(currentColor, currentColor) right top / 1.3px 11.4px no-repeat,
-    linear-gradient(currentColor, currentColor) center / 6.15px 1.3px no-repeat,
-    linear-gradient(currentColor, currentColor) center / 1.3px 6.15px no-repeat;
-  transform: translate(-50%, -50%);
 }
 
 /* Windows desktop caption controls. With `html[data-windows-titlebar]` a
@@ -2122,22 +1957,6 @@ body[data-dsh-orca-maid][data-maid-window-resuming] [data-slot='sidebar'] [role=
   display: none;
 }
 
-/* Vertical identity label riding the stage's left edge (White Route language). */
-body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] :is([data-slot='sidebar'] > :first-child)::after {
-  content: 'ORCA MAID';
-  position: absolute;
-  z-index: 1;
-  top: calc(var(--maid-stage-top, 0px) + 76px + (var(--maid-stage, 300px) - 76px) / 2);
-  left: 9px;
-  transform: translateY(-50%);
-  writing-mode: vertical-rl;
-  font: 600 8px/1 ui-monospace, "SFMono-Regular", Consolas, monospace;
-  letter-spacing: 0.42em;
-  color: var(--maid-muted);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
-  pointer-events: none;
-}
-
 /* The browsing region becomes a frosted glass panel pushed below the stage:
    the art never fights the session list for readability. The production
    shell measures 120px from the pane top to the region's normal position. */
@@ -2170,17 +1989,12 @@ body[data-dsh-orca-maid][data-ds-dark-theme] :is([data-slot='sidebar'] > :first-
       rgba(15, 16, 18, 0.28) 0,
       rgba(15, 16, 18, 0.34) calc(var(--maid-stage, 300px) - 1px),
       rgba(15, 16, 18, 0.92) var(--maid-stage, 300px),
-      rgba(15, 16, 18, 0.95) 100%),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0 1px, transparent 1px 7px);
+      rgba(15, 16, 18, 0.95) 100%);
 }
 
 body[data-dsh-orca-maid][data-ds-dark-theme] .statusCharacterBubble {
   background: color-mix(in srgb, var(--maid-character-signal) 12%, rgba(12, 18, 27, 0.96));
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
-}
-
-body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='sidebar'][data-maid-sidebar-wide] :is([data-slot='sidebar'] > :first-child)::after {
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
 }
 
 body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='sidebar'][data-maid-sidebar-wide] [class*='regionArea']::before {
@@ -2192,56 +2006,18 @@ body[data-dsh-orca-maid] [data-slot='sidebar'] button[aria-haspopup='dialog'] {
   position: relative;
   border: 1px solid transparent;
   border-radius: var(--dsw-radius-md);
-}
-
-body[data-dsh-orca-maid] [data-slot='sidebar'] button[aria-haspopup='dialog']::after {
-  position: absolute;
-  top: 7px;
-  right: 7px;
-  width: 7px;
-  height: 7px;
-  content: '';
-  border-top: 1px solid var(--maid-blue);
-  border-right: 1px solid var(--maid-blue);
-  opacity: 0;
-  transform: translate(-3px, 3px);
-  transition: opacity 140ms ease, transform 140ms ease;
+  transition: background-color var(--maid-ease), border-color var(--maid-ease);
 }
 
 body[data-dsh-orca-maid] [data-slot='sidebar'] button[aria-haspopup='dialog']:hover {
-  border-color: color-mix(in srgb, var(--maid-blue) 28%, transparent);
-  background: color-mix(in srgb, var(--maid-blue) 5.5%, transparent);
-  box-shadow: inset 2px 0 0 var(--maid-blue);
+  border-color: var(--maid-line);
+  background: var(--maid-hover);
 }
 
-body[data-dsh-orca-maid] [data-slot='sidebar'] button[aria-haspopup='dialog']:hover::after,
-body[data-dsh-orca-maid] [data-slot='sidebar'] button[aria-haspopup='dialog']:focus-visible::after {
-  opacity: 0.72;
-  transform: translate(0, 0);
-}
-
-body[data-dsh-orca-maid] [data-slot='sidebar']:not([data-maid-sidebar-wide]) button[aria-haspopup='dialog']::after {
-  top: auto;
-  right: 3px;
-  bottom: 3px;
-  width: 6px;
-  height: 6px;
-  border: none;
-  background: var(--maid-blue);
-  clip-path: polygon(100% 0, 100% 100%, 0 100%);
-}
-
-/* Workspace/session browser: workspaces are quiet chapter rows and sessions
-   are compact entries on one structural guide. The hierarchy comes from
-   spacing, type, and one selected rail rather than a stack of rounded cards. */
-body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree'] {
-  --maid-tree-guide: rgba(23, 23, 23, 0.16);
-}
-
-body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='sidebar'] [role='tree'] {
-  --maid-tree-guide: rgba(255, 255, 255, 0.18);
-}
-
+/* Workspace/session browser: quiet rows on one soft hierarchy. Hover is a
+   neutral wash; the current workspace and the selected session share one
+   low-saturation blue surface. No guide lines, rails, corner markers or
+   gradient washes. */
 body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree'] > div[data-maid-workspace-group] {
   position: relative;
   padding: 3px 0 5px;
@@ -2250,19 +2026,7 @@ body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree'] > div[data-maid-wor
 body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree'] > div[data-maid-workspace-group]
   + div[data-maid-workspace-group] {
   margin-top: 2px;
-  border-top: 1px solid color-mix(in srgb, var(--maid-tree-guide) 72%, transparent);
-}
-
-body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree'] > div[data-maid-workspace-selectable]::before {
-  position: absolute;
-  z-index: 0;
-  top: 41px;
-  bottom: 7px;
-  left: 11px;
-  width: 1px;
-  content: '';
-  background: var(--maid-tree-guide);
-  pointer-events: none;
+  border-top: 1px solid color-mix(in srgb, var(--maid-line) 70%, transparent);
 }
 
 body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'] {
@@ -2280,54 +2044,16 @@ body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded] 
   align-items: center;
   border-radius: var(--dsw-radius-md);
   background: transparent;
-}
-
-body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded]::before {
-  position: absolute;
-  left: 0;
-  content: '';
-  pointer-events: none;
-}
-
-body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='true'] {
-  border-left: 2px solid color-mix(in srgb, var(--maid-graphite) 34%, transparent);
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--maid-graphite) 6%, transparent), transparent 68%);
-  color: var(--maid-ink);
-  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--maid-graphite) 10%, transparent);
-}
-
-body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='true']::before {
-  top: 6px;
-  bottom: 6px;
-  width: 2px;
-  background: color-mix(in srgb, var(--maid-graphite) 48%, transparent);
-  box-shadow: 3px 0 0 color-mix(in srgb, var(--maid-graphite) 12%, transparent);
+  color: var(--maid-graphite);
+  transition: background-color var(--maid-ease), color var(--maid-ease);
 }
 
 body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='false'] {
-  border-left: 1px solid color-mix(in srgb, var(--maid-graphite) 18%, transparent);
   color: color-mix(in srgb, var(--maid-graphite) 76%, var(--maid-muted));
-  background: linear-gradient(90deg, color-mix(in srgb, var(--maid-graphite) 3%, transparent), transparent 58%);
 }
 
-body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='false']::before {
-  top: 16px;
-  width: 5px;
-  height: 5px;
-  border: 1px solid color-mix(in srgb, var(--maid-muted) 58%, transparent);
-  background: var(--maid-surface-strong);
-  transform: translateX(-3px);
-}
-
-body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='true']
-  svg[data-orca-maid-icon='folder-open'] {
-  color: color-mix(in srgb, var(--maid-graphite) 82%, var(--maid-muted));
-}
-
-body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='false']
-  svg[data-orca-maid-icon='folder-closed'] {
-  color: var(--maid-muted);
+body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded]:hover {
+  background: var(--maid-hover);
 }
 
 body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded]
@@ -2342,12 +2068,6 @@ body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded]
   font-weight: 600;
 }
 
-body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='true']
-  > span:nth-child(3) > span:first-child {
-  font-weight: 700;
-  letter-spacing: 0.015em;
-}
-
 body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='false']
   > span:nth-child(3) > span:first-child {
   font-weight: 500;
@@ -2357,58 +2077,30 @@ body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded]
   > span:nth-child(3) > span:nth-child(2) {
   flex: none;
   margin-left: auto;
-  letter-spacing: 0.04em;
-  font: 500 10px/1 ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font: 500 11px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-variant-numeric: tabular-nums;
   color: var(--maid-muted);
 }
 
-body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded]:hover {
-  background: color-mix(in srgb, var(--maid-blue) 5.5%, transparent);
-}
-
+/* The current workspace uses the same soft-blue surface as a selected session
+   and a blue folder glyph; it adds no border or marker of its own. */
 body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree']
   > div[data-maid-workspace-current]
   [role='treeitem'][aria-expanded] {
-  border-left-color: var(--maid-blue);
-  background: linear-gradient(90deg, color-mix(in srgb, var(--maid-blue) 15%, transparent), color-mix(in srgb, var(--maid-blue) 3.5%, transparent) 72%, transparent);
-  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--maid-blue) 20%, transparent);
-}
-
-/* Folder geometry communicates open/closed; blue communicates the current
-   workspace. The small square is deliberately independent from the open
-   folder glyph, so an expanded inactive workspace cannot read as selected. */
-body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree']
-  > div[data-maid-workspace-current]
-  [role='treeitem'][aria-expanded]::before {
-  background: var(--maid-blue);
-  box-shadow: 3px 0 0 color-mix(in srgb, var(--maid-blue) 20%, transparent);
-}
-
-body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree']
-  > div[data-maid-workspace-current]
-  [role='treeitem'][aria-expanded]::after {
-  position: absolute;
-  top: 16px;
-  left: -1px;
-  width: 5px;
-  height: 5px;
-  content: '';
-  background: var(--maid-blue);
-  box-shadow: 3px 0 0 color-mix(in srgb, var(--maid-blue) 22%, transparent);
-  pointer-events: none;
+  background: var(--maid-selected);
+  color: var(--maid-ink);
 }
 
 body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree']
   > div[data-maid-workspace-current]
   [role='treeitem'][aria-expanded]
-  svg[data-orca-maid-icon^='folder-'] {
+  svg:first-of-type {
   color: var(--maid-blue);
 }
 
 /* Session entry: keep the stock status slot and hover actions, but indent the
-   row from the workspace guide and reserve a stable right-aligned time cell. */
+   row from the workspace column and reserve a stable right-aligned time cell. */
 body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selected] {
-  position: relative;
   z-index: 1;
   box-sizing: border-box;
   width: calc(100% - 18px);
@@ -2419,17 +2111,7 @@ body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selecte
   background: transparent;
   backdrop-filter: none;
   box-shadow: none;
-}
-
-body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selected]::before {
-  position: absolute;
-  top: 50%;
-  left: -7px;
-  width: 7px;
-  height: 1px;
-  content: '';
-  background: var(--maid-tree-guide);
-  pointer-events: none;
+  transition: background-color var(--maid-ease), color var(--maid-ease);
 }
 
 body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selected] > span:nth-child(2) {
@@ -2445,45 +2127,18 @@ body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selecte
   flex: 0 0 44px;
   margin-left: auto;
   text-align: right;
-  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 11px;
+  font: 500 11px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: var(--maid-muted);
 }
 
 body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selected]:hover {
-  background: color-mix(in srgb, var(--maid-blue) 5.5%, transparent);
+  background: var(--maid-hover);
 }
 
 body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selected='true'] {
-  background: color-mix(in srgb, var(--maid-blue) 10%, transparent);
-}
-
-body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selected='true']::after {
-  position: absolute;
-  top: 6px;
-  bottom: 6px;
-  left: 0;
-  width: 2px;
-  content: '';
-  background: var(--maid-blue);
-  pointer-events: none;
-}
-
-body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='sidebar'] [role='treeitem'][aria-expanded]:hover {
-  background: rgba(91, 156, 248, 0.09);
-}
-
-body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='sidebar'] [role='tree']
-  > div[data-maid-workspace-current]
-  [role='treeitem'][aria-expanded] {
-  background: linear-gradient(90deg, rgba(91, 156, 248, 0.2), rgba(91, 156, 248, 0.06) 72%, transparent);
-}
-
-body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='sidebar'] div[role='treeitem'][aria-selected]:hover {
-  background: rgba(91, 156, 248, 0.09);
-}
-
-body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='sidebar'] div[role='treeitem'][aria-selected='true'] {
-  background: rgba(91, 156, 248, 0.16);
+  background: var(--maid-selected);
+  color: var(--maid-ink);
 }
 
 body[data-dsh-orca-maid]
@@ -2547,13 +2202,22 @@ body[data-dsh-orca-maid] :where(button, [role='button']):not(
   transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 
+/* Host glyphs are Phosphor line icons. Unify their optical weight and softness
+   with round caps/joins and one stroke width; their official 16px grid and
+   per-slot sizing stay untouched so layout and information density hold. */
+body[data-dsh-orca-maid] svg[stroke-width] {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+
 body[data-dsh-orca-maid] :where(button:hover:not(:disabled), [role='button']:hover):not(
     [data-slot='conversation.input.left'] *,
     [data-slot='conversation.input.right'] *,
     [data-slot='sidebar.footer.action'] *,
     [data-slot='settings.section'] *
   ) {
-  border-color: color-mix(in srgb, var(--maid-blue) 34%, transparent);
+  border-color: color-mix(in srgb, var(--maid-muted) 34%, transparent);
 }
 
 body[data-dsh-orca-maid] :focus-visible:not(
@@ -2562,23 +2226,21 @@ body[data-dsh-orca-maid] :focus-visible:not(
     [data-slot='sidebar.footer.action'] *,
     [data-slot='settings.section'] *
   ) {
-  outline: 2px solid var(--maid-blue);
+  outline: 2px solid color-mix(in srgb, var(--maid-blue) 62%, transparent);
   outline-offset: 2px;
 }
 
 /* The official question composer owns focus at the answer-row level. MAID's
    generic accessibility outline would otherwise override its outline:none
    input and draw the saturated blue rectangle inside that row. Keep the
-   keyboard cue, but move it to the rectilinear row with a calmer signal. */
+   keyboard cue, but move it to the quiet row with a calmer signal. */
 body[data-dsh-orca-maid] [data-question-key] :is(input, textarea):focus-visible {
   outline: none;
 }
 
 body[data-dsh-orca-maid] [data-question-key] :has(> input:focus) {
-  border-color: var(--maid-question-focus);
-  box-shadow:
-    inset 3px 0 0 var(--maid-question-focus),
-    inset 0 0 0 1px var(--maid-question-focus-wash);
+  border-color: color-mix(in srgb, var(--maid-question-focus) 55%, var(--maid-line));
+  box-shadow: 0 0 0 2px var(--maid-question-focus-wash);
 }
 
 /* Inline answers keep the host's zero padding: `.field` shares one grid cell
@@ -2586,10 +2248,8 @@ body[data-dsh-orca-maid] [data-question-key] :has(> input:focus) {
    A bar drawn on the textarea itself therefore covers the first glyph. Draw it
    on the row/block chrome instead — their own padding holds the indicator. */
 body[data-dsh-orca-maid] [data-question-key] :is([class*='_customRow'], [class*='_customBlock']):focus-within {
-  border-color: var(--maid-question-focus);
-  box-shadow:
-    inset 3px 0 0 var(--maid-question-focus),
-    inset 0 0 0 1px var(--maid-question-focus-wash);
+  border-color: color-mix(in srgb, var(--maid-question-focus) 55%, var(--maid-line));
+  box-shadow: 0 0 0 2px var(--maid-question-focus-wash);
 }
 
 body[data-dsh-orca-maid] [data-question-key] textarea:focus {
@@ -2598,12 +2258,11 @@ body[data-dsh-orca-maid] [data-question-key] textarea:focus {
 
 /* Todo glyphs. DSH 0.1.7 draws each todo state with the shared StateDot (a
    round dot, or a rotating ring while in progress) inside
-   `li[data-status] > .glyph`, so the SVG-path redraws in icons.ts that used
-   to catch the old todo icons no longer match anything. Hide the dot and
-   paint MAID's straight-line set on the glyph box itself, keyed on the host's
-   status attribute: corner brackets while pending, a ticked frame when done,
-   and in progress the context-usage pixel field, whose cells fill bottom-up
-   on a stepped 2.4s cycle (one 16px pseudo-element, clip-path steps only). */
+   `li[data-status] > .glyph`; the MAID glyph set paints on the glyph box
+   itself, keyed on the host's status attribute: corner brackets while pending,
+   a ticked frame when done, and in progress the context-usage pixel field,
+   whose cells fill bottom-up on a stepped 2.4s cycle (one 16px pseudo-element,
+   clip-path steps only). */
 body[data-dsh-orca-maid] [data-testid='todo-panel'] li[data-status] > [class*='_glyph'] {
   position: relative;
   color: var(--dsw-alias-label-tertiary);
@@ -2675,7 +2334,7 @@ body[data-dsh-orca-maid][data-ds-dark-theme] [data-question-key] [class*='_badge
   color: var(--dsw-alias-brand-primary-invert);
 }
 
-body[data-dsh-orca-maid]::selection { color: #fff; background: var(--maid-blue); }
+body[data-dsh-orca-maid]::selection { color: var(--maid-ink); background: color-mix(in srgb, var(--maid-blue) 22%, transparent); }
 body[data-dsh-orca-maid] ::-webkit-scrollbar { width: 9px; height: 9px; }
 body[data-dsh-orca-maid] ::-webkit-scrollbar-track { background: transparent; }
 body[data-dsh-orca-maid] ::-webkit-scrollbar-thumb {
@@ -2684,35 +2343,34 @@ body[data-dsh-orca-maid] ::-webkit-scrollbar-thumb {
   background: rgba(120, 120, 124, 0.35);
   background-clip: padding-box;
 }
-body[data-dsh-orca-maid] ::-webkit-scrollbar-thumb:hover { background-color: var(--maid-blue); }
+body[data-dsh-orca-maid] ::-webkit-scrollbar-thumb:hover { background-color: color-mix(in srgb, var(--maid-muted) 62%, transparent); }
 
 /* Signal chip riding the sidebar logo row, right of the replacement wordmark. */
 body[data-dsh-orca-maid] .signalChip {
   --maid-signal-color: var(--maid-cyan);
-  --maid-signal-wash: color-mix(in srgb, var(--maid-signal-color) 8%, transparent);
   position: absolute; z-index: 1; top: 50%; left: 136px;
   transform: translateY(-50%);
-  display: flex; align-items: center; gap: 7px;
+  display: flex; align-items: center; gap: 6px;
   box-sizing: border-box;
-  min-height: 18px;
-  padding: 4px 7px 4px 6px;
-  border-left: 1px solid color-mix(in srgb, var(--maid-signal-color) 52%, transparent);
-  border-radius: 6px;
-  background: linear-gradient(90deg, var(--maid-signal-wash), transparent 90%);
-  color: color-mix(in srgb, var(--maid-signal-color) 70%, var(--maid-graphite));
+  min-height: 20px;
+  padding: 4px 8px;
+  border: 1px solid var(--maid-line);
+  border-radius: 999px;
+  background: var(--maid-surface-strong);
+  color: var(--maid-graphite);
   white-space: nowrap; pointer-events: none;
-  font: 600 8px/1 ui-monospace, "SFMono-Regular", Consolas, monospace;
-  letter-spacing: 0.2em;
+  font: 600 10px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0.08em;
   opacity: 0;
-  transition: opacity 220ms ease 90ms, color 160ms ease, border-color 160ms ease, background-color 160ms ease;
+  transition: opacity 200ms ease 70ms, color var(--maid-ease), border-color var(--maid-ease), background-color var(--maid-ease);
 }
 body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] .signalChip { opacity: 1; }
 body[data-dsh-orca-maid] .signalDot {
   width: 6px; height: 6px; border-radius: 50%;
   flex: 0 0 6px;
   background: var(--maid-signal-color);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--maid-signal-color) 70%, transparent);
-  animation: maidSignalPulse 2.6s ease-in-out infinite;
+  box-shadow: none;
+  animation: maidSignalPulse 3s ease-in-out infinite;
 }
 
 body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='syncing'],
@@ -2721,7 +2379,7 @@ body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='working'] {
 }
 
 body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='approval'] {
-  --maid-signal-color: var(--maid-permission-write);
+  --maid-signal-color: var(--maid-approval);
 }
 
 body[data-dsh-orca-maid] .signalChip[data-orca-maid-status='input'],
@@ -2994,33 +2652,6 @@ body[data-dsh-orca-maid] .pricingTooltipValue {
   font-weight: 700;
 }
 
-/* Sidebar seam ruler: a tick strip centered on the column boundary replaces
-   the old metal bar — mechanism through precision, not mass. */
-body[data-dsh-orca-maid] .spine {
-  position: fixed; top: 0; bottom: 0; left: 0;
-  z-index: 850; width: 9px;
-  /* Positioned by transform, not `left`: a compositor-only move that the
-     track clock can ease in step with the pane edge. A drag writes an inline
-     transform per pointer frame and drops the easing (see below). */
-  transform: translateX(calc(var(--maid-sidebar-width) - 4px));
-  transition: transform var(--maid-track-duration) var(--maid-track-ease);
-  will-change: transform;
-  pointer-events: none;
-  background: repeating-linear-gradient(180deg, var(--maid-line) 0 1px, transparent 1px 56px);
-  -webkit-mask-image: linear-gradient(180deg, transparent, #000 56px, #000 calc(100% - 56px), transparent);
-  mask-image: linear-gradient(180deg, transparent, #000 56px, #000 calc(100% - 56px), transparent);
-}
-
-/* Dragging the sidebar handle writes widths at pointer cadence; easing them
-   would detach the seam from the handle. */
-body[data-dsh-orca-maid][data-maid-sidebar-dragging] .spine { transition: none; }
-
-/* The seam is decorative in constrained layouts; retiring it avoids moving a
-   body-level fixed layer alongside the AppFrame track transition. */
-@media (max-width: 1099px) {
-  body[data-dsh-orca-maid] .spine { display: none; }
-}
-
 /* ---- Hero橱窗：空态是皮肤的展示窗口 -------------------------------------- */
 
 body[data-dsh-orca-maid] [data-phase='hero'] [class*='titleGroup'] > span:not([class*='previewBadge']) {
@@ -3033,30 +2664,16 @@ body[data-dsh-orca-maid] [data-phase='hero'] [class*='titleGroup'] > span:not([c
   text-align: left;
   white-space: nowrap;
 }
-body[data-dsh-orca-maid] [data-phase='hero'] [class*='titleGroup'] > span:not([class*='previewBadge'])::after {
-  content: '';
-  display: inline-block;
-  width: 9px; height: 9px; margin-left: 10px;
-  background: var(--maid-blue);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--maid-blue) 50%, transparent);
-  animation: maid-terminal-caret 1.05s steps(1, end) infinite;
-}
-
-@keyframes maid-terminal-caret {
-  0%, 48% { opacity: 1; }
-  49%, 100% { opacity: 0; }
-}
 body[data-dsh-orca-maid] [data-phase='hero'] [class*='previewBadge'] {
   border: 1px solid var(--maid-line); border-radius: var(--dsw-radius-sm);
   padding: 3px 8px 2px;
   color: var(--maid-muted); background: var(--maid-surface);
-  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 9px; letter-spacing: 0.22em;
+  font: 500 11px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0.02em;
 }
 
-/* Hero and active phases share one signature terminal: the host's 28px
-   composer radius, a stronger frame, and mechanical side arms bracketing
-   the card. */
+/* Hero and active phases share one quiet composer surface: the host's 28px
+   radius, a hairline frame and the soft MAID shadow. */
 body[data-dsh-orca-maid] [data-composer-card] {
   position: relative;
   container-name: maid-composer;
@@ -3076,33 +2693,12 @@ body[data-dsh-orca-maid] :is([role='menu'], [role='listbox']) {
   overscroll-behavior: contain;
 }
 body[data-dsh-orca-maid] [data-composer-card]:focus-within {
-  border-color: color-mix(in srgb, var(--maid-blue) 45%, transparent);
-  box-shadow: var(--maid-shadow), 0 0 0 3px color-mix(in srgb, var(--maid-blue) 10%, transparent);
+  border-color: color-mix(in srgb, var(--maid-blue) 32%, var(--maid-line));
+  box-shadow: var(--maid-shadow), 0 0 0 2px color-mix(in srgb, var(--maid-blue) 8%, transparent);
 }
-body[data-dsh-orca-maid] [data-composer-card]:not([class*='cardWorkspaceTrigger'])::before,
-body[data-dsh-orca-maid] [data-composer-card]:not([class*='cardWorkspaceTrigger'])::after {
-  position: absolute;
-  z-index: 5;
-  top: 22%;
-  bottom: 22%;
-  width: 7px;
-  content: '';
-  border: 1px solid color-mix(in srgb, var(--maid-graphite) 46%, transparent);
-  pointer-events: none;
-}
-
-body[data-dsh-orca-maid] [data-composer-card]:not([class*='cardWorkspaceTrigger'])::before {
-  left: -10px;
-  border-right: 0;
-}
-
-body[data-dsh-orca-maid] [data-composer-card]:not([class*='cardWorkspaceTrigger'])::after {
-  right: -10px;
-  border-left: 0;
-}
-
-/* The stock bracket artwork remains untouched. These transparent controls
-   only turn its existing left and right hit planes into drag surfaces. */
+/* The composer card is a single soft surface; the invisible drag zones below
+   keep the collapse gesture without drawing brackets around the input. */
+/* Transparent drag surfaces on the composer's left and right edges. */
 body[data-dsh-orca-maid] [data-maid-composer-handle] {
   position: absolute;
   z-index: 6;
@@ -3252,67 +2848,42 @@ body[data-dsh-orca-maid] [data-maid-composer-restore] {
   height: 28px;
   margin: 0;
   padding: 0;
-  border: 1px solid color-mix(in srgb, var(--maid-graphite) 46%, transparent);
-  background: color-mix(in srgb, var(--maid-surface-strong) 96%, transparent);
-  box-shadow: 5px 7px 0 rgba(0, 0, 0, 0.08), 0 10px 28px rgba(0, 0, 0, 0.14);
-  color: var(--maid-graphite);
+  border: 1px solid var(--maid-line);
+  border-radius: var(--dsw-radius-sm);
+  background: var(--maid-surface-strong);
+  box-shadow: var(--maid-shadow);
+  color: var(--maid-muted);
   cursor: pointer;
-  animation: maidComposerRestoreControlIn 240ms linear 260ms both;
+  transition: background-color var(--maid-ease), border-color var(--maid-ease), color var(--maid-ease), opacity var(--maid-ease);
+  animation: maidComposerRestoreControlIn 180ms ease-out 220ms both;
 }
 
 body[data-dsh-orca-maid] [data-maid-composer-restore][hidden] { display: none; }
 
-body[data-dsh-orca-maid] [data-maid-composer-restore]::before,
-body[data-dsh-orca-maid] [data-maid-composer-restore]::after {
-  position: absolute;
-  top: 4px;
-  bottom: 4px;
-  width: 4px;
-  content: '';
-  border: 1px solid currentColor;
-}
-
-body[data-dsh-orca-maid] [data-maid-composer-restore]::before {
-  left: -6px;
-  border-right: 0;
-}
-
-body[data-dsh-orca-maid] [data-maid-composer-restore]::after {
-  right: -6px;
-  border-left: 0;
-}
-
 body[data-dsh-orca-maid] [data-maid-composer-restore-core] {
-  width: 10px;
-  height: 10px;
-  border: 1px solid currentColor;
-  background: color-mix(in srgb, var(--maid-blue) 10%, transparent);
-  box-shadow: inset 3px 0 0 var(--maid-blue);
+  width: 8px;
+  height: 8px;
+  border: solid currentColor;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(-135deg);
+  background: none;
+  box-shadow: none;
 }
 
 body[data-dsh-orca-maid] [data-maid-composer-restore]:is(:hover, :focus-visible) {
-  border-color: var(--maid-blue);
-  color: var(--maid-blue);
-  outline: 1px solid color-mix(in srgb, var(--maid-blue) 40%, transparent);
-  outline-offset: 2px;
-  transform: translateY(-1px);
+  border-color: var(--maid-line);
+  background: var(--maid-hover);
+  color: var(--maid-ink);
+  outline: none;
 }
 
 body[data-dsh-orca-maid] [data-maid-composer-restore][data-maid-composer-restore-exiting] {
   pointer-events: none;
-  animation: maidComposerRestoreControlOut 160ms ease-out both;
-}
-
-body[data-dsh-orca-maid][data-ds-dark-theme] [data-maid-composer-restore] {
-  border-color: color-mix(in srgb, var(--maid-graphite) 34%, transparent);
-  background: #111925;
-  box-shadow: 5px 7px 0 rgba(0, 0, 0, 0.2), 0 12px 30px rgba(0, 0, 0, 0.34);
+  animation: maidComposerRestoreControlOut 150ms ease-out both;
 }
 
 @keyframes maidComposerRestoreControlIn {
-  0% { opacity: 0; transform: scale(0.65); }
-  65% { opacity: 1; transform: scale(1.12); }
-  82% { transform: scale(0.97); }
+  0% { opacity: 0; transform: scale(0.92); }
   100% { opacity: 1; transform: none; }
 }
 
@@ -3401,34 +2972,10 @@ body[data-dsh-orca-maid] [data-maid-composer-ghost] {
   100% { opacity: 1; transform: none; }
 }
 
-/* Standby telemetry lives only under the hero橱窗 — an instrument reading,
-   not floating chrome. */
-body[data-dsh-orca-maid] .standby {
-  position: fixed; bottom: 18px; left: calc(50% + 9vw); z-index: 900;
-  display: none; align-items: center; gap: 14px; width: min(420px, 38vw);
-  transform: translateX(-50%); color: var(--maid-muted);
-  font: 500 8px/1 ui-monospace, "SFMono-Regular", Consolas, monospace;
-  letter-spacing: 0.2em; pointer-events: none;
-}
-body[data-dsh-orca-maid][data-maid-scene='hero'] .standby { display: flex; }
-body[data-dsh-orca-maid] .standbyLine {
-  flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--maid-line));
-}
-body[data-dsh-orca-maid] .standbyLine:last-child {
-  background: linear-gradient(90deg, var(--maid-line), transparent);
-}
-
 body[data-dsh-orca-maid] [data-aionui-explorer-col],
 body[data-dsh-orca-maid] [data-aionui-preview-col],
 body[data-dsh-orca-maid] [data-gitgraph-dialog] {
   border-color: var(--maid-line); background: var(--maid-surface); box-shadow: var(--maid-shadow);
-}
-
-/* Icon redraw: matched host glyphs keep their element, sizing and React
-   ownership, but the original drawing is retired while the MAID art group
-   (see icons.ts) carries the visible rectilinear geometry instead. */
-body[data-dsh-orca-maid] [data-orca-maid-icon] > :not([data-orca-maid-icon-art]) {
-  display: none;
 }
 
 body[data-dsh-orca-maid] {
@@ -3444,6 +2991,41 @@ body[data-dsh-orca-maid] {
   --aion-brand: var(--maid-cyan);
   --aion-border-base: var(--maid-line);
   --aion-overlay-shadow: var(--maid-shadow);
+}
+
+/* The semantic width handle is a quiet hairline pill; hover only deepens the
+   line, with no glow, gradient or pulse. */
+body[data-dsh-orca-maid]
+  [data-phase='active']
+  > :has(> [data-conversation-scroll])
+  > [data-width-handle][data-side]::after {
+  width: 2px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--maid-muted) 44%, transparent);
+}
+
+body[data-dsh-orca-maid]
+  [data-phase='active']
+  > :has(> [data-conversation-scroll])
+  > [data-width-handle][data-side]:is(:hover, [data-dragging])::after {
+  background: color-mix(in srgb, var(--maid-blue) 55%, transparent);
+}
+
+/* Turn navigation: one neutral dot per row, no cyan glow or white ring. */
+body[data-dsh-orca-maid] [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label]::before {
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--maid-ink) 32%, transparent);
+  box-shadow: none;
+  transition: background-color var(--maid-ease);
+}
+
+body[data-dsh-orca-maid] [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label]:is(:hover, :focus-visible)::before {
+  background: color-mix(in srgb, var(--maid-ink) 54%, transparent);
+}
+
+body[data-dsh-orca-maid] [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label][aria-current='true']::before {
+  background: color-mix(in srgb, var(--maid-ink) 78%, transparent);
+  box-shadow: none;
 }
 
 @media (max-width: 900px) {
@@ -3466,13 +3048,11 @@ body[data-dsh-orca-maid] {
     margin-top: 0;
   }
   body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] [class*='regionArea']::before { display: none; }
-  body[data-dsh-orca-maid] .spine,
   body[data-dsh-orca-maid] .signalChip,
   body[data-dsh-orca-maid] .statusCharacter { display: none; }
   /* Match the light's base selector specificity so this also hides its fixed
      Windows caption placement at narrow widths. */
   body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > .pricingLight { display: none; }
-  body[data-dsh-orca-maid][data-maid-scene='hero'] .standby { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3481,19 +3061,16 @@ body[data-dsh-orca-maid] {
   body[data-dsh-orca-maid] [role='button'],
   body[data-dsh-orca-maid] .dshWordmark,
   body[data-dsh-orca-maid] .statusCharacter,
-  body[data-dsh-orca-maid] .spine,
   body[data-dsh-orca-maid] .statusCharacterBubble,
   body[data-dsh-orca-maid] .pricingLight,
   body[data-dsh-orca-maid] .pricingLamp,
   body[data-dsh-orca-maid] .pricingTooltip,
   body[data-dsh-orca-maid] :is([data-slot='sidebar'] > :first-child)::before { transition: none; }
-  body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > :first-child::after,
   body[data-dsh-orca-maid] .signalDot,
   body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > :first-child,
   body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog'],
   body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog']::before,
   body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog']::after,
-  body[data-dsh-orca-maid] [data-phase='hero'] [class*='titleGroup'] > span:not([class*='previewBadge'])::after,
   body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-entering] [data-composer-card],
   body[data-dsh-orca-maid] [data-maid-composer-ghost],
   body[data-dsh-orca-maid] [data-composer-seat][data-maid-composer-restoring] [data-composer-card],
@@ -3508,123 +3085,10 @@ body[data-dsh-orca-maid] {
   body[data-dsh-orca-maid] .darkSceneLayer,
   body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > button:not([data-dsh-part='sidebar-entry'])::before,
   body[data-dsh-orca-maid] [role='switch'] > [class*='thumb'],
-  body[data-dsh-orca-maid] [data-slot='sidebar'] button[aria-haspopup='dialog']::after { transition: none; }
   body[data-dsh-orca-maid] .statusCharacterBubble { transition: none; }
   body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog']::before,
   body[data-dsh-orca-maid][data-maid-settings-open] :is([data-slot='sidebar.settings'] > [role='presentation'], :where(body) > [role='presentation'][data-maid-settings-overlay]) > [role='dialog']::after { display: none; }
-  body[data-dsh-orca-maid] .statusCharacterFrame { animation: none; }
   body[data-dsh-orca-maid] .pricingLight[data-orca-maid-price='transition'] .pricingLampAmber { animation: none; }
-}
-
-@keyframes maidGateWeave {
-  0%   { transform: translate(-0.090px, 0.062px) scaleX(var(--maid-character-mirror)); }
-  14%  { transform: translate(0.090px, -0.062px) scaleX(var(--maid-character-mirror)); }
-  29%  { transform: translate(0.032px, 0.062px) scaleX(var(--maid-character-mirror)); }
-  43%  { transform: translate(-0.041px, -0.016px) scaleX(var(--maid-character-mirror)); }
-  58%  { transform: translate(0.059px, 0.011px) scaleX(var(--maid-character-mirror)); }
-  72%  { transform: translate(-0.018px, -0.062px) scaleX(var(--maid-character-mirror)); }
-  86%  { transform: translate(0.090px, 0.034px) scaleX(var(--maid-character-mirror)); }
-  100% { transform: translate(-0.090px, 0.062px) scaleX(var(--maid-character-mirror)); }
-}
-
-/* The semantic handles are siblings of the conversation scrollport inside the
-   host body wrapper. Anchor the rule to that relationship without depending
-   on generated class names. */
-body[data-dsh-orca-maid]
-  [data-phase='active']
-  > :has(> [data-conversation-scroll])
-  > [data-width-handle][data-side]::after {
-  width: 3px;
-  border-radius: 999px;
-  background: linear-gradient(
-    to bottom,
-    transparent calc(var(--dsh-width-handle-pointer-y, 50%) - 50px),
-    rgba(120, 120, 120, 0.18) calc(var(--dsh-width-handle-pointer-y, 50%) - 40px),
-    #a0a0a3 calc(var(--dsh-width-handle-pointer-y, 50%) - 24px),
-    #6f6f73 calc(var(--dsh-width-handle-pointer-y, 50%) - 6px),
-    #6f6f73 calc(var(--dsh-width-handle-pointer-y, 50%) + 6px),
-    #a0a0a3 calc(var(--dsh-width-handle-pointer-y, 50%) + 24px),
-    rgba(120, 120, 120, 0.18) calc(var(--dsh-width-handle-pointer-y, 50%) + 40px),
-    transparent calc(var(--dsh-width-handle-pointer-y, 50%) + 50px)
-  );
-  filter:
-    drop-shadow(0 0 1px rgba(255, 255, 255, 0.9))
-    drop-shadow(0 0 3px rgba(120, 120, 120, 0.42));
-}
-
-body[data-dsh-orca-maid][data-ds-dark-theme]
-  [data-phase='active']
-  > :has(> [data-conversation-scroll])
-  > [data-width-handle][data-side]::after {
-  background: linear-gradient(
-    to bottom,
-    transparent calc(var(--dsh-width-handle-pointer-y, 50%) - 52px),
-    var(--maid-blue) calc(var(--dsh-width-handle-pointer-y, 50%) - 36px),
-    var(--maid-cyan) calc(var(--dsh-width-handle-pointer-y, 50%) - 10px),
-    #f7faff var(--dsh-width-handle-pointer-y, 50%),
-    var(--maid-cyan) calc(var(--dsh-width-handle-pointer-y, 50%) + 10px),
-    var(--maid-blue) calc(var(--dsh-width-handle-pointer-y, 50%) + 36px),
-    transparent calc(var(--dsh-width-handle-pointer-y, 50%) + 52px)
-  );
-  filter:
-    drop-shadow(0 0 1px rgba(18, 19, 23, 0.98))
-    drop-shadow(0 0 6px rgba(123, 181, 255, 0.78));
-}
-
-body[data-dsh-orca-maid]
-  [data-phase='active']
-  > :has(> [data-conversation-scroll])
-  > [data-width-handle][data-side]:is(:hover, [data-dragging])::after {
-  transform-origin: center;
-  animation: orcaMaidWidthHandleSignal 920ms steps(4, end) infinite;
-}
-
-/* The rail precedes the transcript root; root > scroll > flow stays present
-   even when data-chat-following-tail is removed while reading history. */
-body[data-dsh-orca-maid]:not([data-ds-dark-theme]) [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label]::before {
-  border-radius: var(--dsw-radius-sm);
-  background: rgba(120, 120, 120, 0.56);
-}
-
-body[data-dsh-orca-maid]:not([data-ds-dark-theme]) [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label]:is(:hover, :focus-visible)::before {
-  background: #a0a0a3;
-  box-shadow: 0 0 5px rgba(120, 120, 120, 0.46);
-}
-
-body[data-dsh-orca-maid]:not([data-ds-dark-theme]) [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label][aria-current='true']::before {
-  background: #6f6f73;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.92),
-    0 0 5px rgba(120, 120, 120, 0.38);
-}
-
-body[data-dsh-orca-maid][data-ds-dark-theme] [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label]::before {
-  background: color-mix(in srgb, var(--maid-muted) 74%, transparent);
-}
-
-body[data-dsh-orca-maid][data-ds-dark-theme] [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label]:is(:hover, :focus-visible)::before {
-  background: var(--maid-cyan);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--maid-cyan) 72%, transparent);
-}
-
-body[data-dsh-orca-maid][data-ds-dark-theme] [data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label][aria-current='true']::before {
-  background: var(--maid-cyan);
-  box-shadow:
-    0 0 0 1px #f7faff,
-    0 0 7px color-mix(in srgb, var(--maid-cyan) 76%, transparent);
-}
-
-@keyframes orcaMaidWidthHandleSignal {
-  0%,
-  100% {
-    opacity: 0.72;
-    transform: scaleX(0.76);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scaleX(1.24);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -15,26 +15,37 @@ function declarationBlock(selector: string): string {
 }
 
 describe('workspace state styling', () => {
-  it('reserves blue for the current workspace instead of every open folder', () => {
-    const openBlock = declarationBlock(
-      "body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded='true']",
-    )
+  it('uses one soft selected surface instead of rails and gradient washes', () => {
     const currentBlock = declarationBlock(
       "body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree']\n  > div[data-maid-workspace-current]\n  [role='treeitem'][aria-expanded]",
     )
-
-    expect(openBlock).toContain('var(--maid-graphite)')
-    expect(openBlock).not.toContain('border-left: 2px solid var(--maid-blue)')
-    expect(currentBlock).toContain('border-left-color: var(--maid-blue)')
+    expect(currentBlock).toContain('background: var(--maid-selected)')
+    expect(currentBlock).not.toContain('border-left')
+    expect(currentBlock).not.toContain('linear-gradient')
   })
 
-  it('adds an independent square marker to the current workspace', () => {
-    const markerBlock = declarationBlock(
-      "body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree']\n  > div[data-maid-workspace-current]\n  [role='treeitem'][aria-expanded]::after",
-    )
+  it('adds no independent square marker or connector to the current workspace', () => {
+    expect(css).not.toContain("> div[data-maid-workspace-current]\n  [role='treeitem'][aria-expanded]::after")
+    expect(css).not.toContain("> div[data-maid-workspace-current]\n  [role='treeitem'][aria-expanded]::before")
+    expect(css).not.toContain('--maid-tree-guide')
+  })
 
-    expect(markerBlock).toContain('width: 5px')
-    expect(markerBlock).toContain('height: 5px')
-    expect(markerBlock).toContain('background: var(--maid-blue)')
+  it('keeps hover neutral and selection low-saturation blue', () => {
+    const hover = declarationBlock(
+      "body[data-dsh-orca-maid] [data-slot='sidebar'] [role='treeitem'][aria-expanded]:hover",
+    )
+    expect(hover).toContain('background: var(--maid-hover)')
+    const selected = declarationBlock(
+      "body[data-dsh-orca-maid] [data-slot='sidebar'] div[role='treeitem'][aria-selected='true']",
+    )
+    expect(selected).toContain('background: var(--maid-selected)')
+    expect(css).not.toContain("div[role='treeitem'][aria-selected='true']::after")
+  })
+
+  it('reserves blue for the current folder glyph, not for every open folder', () => {
+    const currentIcon = declarationBlock(
+      "body[data-dsh-orca-maid] [data-slot='sidebar'] [role='tree']\n  > div[data-maid-workspace-current]\n  [role='treeitem'][aria-expanded]\n  svg",
+    )
+    expect(currentIcon).toContain('color: var(--maid-blue)')
   })
 })

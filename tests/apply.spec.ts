@@ -12,16 +12,6 @@ import { resolve } from 'node:path'
 import { apply } from '../src/client/index.ts'
 import { installMaidPageIcons } from '../src/client/page-icons.ts'
 
-// Complete SVGs rendered from the pinned official source; no host checkout is needed at test time.
-const HOST_ICONS: Array<{ component: string; name: string; svg: string }> = JSON.parse(
-  readFileSync(resolve(process.cwd(), 'tests/fixtures/dsh-0.1.7-alpha.1-icons.json'), 'utf8'),
-).icons
-function hostIcon(component: string, attributes = ''): string {
-  const fixture = HOST_ICONS.find(icon => icon.component === component)
-  if (!fixture) throw new Error(`Missing host fixture: ${component}`)
-  return fixture.svg.replace('<svg ', `<svg ${attributes} `)
-}
-
 const CSS = readFileSync(resolve(process.cwd(), 'src/client/orca-maid.module.css'), 'utf8')
 const TURN_MARK_SELECTOR = "[data-phase='active'] :has(+ * > * > [data-chat-flow]) > nav button[type='button'][aria-label]"
 
@@ -84,6 +74,18 @@ describe('Maid Link skin apply', () => {
     expect(CSS).not.toContain("[aria-label^='跳转到第']")
   })
 
+  it('leaves host icon markup untouched', async () => {
+    document.body.innerHTML = '<button type="button" aria-label="fixture"><svg width="16" height="16" viewBox="0 0 16 16" stroke-width="1.3"><path d="M1 1h2" stroke="currentColor"></path></svg></button>'
+    const svg = document.querySelector('svg')!
+    const before = svg.innerHTML
+    fiber = await mount()
+    expect(svg.innerHTML).toBe(before)
+    expect(svg.hasAttribute('data-orca-maid-icon')).toBe(false)
+    expect(svg.querySelector('[data-orca-maid-icon-art]')).toBeNull()
+    await fiber.dispose()
+    expect(svg.innerHTML).toBe(before)
+  })
+
   it('sets the body attribute and retracts it on dispose', async () => {
     fiber = await mount()
     expect(document.body.hasAttribute('data-dsh-orca-maid')).toBe(true)
@@ -93,10 +95,9 @@ describe('Maid Link skin apply', () => {
 
   it('injects chrome and retracts every element on dispose', async () => {
     fiber = await mount()
-    expect(document.body.querySelectorAll('[data-skin-chrome]')).toHaveLength(4)
+    expect(document.body.querySelectorAll('[data-skin-chrome]')).toHaveLength(2)
     expect(document.body.querySelectorAll('[data-skin-chrome="light-scene"] > div')).toHaveLength(2)
     expect(document.body.querySelectorAll('[data-skin-chrome="dark-scene"] > div')).toHaveLength(2)
-    expect(document.body.textContent).toContain('ORCA MAID')
     expect(document.body.style.getPropertyValue('--orca-maid-light-hero-art')).toContain('/skin-assets/orca-maid/')
     expect(document.body.style.getPropertyValue('--orca-maid-light-active-art')).toContain('/skin-assets/orca-maid/')
     expect(document.body.style.getPropertyValue('--orca-maid-dark-hero-art')).toContain('/skin-assets/orca-maid/')
@@ -322,9 +323,7 @@ describe('Maid Link skin apply', () => {
     const frame = document.querySelector<HTMLElement>("[id='root'] > div[data-slot='root'] > div")!
     pane.getBoundingClientRect = () => ({ width: 280 } as DOMRect)
     fiber = await mount()
-    const spine = document.querySelector<HTMLElement>("[data-skin-chrome='spine']")!
     expect(pane.style.getPropertyValue('--maid-sidebar-art-width')).toBe('280px')
-    expect(spine.style.transform).toBe('')
 
     frame.setAttribute('data-dragging', '')
     await Promise.resolve()
@@ -336,9 +335,8 @@ describe('Maid Link skin apply', () => {
     for (const width of [296, 310, 326]) {
       frame.style.gridTemplateColumns = `${width}px minmax(0px, 1fr) 0px`
       notifyResize()
-      // The stage and the seam ruler follow at pointer cadence...
+      // The stage follows at pointer cadence...
       expect(pane.style.getPropertyValue('--maid-sidebar-art-width')).toBe(`${width}px`)
-      expect(spine.style.transform).toBe(`translateX(${width - 4}px)`)
     }
     // ...while the sidebar slot's copy, which restyles the whole sidebar subtree, waits for the drop.
     expect(setProperty.mock.calls.filter(([property]) => property === '--maid-sidebar-width')).toEqual([])
@@ -346,9 +344,7 @@ describe('Maid Link skin apply', () => {
     frame.removeAttribute('data-dragging')
     await Promise.resolve()
     expect(document.body.hasAttribute('data-maid-sidebar-dragging')).toBe(false)
-    expect(spine.style.transform).toBe('')
     expect(pane.parentElement!.style.getPropertyValue('--maid-sidebar-width')).toBe('326px')
-    expect(spine.style.getPropertyValue('--maid-sidebar-width')).toBe('326px')
     // The body never carries the width while no settings overlay exists.
     expect(document.body.style.getPropertyValue('--maid-sidebar-width')).toBe('')
     await fiber.dispose()
@@ -466,6 +462,16 @@ describe('Maid Link skin apply', () => {
     expect(label.textContent).toBe('TASK RUNNING')
 
     scroll.querySelector("[data-state='running']")?.remove()
+
+    // The host composer stop glyph (filled rounded square) is the structural
+    // running signal for a plain streaming turn.
+    const stop = document.createElement('button')
+    stop.innerHTML = '<svg viewBox="0 0 16 16"><rect x="3" y="3" width="10" height="10" rx="3" fill="currentColor"></rect></svg>'
+    scroll.append(stop)
+    await settleLinkStatus()
+    expect(label.textContent).toBe('TASK RUNNING')
+    stop.remove()
+
     scroll.append(Object.assign(document.createElement('div'), { innerHTML: '<div data-approval-key="approval"></div>' }))
     await settleLinkStatus()
     expect(label.textContent).toBe('AUTH REQUEST')
@@ -521,354 +527,6 @@ describe('Maid Link skin apply', () => {
     expect(document.title).not.toBe('original')
     await fiber.dispose()
     expect(document.title).toBe('original')
-  })
-
-  it('redraws all target host glyphs without changing their owned SVG children', async () => {
-    document.body.innerHTML = HOST_ICONS.map((icon, index) => `<span data-target-icon="${index}">${icon.svg}</span>`).join('')
-    const svgs = Array.from(document.querySelectorAll<SVGElement>('[data-target-icon] > svg'))
-    const originals = svgs.map(svg => svg.innerHTML)
-    fiber = await mount()
-    for (const [index, svg] of svgs.entries()) {
-      const fixture = HOST_ICONS[index]!
-      expect(svg.getAttribute('data-orca-maid-icon'), fixture.component).toBe(fixture.name)
-      const art = svg.querySelector('g[data-orca-maid-icon-art]')!
-      expect(art?.querySelectorAll('path, rect').length, fixture.component).toBeGreaterThan(0)
-      expect(svg.querySelectorAll(':scope > g[data-orca-maid-icon-art]')).toHaveLength(1)
-    }
-    await fiber.dispose()
-    svgs.forEach((svg, index) => { expect(svg.innerHTML, HOST_ICONS[index]!.component).toBe(originals[index]) })
-    expect(document.querySelector('[data-orca-maid-icon]')).toBeNull()
-  })
-
-  it('updates a retained pin after an attribute change and releases an unrecognized replacement', async () => {
-    document.body.innerHTML = hostIcon('IconPinOutlineRegular')
-    const svg = document.querySelector<SVGElement>('svg')!
-    const hostPaths = Array.from(svg.querySelectorAll('path'))
-    fiber = await mount()
-    expect(svg.getAttribute('data-orca-maid-icon')).toBe('pin')
-    hostPaths[0]!.setAttribute('fill', 'currentColor')
-    await new Promise(resolve => { setTimeout(resolve, 0) })
-    expect(svg.getAttribute('data-orca-maid-icon')).toBe('pin-filled')
-    hostPaths.forEach(path => { path.setAttribute('d', 'M0 0h1') })
-    await new Promise(resolve => { setTimeout(resolve, 0) })
-    expect(svg.hasAttribute('data-orca-maid-icon')).toBe(false)
-    expect(svg.querySelector('[data-orca-maid-icon-art]')).toBeNull()
-    expect(Array.from(svg.querySelectorAll('path'))).toEqual(hostPaths)
-  })
-
-  it('redraws matched host icons in place and retracts them on dispose', async () => {
-    document.body.innerHTML = `
-      <button type="button" aria-label="发送消息">${hostIcon('ComposerSend')}</button>
-      <button type="button" aria-label="关闭">${hostIcon('IconCloseFillRegular')}</button>
-      <button type="button" aria-label="添加文件">${hostIcon('IconPaperclipOutlineRegular')}</button>
-      <svg viewBox="0 0 16 16"><path d="M0 0h16v16H0z"></path></svg>
-    `
-    const send = document.querySelector<SVGElement>('[aria-label="发送消息"] svg')!
-    const close = document.querySelector<SVGElement>('[aria-label="关闭"] svg')!
-    const paperclip = document.querySelector<SVGElement>('[aria-label="添加文件"] svg')!
-    const unknown = document.querySelectorAll('svg')[3]!
-    fiber = await mount()
-    expect(send.hasAttribute('data-orca-maid-icon')).toBe(true)
-    expect(send.getAttribute('data-orca-maid-icon')).toBe('send')
-    const sendArt = send.querySelector('g[data-orca-maid-icon-art]')
-    expect(sendArt).not.toBeNull()
-    expect(sendArt?.getAttribute('stroke-linejoin')).toBe('miter')
-    expect(sendArt?.querySelectorAll('path').length).toBeGreaterThan(0)
-    expect(close.getAttribute('data-orca-maid-icon')).toBe('close')
-    // The current close glyph uses the same 16-unit art grid.
-    expect(close.querySelector('g[data-orca-maid-icon-art]')?.getAttribute('transform')).toBeNull()
-    // Keep the two-loop clip tilted for separation at its small display size.
-    expect(paperclip.getAttribute('data-orca-maid-icon')).toBe('paperclip')
-    const clipPath = paperclip.querySelector('g[data-orca-maid-icon-art] path')!
-    expect(clipPath.getAttribute('d')).toContain('a2.75 2.75')
-    expect(clipPath.getAttribute('transform')).toBe('rotate(-45 8 8)')
-    expect(unknown.hasAttribute('data-orca-maid-icon')).toBe(false)
-    await fiber.dispose()
-    expect(document.querySelector('[data-orca-maid-icon]')).toBeNull()
-    expect(document.querySelector('[data-orca-maid-icon-art]')).toBeNull()
-    expect(send.querySelector('path')?.getAttribute('d')).toContain('M8.3125 0.980183')
-  })
-
-  it('redraws the composer command button as a prompt while other plus icons stay plus', async () => {
-    // The command trigger shares its host glyph with other plus controls.
-    document.body.innerHTML = `
-      <div data-composer-seat>
-        <button type="button" aria-label="指令" aria-haspopup="listbox">${hostIcon('IconPlusOutlineMedium')}</button>
-      </div>
-      <button type="button" aria-label="新建会话">${hostIcon('IconPlusOutlineMedium')}</button>
-    `
-    fiber = await mount()
-    const command = document.querySelector<SVGElement>('[data-composer-seat] svg')!
-    const plus = document.querySelector<SVGElement>('[aria-label="新建会话"] svg')!
-    expect(command.getAttribute('data-orca-maid-icon')).toBe('command')
-    expect(command.querySelector('g[data-orca-maid-icon-art] path')?.getAttribute('d')).toContain('M4.5 4.5 8 8')
-    expect(plus.getAttribute('data-orca-maid-icon')).toBe('plus')
-  })
-
-  it('redraws the generic tool row as a diagonal wrench and leaves other sparkles alone', async () => {
-    // Every tool row carries `data-tool` (dsh-client-ui-tool's ToolRow) and the
-    // unmapped tools take the sparkle glyph as their icon, while the trajectory
-    // view uses that same glyph for assistant messages — and the host itself
-    // draws a wrench for tool kinds.
-    document.body.innerHTML = `
-      <div data-variant="code" data-tool="unknown-tool" data-state="done">
-        ${hostIcon('IconSparkleRegular')}
-      </div>
-      <div data-chat-flow-kind="assistant-step">
-        ${hostIcon('IconSparkleRegular')}
-      </div>
-    `
-    fiber = await mount()
-    const svgs = Array.from(document.querySelectorAll<SVGElement>('svg'))
-    expect(svgs.map(svg => svg.getAttribute('data-orca-maid-icon'))).toEqual(['wrench', 'sparkle'])
-
-    const art = svgs[0]!.querySelector('g[data-orca-maid-icon-art]')!
-    expect(art.querySelector('g')?.getAttribute('transform')).toBe('rotate(-45 8 8)')
-    expect(Array.from(art.querySelectorAll('path')).map(path => path.getAttribute('d'))).toEqual([
-      'M8 4.75v6.5',
-      'M6 2.5v2.25h4V2.5',
-      'M6 13.5v-2.25h4V13.5',
-    ])
-
-    await fiber.dispose()
-    expect(document.querySelectorAll('[data-orca-maid-icon]').length).toBe(0)
-  })
-
-  it('redraws the target globe', async () => {
-    document.body.innerHTML = `
-      ${hostIcon('IconGlobeOutlineRegular')}
-    `
-    fiber = await mount()
-    const globe = document.querySelector('svg')!
-    expect(globe.getAttribute('data-orca-maid-icon')).toBe('globe')
-    expect(globe.querySelector('g[data-orca-maid-icon-art]')).not.toBeNull()
-  })
-
-  it('distinguishes all permission and workspace folder icons', async () => {
-    document.body.innerHTML = `
-      ${hostIcon('PermissionIconReadOnlyRegular', 'data-test="read"')}
-      ${hostIcon('PermissionIconWorkspaceWriteRegular', 'data-test="write"')}
-      ${hostIcon('PermissionIconFullAccessRegular', 'data-test="full"')}
-      ${hostIcon('IconFolderOpenRegular', 'data-test="open"')}
-      ${hostIcon('IconFolderCloseRegular', 'data-test="closed"')}
-    `
-    fiber = await mount()
-    const icon = (name: string): string | null => document.querySelector(`[data-test="${name}"]`)?.getAttribute('data-orca-maid-icon') ?? null
-    expect(icon('read')).toBe('permission-read')
-    expect(icon('write')).toBe('permission-write')
-    expect(icon('full')).toBe('permission-full')
-    expect(icon('open')).toBe('folder-open')
-    expect(icon('closed')).toBe('folder-closed')
-  })
-
-  it('redraws the agent-protocol glyphs: queue send, todo, question, goal, delete', async () => {
-    document.body.innerHTML = `
-      <button type="button" aria-label="发送">${hostIcon('IconSendOutlineRegular')}</button>
-      <button type="button" aria-label="编辑">${hostIcon('IconEditOutlineRegular')}</button>
-      <button type="button" aria-label="删除">${hostIcon('IconTrashOutlineRegular')}</button>
-      ${hostIcon('IconChecklistOutlineRegular')}
-      ${hostIcon('IconQuestionOutlineRegular')}
-      ${hostIcon('IconGoalOutlineRegular')}
-      ${hostIcon('IconFolderCloseRegular')}
-      ${hostIcon('IconChevronRightOutlineRegular')}
-    `
-    fiber = await mount()
-    const names = Array.from(document.querySelectorAll('[data-orca-maid-icon]'))
-      .map((el) => el.getAttribute('data-orca-maid-icon'))
-    expect(names).toEqual(['send', 'edit', 'trash', 'checklist', 'question', 'goal', 'folder-closed', 'chevron-right'])
-    for (const el of document.querySelectorAll('[data-orca-maid-icon]')) {
-      expect(el.querySelector('g[data-orca-maid-icon-art]')).not.toBeNull()
-    }
-    await fiber.dispose()
-    expect(document.querySelectorAll('[data-orca-maid-icon]').length).toBe(0)
-  })
-
-  it('redraws the thought row as a tailed balloon and the context-injection row as a syringe', async () => {
-    document.body.innerHTML = `
-      ${hostIcon('IconThinkOutlineRegular')}
-      ${hostIcon('IconContextInjectionOutlineRegular')}
-      ${hostIcon('IconThinkOutlineMedium')}
-    `
-    fiber = await mount()
-    const svgs = Array.from(document.querySelectorAll<SVGElement>('svg'))
-    expect(svgs.map(svg => svg.getAttribute('data-orca-maid-icon')))
-      .toEqual(['think', 'context-injection', 'think'])
-
-    const think = svgs[0]!
-    const thinkArt = think.querySelector('g[data-orca-maid-icon-art]')!
-    expect(Array.from(thinkArt.querySelectorAll('path')).map(path => path.getAttribute('d'))).toEqual([
-      'M2.25 2.75h11.5v8.25H6.75L4 13.75V11H2.25z',
-      'M4 6h2v2H4zM7 6h2v2H7zM10 6h2v2h-2z',
-    ])
-    // The host drawing stays in place; the stylesheet hides it while the skin
-    // is active, so the redraw must not replace the host node.
-    expect(think.querySelector(':scope > path')?.getAttribute('d')).toBe(new DOMParser().parseFromString(hostIcon('IconThinkOutlineRegular'), 'image/svg+xml').querySelector('path')?.getAttribute('d'))
-
-    const injection = svgs[1]!
-    const injectionArt = injection.querySelector('g[data-orca-maid-icon-art]')!
-    expect(Array.from(injectionArt.querySelectorAll('path')).map(path => path.getAttribute('d'))).toEqual([
-      'M5.25 2.5h5.5',
-      'M8 2.5v2.25',
-      'M5 4.75h6v7.5H5z',
-      'M6.25 10.5h3.5v1.75h-3.5z',
-      'M8 12.25v2.25',
-    ])
-
-    await fiber.dispose()
-    expect(document.querySelectorAll('[data-orca-maid-icon]').length).toBe(0)
-  })
-
-  it('redraws the token-usage cylinder and the session-stats dial as rectilinear art', async () => {
-    document.body.innerHTML = `
-      ${hostIcon('IconDatabaseOutlineRegular')}
-      ${hostIcon('IconGaugeOutlineRegular')}
-    `
-    fiber = await mount()
-    const svgs = Array.from(document.querySelectorAll<SVGElement>('svg'))
-    expect(svgs.map(svg => svg.getAttribute('data-orca-maid-icon'))).toEqual(['database', 'gauge'])
-
-    const databaseArt = svgs[0]!.querySelector('g[data-orca-maid-icon-art]')!
-    expect(Array.from(databaseArt.querySelectorAll('path')).map(path => path.getAttribute('d'))).toEqual([
-      'M3.5 2h9v12h-9z',
-      'M3.5 6h9M3.5 10h9',
-    ])
-    // The host's elliptical head must not survive inside the redraw.
-    expect(databaseArt.querySelector('ellipse')).toBeNull()
-
-    const gaugeArt = svgs[1]!.querySelector('g[data-orca-maid-icon-art]')!
-    expect(Array.from(gaugeArt.querySelectorAll('path')).map(path => path.getAttribute('d'))).toEqual([
-      'M2.5 12.25V2.75h11v9.5',
-      'M8 9 11.25 5.75',
-      'M7 8h2v2H7z',
-    ])
-    expect(gaugeArt.querySelector('circle')).toBeNull()
-
-    await fiber.dispose()
-    expect(document.querySelectorAll('[data-orca-maid-icon]').length).toBe(0)
-  })
-
-  it('redraws the timestamp clock and keeps every theme icon drawn', async () => {
-    document.body.innerHTML = `
-      ${hostIcon('IconClockOutlineRegular')}
-      ${hostIcon('IconLightOutlineRegular')}
-      ${hostIcon('IconDarkOutlineRegular')}
-      ${hostIcon('IconFollowsystemOutlineRegular')}
-    `
-    fiber = await mount()
-    const svgs = Array.from(document.querySelectorAll<SVGElement>('svg'))
-    expect(svgs.map(svg => svg.getAttribute('data-orca-maid-icon')))
-      .toEqual(['clock', 'sun', 'moon', 'monitor'])
-    for (const svg of svgs) {
-      // A key without art hides the host glyph and draws nothing in its place.
-      const art = svg.querySelector('g[data-orca-maid-icon-art]')
-      expect(art).not.toBeNull()
-      expect(art?.querySelectorAll('path').length).toBeGreaterThan(0)
-    }
-    // Register contract for the theme pair: the light glyph fills nothing, the
-    // dark glyph is a filled block, so ink coverage itself carries the reading
-    // and the two never drift back into two look-alike outlines.
-    const lightArt = svgs[1]!.querySelector('g[data-orca-maid-icon-art]')!
-    expect(lightArt.querySelectorAll('path[fill]')).toHaveLength(0)
-    // One closed outline: the lobes belong to the same path, so the glyph has no
-    // inner edges at all.
-    expect(Array.from(lightArt.querySelectorAll('path')).map(path => path.getAttribute('d'))).toEqual([
-      'M6.5 1.5h3v2h3v3h2v3h-2v3h-3v2h-3v-2h-3v-3h-2v-3h2v-3h3z',
-    ])
-    const darkArt = svgs[2]!.querySelector('g[data-orca-maid-icon-art]')!
-    expect(darkArt.querySelector('path[fill="currentColor"]')).not.toBeNull()
-    expect(darkArt.querySelector('path')?.getAttribute('fill-rule')).toBe('evenodd')
-    expect(Array.from(svgs[0]!.querySelectorAll('g[data-orca-maid-icon-art] path')).map(path => path.getAttribute('d')))
-      .toEqual(['M2.25 2.25h11.5v11.5H2.25z', 'M8 8V4.5M8 8h3.5'])
-
-    await fiber.dispose()
-    expect(document.querySelectorAll('[data-orca-maid-icon]').length).toBe(0)
-  })
-
-  it('re-matches a retained composer svg when send changes to stop', async () => {
-    document.body.innerHTML = `
-      <button type="button" aria-label="发送消息">
-        ${hostIcon('ComposerSend')}
-      </button>
-    `
-    const svg = document.querySelector<SVGElement>('svg')!
-    fiber = await mount()
-    expect(svg.getAttribute('data-orca-maid-icon')).toBe('send')
-
-    svg.querySelector(':scope > path')?.remove()
-    const stop = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-    for (const [name, value] of Object.entries({ x: '3', y: '3', width: '10', height: '10', rx: '3', fill: 'currentColor' })) {
-      stop.setAttribute(name, value)
-    }
-    svg.prepend(stop)
-    await new Promise(resolve => { setTimeout(resolve, 0) })
-
-    expect(svg.getAttribute('data-orca-maid-icon')).toBe('stop')
-    expect(svg.querySelectorAll('g[data-orca-maid-icon-art]')).toHaveLength(1)
-    expect(svg.querySelector('g[data-orca-maid-icon-art] path')?.getAttribute('d')).toContain('M3.75 3.75')
-    await fiber.dispose()
-  })
-
-  it('reconciles only SVGs inside the changed subtree', async () => {
-    document.body.innerHTML = `
-      ${hostIcon('ComposerSend')}
-    `
-    const existing = document.querySelector<SVGElement>('svg')!
-    fiber = await mount()
-    await new Promise(resolve => { setTimeout(resolve, 0) })
-    const clone = vi.spyOn(existing, 'cloneNode')
-    clone.mockClear()
-
-    const added = document.createElement('div')
-    added.innerHTML = `
-      ${hostIcon('IconEditOutlineRegular')}
-    `
-    document.body.append(added)
-    await new Promise(resolve => { setTimeout(resolve, 0) })
-
-    expect(clone).not.toHaveBeenCalled()
-    expect(added.querySelector('svg')?.getAttribute('data-orca-maid-icon')).toBe('edit')
-  })
-
-  it('fits the target large check glyph with a uniform scale', async () => {
-    document.body.innerHTML = `
-      ${hostIcon('IconCheckCircleFillRegular')}
-    `
-    fiber = await mount()
-    const art = document.querySelector('g[data-orca-maid-icon-art]')!
-    expect(art.getAttribute('transform')).toBe('translate(0 0) scale(2.25)')
-    await fiber.dispose()
-  })
-
-  it('mirrors the context-usage ring as a bottom-up pixel gauge', async () => {
-    // Neutral class names: the ring's real classes are CSS-module hashes that
-    // move with the host build, so the matcher must key off the drawing.
-    document.body.innerHTML = `
-      <svg viewBox="0 0 14 14" aria-label="上下文已用 50%">
-        <circle class="host_track" cx="7" cy="7" r="5.5"></circle>
-        <circle class="host_fill" cx="7" cy="7" r="5.5" stroke-dasharray="17.28 34.56" transform="rotate(-90 7 7)"></circle>
-      </svg>
-    `
-    const gauge = document.querySelector('svg')!
-    fiber = await mount()
-    expect(gauge.getAttribute('data-orca-maid-icon')).toBe('usage')
-    const cells = Array.from(gauge.querySelectorAll<SVGElement>('rect[data-orca-maid-usage-cell]'))
-    expect(cells).toHaveLength(36)
-    // 50%: eighteen solid cells, the rest a faint grid.
-    expect(cells[17]?.getAttribute('opacity')).toBe('1')
-    expect(cells[18]?.getAttribute('opacity')).toBe('0.12')
-    const ring = gauge.querySelector('circle[stroke-dasharray]')!
-    // 15%: five solid cells and the boundary cell fading in at 0.4.
-    ring.setAttribute('stroke-dasharray', '5.184 34.56')
-    await new Promise(resolve => { setTimeout(resolve, 0) })
-    expect(cells[4]?.getAttribute('opacity')).toBe('1')
-    expect(cells[5]?.getAttribute('opacity')).toBe('0.4')
-    expect(cells[6]?.getAttribute('opacity')).toBe('0.12')
-    // 100%: the full field is lit.
-    ring.setAttribute('stroke-dasharray', '34.56 34.56')
-    await new Promise(resolve => { setTimeout(resolve, 0) })
-    expect(cells[35]?.getAttribute('opacity')).toBe('1')
-    await fiber.dispose()
-    expect(gauge.querySelector('[data-orca-maid-icon-art]')).toBeNull()
   })
 
   it('completes the rail search open when the row lands focused but collapsed', async () => {

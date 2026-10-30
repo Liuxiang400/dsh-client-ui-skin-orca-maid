@@ -4,7 +4,6 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 const CSS = readFileSync(resolve(process.cwd(), 'src/client/orca-maid.module.css'), 'utf8').replaceAll('\r\n', '\n')
-const ICONS = readFileSync(resolve(process.cwd(), 'src/client/icons.ts'), 'utf8')
 
 describe('ORCA MAID rounded shape contract at the token level', () => {
   it('hands token-drawn surfaces the host radius scale instead of zeroing it', () => {
@@ -30,14 +29,5 @@ describe('ORCA MAID todo glyphs (DSH 0.1.7 StateDot markup)', () => {
     expect(CSS).toMatch(/li\[data-status='in_progress'\] > \[class\*='_glyph'\]::after \{[^}]*animation: maidTodoFill 2\.4s step-end infinite/)
     expect(CSS).toMatch(/@keyframes maidTodoFill \{[^@]*72% \{ clip-path: polygon\(3\.5px 12\.5px, 12\.5px 12\.5px, 12\.5px 3\.5px/)
     expect(CSS).toMatch(/prefers-reduced-motion: reduce\)[^@]*li\[data-status='in_progress'\] > \[class\*='_glyph'\]::after \{\s*animation: none;/)
-  })
-})
-
-describe('ORCA MAID icon matchers for DSH 0.1.7 artwork', () => {
-  it('keeps the redraws for the clock, user and users icons', () => {
-    expect(ICONS).toContain(`["d=\\"M8 4.31V8.46L11 10.08", 'clock']`)
-    expect(ICONS).toContain(`["d=\\"M8 8.25C9.51878 8.25 10.75 7.01878 10.75", 'user']`)
-    expect(ICONS).toContain(`["d=\\"M6 8.25C7.51878 8.25 8.75 7.01878 8.75", 'users']`)
-    expect(ICONS).toMatch(/\n  users: \[/)
   })
 })
