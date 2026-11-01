@@ -1,11 +1,20 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { test } from 'node:test'
-import { isOlderStable, releaseVersion, verifyPublished } from './release.mjs'
+import { resolve } from 'node:path'
+import { isOlderStable, publishArguments, releaseVersion, verifyPublished } from './release.mjs'
+
+test('publishes a local tarball without GitHub shorthand ambiguity', () => {
+  const args = publishArguments('release/skin-0.2.1.tgz', 'latest')
+  assert.equal(args[0], 'publish')
+  assert.equal(args[1], resolve('release/skin-0.2.1.tgz'))
+  assert.ok(args.includes('--provenance'))
+  assert.equal(args[args.indexOf('--tag') + 1], 'latest')
+})
 
 function fixture(version) {
   return [
-    { name: '@bendix400/dsh-client-ui-skin-orca-maid', version, repository: { url: 'git+https://github.com/Liuxiang400/dsh-client-ui-skin-orca-maid.git' } },
+    { name: '@bendix400/dsh-client-ui-skin-orca-maid', version, repository: { url: 'git+https://github.com/Liuxiang400/dsh-skin-abyss.git' } },
     { version, packages: { '': { version } } },
     `v${version}`,
   ]

@@ -2,7 +2,7 @@
   "name": "@bendix400/dsh-client-ui-skin-orca-maid",
   "description": "ABYSS: a gray-blue pixel terminal skin for DSH, with a whale-girl companion and standalone appearance controls.",
   "icon": "assets/plugin-icon.png",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -22,18 +22,18 @@
     }
   },
   "scripts": {
-    "build": "node scripts/prepare-skin-assets.mjs . && tsdown && node scripts/write-skin-build.mjs . Liuxiang400/dsh-client-ui-skin-orca-maid",
+    "build": "node scripts/prepare-skin-assets.mjs . && tsdown && node scripts/write-skin-build.mjs . Liuxiang400/dsh-skin-abyss",
     "test": "vitest run",
     "prepublishOnly": "npm run build && npm test"
   },
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Liuxiang400/dsh-client-ui-skin-orca-maid.git"
+    "url": "git+https://github.com/Liuxiang400/dsh-skin-abyss.git"
   },
-  "homepage": "https://github.com/Liuxiang400/dsh-client-ui-skin-orca-maid#readme",
+  "homepage": "https://github.com/Liuxiang400/dsh-skin-abyss#readme",
   "bugs": {
-    "url": "https://github.com/Liuxiang400/dsh-client-ui-skin-orca-maid/issues"
+    "url": "https://github.com/Liuxiang400/dsh-skin-abyss/issues"
   },
   "publishConfig": {
     "access": "public",

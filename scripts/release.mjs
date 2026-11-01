@@ -5,7 +5,7 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 const registry = 'https://registry.npmjs.org'
-const repository = 'Liuxiang400/dsh-client-ui-skin-orca-maid'
+const repository = 'Liuxiang400/dsh-skin-abyss'
 const packageName = '@bendix400/dsh-client-ui-skin-orca-maid'
 const readJSON = path => JSON.parse(readFileSync(path, 'utf8'))
 const run = (command, args) => execFileSync(command, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'] }).trim()
@@ -35,6 +35,11 @@ export function isOlderStable(version, latest) {
     if (a[i] !== b[i]) return a[i] < b[i]
   }
   return false
+}
+
+// npm can parse an unprefixed relative tarball path as GitHub owner/repo shorthand.
+export function publishArguments(artifact, distTag) {
+  return ['publish', resolve(artifact), '--access', 'public', '--provenance', '--tag', distTag, '--registry', registry, '--ignore-scripts']
 }
 
 async function getJSON(url, headers = {}) {
@@ -97,7 +102,7 @@ async function main(command) {
       return
     }
     if (isOlderStable(release.version, metadata?.['dist-tags']?.latest)) throw new Error('Refusing to move npm latest backwards; use an increasing stable version')
-    console.log(run('npm', ['publish', artifact, '--access', 'public', '--provenance', '--tag', release.distTag, '--registry', registry, '--ignore-scripts']))
+    console.log(run('npm', publishArguments(artifact, release.distTag)))
     return
   }
   // A GitHub-only retry must still prove that npm contains this exact artifact.
