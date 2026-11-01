@@ -2,7 +2,19 @@ import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { test } from 'node:test'
 import { resolve } from 'node:path'
-import { isOlderStable, publishArguments, releaseVersion, verifyPublished } from './release.mjs'
+import { isOlderStable, publishArguments, releaseVersion, verifyPublished, waitForPublished } from './release.mjs'
+
+test('waits for registry propagation but rejects changed bytes immediately', async () => {
+  const bytes = Buffer.from('artifact')
+  const integrity = `sha512-${createHash('sha512').update(bytes).digest('base64')}`
+  let reads = 0
+  let waits = 0
+  await waitForPublished(bytes, async () => ++reads < 3 ? null : { integrity }, async () => { waits++ })
+  assert.equal(reads, 3)
+  assert.equal(waits, 2)
+  await assert.rejects(waitForPublished(bytes, async () => ({ integrity: 'different' }), async () => assert.fail('must not retry mismatched bytes')), /different bytes/)
+  await assert.rejects(waitForPublished(bytes, async () => null, async () => {}), /not visible yet/)
+})
 
 test('publishes a local tarball without GitHub shorthand ambiguity', () => {
   const args = publishArguments('release/skin-0.2.1.tgz', 'latest')

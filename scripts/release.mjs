@@ -42,6 +42,21 @@ export function publishArguments(artifact, distTag) {
   return ['publish', resolve(artifact), '--access', 'public', '--provenance', '--tag', distTag, '--registry', registry, '--ignore-scripts']
 }
 
+export async function waitForPublished(bytes, readDist, wait = () => new Promise(resolve => setTimeout(resolve, 2000))) {
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const dist = await readDist()
+    if (dist) { verifyPublished(bytes, dist); return }
+    if (attempt < 5) await wait()
+  }
+  throw new Error('npm version metadata is not visible yet. Retry this release after registry propagation.')
+}
+
+// The tag endpoint excludes drafts. Listing releases includes authenticated drafts.
+function findGitHubRelease(tag) {
+  const pages = JSON.parse(run('gh', ['api', `repos/${repository}/releases`, '--paginate', '--slurp']))
+  return pages.flat().find(item => item.tag_name === tag)
+}
+
 async function getJSON(url, headers = {}) {
   const response = await fetch(url, { headers, signal: AbortSignal.timeout(30_000) })
   if (response.status === 404) return null
@@ -106,10 +121,8 @@ async function main(command) {
     return
   }
   // A GitHub-only retry must still prove that npm contains this exact artifact.
-  const published = await getJSON(`${npmURL}/${encodeURIComponent(release.version)}`)
-  verifyPublished(bytes, published?.dist)
-  const api = `https://api.github.com/repos/${repository}/releases/tags/${release.tag}`
-  const existing = await getJSON(api, { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json' })
+  await waitForPublished(bytes, async () => (await getJSON(`${npmURL}/${encodeURIComponent(release.version)}`))?.dist)
+  const existing = findGitHubRelease(release.tag)
   const assets = [artifact, 'release/SHA256SUMS.txt']
   if (existing && !existing.draft) {
     for (const path of assets) {
@@ -124,7 +137,8 @@ async function main(command) {
   }
   run('gh', ['release', 'upload', release.tag, ...assets, '--repo', repository, '--clobber'])
   // Check server-side digests before making the draft public.
-  const draft = await getJSON(api, { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json' })
+  const draft = findGitHubRelease(release.tag)
+  if (!draft?.draft) throw new Error('Expected a draft release before publishing attachments')
   for (const path of assets) {
     const asset = draft.assets.find(item => item.name === path.split('/').at(-1))
     if (asset?.digest !== `sha256:${digest(readFileSync(path), 'sha256')}`) throw new Error(`Uploaded asset checksum mismatch: ${path}`)
