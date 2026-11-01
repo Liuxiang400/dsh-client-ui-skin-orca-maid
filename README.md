@@ -38,6 +38,57 @@ npm test        # vitest，201 个用例
 `lib/`、`assets/runtime/manifest.json` 与 `skin.build.json` 是**提交型产物**：
 改了源码或素材后必须重新构建并一并提交，否则安装方可执行文件与清单会脱节。
 
+## 自动发布
+
+推送 `v<版本号>` tag 后，`.github/workflows/release.yml` 会依次校验版本、安装锁定依赖、
+构建、测试、打包，通过 npm Trusted Publishing（OIDC）发布，再创建 GitHub Release。
+Release 包含 npm 版本链接、兼容范围、自动生成的变更记录、同一份 `.tgz` 和 SHA-256 校验文件。
+CI 会重新生成构建产物，`skin.build.json.sourceCommit` 指向 tag 的提交；安装成品以 npm / Release 的 `.tgz` 为准。
+
+### npm 一次性设置
+
+打开 [npm 包设置](https://www.npmjs.com/package/@bendix400/dsh-client-ui-skin-orca-maid/access)，
+在 **Trusted Publisher** 中选择 **GitHub Actions**，填写：
+
+| 字段 | 值 |
+| --- | --- |
+| Organization or user | `Liuxiang400` |
+| Repository | `dsh-client-ui-skin-orca-maid` |
+| Workflow filename | `release.yml` |
+| Environment name | 留空（工作流没有使用 environment） |
+
+如果页面显示 Allowed actions，勾选 **Allow npm publish**（直接发布）；仅允许 staged publishing 不够。
+无需允许独立的 `npm dist-tag` 操作，也无需创建 `NPM_TOKEN` 或手动配置 GitHub secret。
+工作流使用 GitHub 自动提供的 `GITHUB_TOKEN` 创建 Release。
+详见 [npm Trusted Publishing 文档](https://docs.npmjs.com/trusted-publishers/)。
+
+### 发布新版本
+
+确保本次改动已整理好；以下以从 `0.1.2` 发布 `0.1.3` 为例：
+
+```sh
+npm version 0.1.3 --no-git-tag-version
+npm run build
+npm test
+node --test scripts/release.test.mjs
+git add package.json package-lock.json lib/ assets/runtime/manifest.json skin.build.json
+git commit -m "chore: release 0.1.3"
+git tag -a v0.1.3 -m "Release 0.1.3"
+git push origin main
+git push origin v0.1.3
+```
+
+源码、素材等其他改动也应在打 tag 前提交。tag 必须与 `package.json`、`package-lock.json` 的版本一致。
+普通版本发布至 npm `latest`；如 `v0.2.0-beta.1` 的预览版本发布至 `next`，GitHub 标为 Pre-release。
+正式版应按递增顺序发布；工作流会拒绝用新发布的旧版本倒退 npm `latest`。
+
+在 GitHub **Actions → Release → Run workflow** 可手动验证安装、构建、测试和打包，**不会发布**。
+实际发布只能由版本 tag 的 push 触发。先完成 npm 设置，再推送新版本 tag；不要移动或重推已经发布的版本 tag。
+
+如果发布失败，修正外部设置后使用失败运行的 **Re-run all jobs**。npm 版本已存在时，工作流只有在
+安装包 SHA-512 完全一致时才跳过 npm 发布并继续补齐 GitHub Release；不一致则停止，需发布新版本。
+已公开的 GitHub Release 附件不会自动覆盖。`v0.1.2` 是接入自动化前的手动发布，保持原样。
+
 ## 换素材
 
 素材文件名必须是其内容的 SHA-256，构建会逐个校验，不符即失败。
