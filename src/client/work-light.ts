@@ -1,6 +1,6 @@
 import './work-light.module.css'
 
-/** A bounded light rig: its gradients stay still while two dust layers drift. */
+/** A bounded light rig with drifting dust and compact sidebar clusters. */
 export function createMaidWorkLight(mode: 'sidebar' | 'repair'): HTMLElement {
   const light = document.createElement('div')
   light.dataset.maidWorkLight = mode
@@ -21,9 +21,35 @@ export function createMaidWorkLight(mode: 'sidebar' | 'repair'): HTMLElement {
   rig.append(housing, illumination)
   light.append(suspension, rig)
   // Dust lives in room coordinates, outside the falling/rotating lamp rig.
-  for (const part of ['dust-near', 'dust-far']) {
+  const dustParts = mode === 'sidebar'
+    ? ['dust-near', 'dust-far', 'dust-mid']
+    : ['dust-near', 'dust-far']
+  for (const part of dustParts) {
     const dust = document.createElement('span')
     dust.dataset.maidLightPart = part
+    if (mode === 'sidebar') {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+      svg.setAttribute('viewBox', '0 0 100 100')
+      svg.setAttribute('preserveAspectRatio', 'none')
+      svg.setAttribute('aria-hidden', 'true')
+      svg.setAttribute('focusable', 'false')
+      svg.dataset.maidDustLinks = ''
+      const outline = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+      // Match the percentage positions of the CSS light points.
+      outline.setAttribute('d', part === 'dust-near'
+        ? 'M50 12L8 72L50 90L92 72Z M50 12V90'
+        : 'M22 26L72 44L39 78Z')
+      outline.setAttribute('vector-effect', 'non-scaling-stroke')
+      if (part === 'dust-near') {
+        const rear = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        rear.setAttribute('d', 'M8 72H92')
+        rear.setAttribute('opacity', '.4')
+        rear.setAttribute('vector-effect', 'non-scaling-stroke')
+        svg.append(rear)
+      }
+      svg.append(outline)
+      dust.append(svg)
+    }
     light.append(dust)
   }
   return light

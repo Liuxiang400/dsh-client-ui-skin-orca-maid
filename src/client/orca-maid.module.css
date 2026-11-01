@@ -541,13 +541,29 @@ body[data-dsh-orca-maid] [id='root'] {
   background: transparent;
 }
 
+/* Keep navigation on a quiet solid surface above the scene's soft entrance. */
+body[data-dsh-orca-maid] [data-slot='conversation.header'] {
+  background-color: #f6f6f6;
+}
+
+body[data-dsh-orca-maid][data-ds-dark-theme] [data-slot='conversation.header'] {
+  background-color: #0f1012;
+}
+
+body[data-dsh-orca-maid] [data-slot='conversation.header'],
+body[data-dsh-orca-maid] [data-slot='conversation.header'] > header,
+body[data-dsh-orca-maid] [data-slot='conversation.session.header'] {
+  border-bottom-color: color-mix(in srgb, var(--maid-line) 40%, transparent);
+}
+
 /* Light mode mirrors the dark narrative with one continuous observation
    studio: the relaxed wink welcomes a new session, then the same character,
    chair and console crossfade into the working pose when the task begins. */
 body[data-dsh-orca-maid] .lightScene {
   position: fixed;
   z-index: 0;
-  inset: 0;
+  inset: var(--maid-scene-top, 0px) 0 0;
+  mask-image: linear-gradient(to bottom, transparent, #000 var(--maid-scene-fade, 0px));
   display: block;
   overflow: hidden;
   pointer-events: none;
@@ -618,7 +634,8 @@ body[data-dsh-orca-maid]:not([data-ds-dark-theme])[data-maid-scene='active'] .li
 body[data-dsh-orca-maid] .darkScene {
   position: fixed;
   z-index: 0;
-  inset: 0;
+  inset: var(--maid-scene-top, 0px) 0 0;
+  mask-image: linear-gradient(to bottom, transparent, #000 var(--maid-scene-fade, 0px));
   display: none;
   overflow: hidden;
   pointer-events: none;
@@ -1649,6 +1666,48 @@ body[data-dsh-orca-maid] [data-slot='sidebar'] > :first-child > .statusCharacter
 body[data-dsh-orca-maid] [data-slot='sidebar'][data-maid-sidebar-wide] > :first-child > .statusCharacter {
   opacity: 1;
   transition: opacity 120ms ease-out;
+}
+
+/* Airy geometry frames the light-mode character, with an open centre so
+   the fine lines stay around the figure instead of competing with her face. */
+body[data-dsh-orca-maid]:not([data-ds-dark-theme]) .statusCharacter::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -12px -6px 0;
+  pointer-events: none;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 250' fill='none'%3E%3Cg stroke='%236386a5' stroke-width='.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='46' cy='51' r='19' opacity='.32'/%3E%3Cpath d='M21 85H65M26 91H45' opacity='.25'/%3E%3Cpath d='M224 39L245 76L203 76Z' opacity='.36'/%3E%3Cpath d='M235 103V133M220 118H250' opacity='.22'/%3E%3Cpath d='M31 153L47 169L31 185L15 169Z' opacity='.3'/%3E%3Cpath d='M216 186H258M231 194H251' opacity='.3'/%3E%3Ccircle cx='235' cy='170' r='12' opacity='.24'/%3E%3Cpath d='M66 218H96M72 224H84' opacity='.2'/%3E%3C/g%3E%3Cg fill='%236386a5' opacity='.3'%3E%3Ccircle cx='81' cy='30' r='1.5'/%3E%3Ccircle cx='259' cy='89' r='1.2'/%3E%3Ccircle cx='18' cy='123' r='1.3'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 32% 32%, rgba(171, 203, 227, .15), transparent 64%),
+    radial-gradient(ellipse at 76% 66%, rgba(188, 195, 222, .1), transparent 58%);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+/* A quiet night sky behind the sprite. Fade every edge into the sidebar
+   so the scene has depth without turning into a separate rectangular card. */
+body[data-dsh-orca-maid][data-ds-dark-theme] .statusCharacter::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -18px -8px -4px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 13% 18%, #c9dfffa6 0 .7px, transparent 1.4px),
+    radial-gradient(circle at 31% 9%, #b8cff570 0 .5px, transparent 1.2px),
+    radial-gradient(circle at 59% 13%, #dce9ff99 0 .7px, transparent 1.5px),
+    radial-gradient(circle at 81% 23%, #c7c6f57a 0 .6px, transparent 1.3px),
+    radial-gradient(circle at 91% 41%, #c9dfff80 0 .6px, transparent 1.3px),
+    radial-gradient(circle at 8% 48%, #b8cff566 0 .5px, transparent 1.2px),
+    radial-gradient(circle at 21% 61%, #dce9ff85 0 .6px, transparent 1.4px),
+    radial-gradient(circle at 76% 59%, #b8cff559 0 .5px, transparent 1.2px),
+    radial-gradient(circle at 88% 76%, #c9dfff85 0 .7px, transparent 1.5px),
+    radial-gradient(circle at 34% 85%, #c7c6f566 0 .5px, transparent 1.2px),
+    radial-gradient(circle at 66% 88%, #b8cff559 0 .5px, transparent 1.2px),
+    radial-gradient(ellipse at 32% 29%, rgba(62, 104, 171, .24), transparent 60%),
+    radial-gradient(ellipse at 78% 48%, rgba(100, 77, 156, .16), transparent 57%),
+    radial-gradient(ellipse at 50% 45%, #16243c 0%, rgba(18, 29, 48, .75) 44%, transparent 76%);
+  mask-image: radial-gradient(ellipse at 50% 46%, #000 25%, #000c 53%, transparent 74%);
 }
 
 body[data-dsh-orca-maid] .statusCharacterFrame {

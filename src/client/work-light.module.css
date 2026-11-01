@@ -72,6 +72,70 @@ body[data-dsh-orca-maid] [data-maid-light-part='dust-far'] {
   animation: maidWorkDustFar 19s ease-in-out -7s infinite alternate;
 }
 
+/* Small, linked groups sway as a unit in the space around the character.
+   Fixed-size clusters keep the dots together even in a wide sidebar. */
+body[data-dsh-orca-maid] [data-maid-work-light='sidebar'] [data-maid-light-part^='dust-'] {
+  inset: auto;
+  top: 25%;
+  left: 13%;
+  width: 38px;
+  height: 44px;
+  opacity: .65;
+  background:
+    radial-gradient(circle at 22% 26%, #d4eaffcc 0 1px, transparent 2px),
+    radial-gradient(circle at 72% 44%, #b5d8f7a6 0 .8px, transparent 1.7px),
+    radial-gradient(circle at 39% 78%, #d4eaffb3 0 .9px, transparent 1.9px);
+  animation: maidDustClusterSway 9s ease-in-out -3s infinite alternate;
+}
+
+body[data-dsh-orca-maid] [data-maid-dust-links] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: rgba(181, 216, 247, .3);
+  stroke-width: .65px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+body[data-dsh-orca-maid] [data-maid-work-light='sidebar'] [data-maid-light-part='dust-near'] {
+  width: 50px;
+  height: 44px;
+  background:
+    radial-gradient(circle at 50% 12%, #d4eaffcc 0 1px, transparent 2px),
+    radial-gradient(circle at 8% 72%, #b5d8f7a6 0 .8px, transparent 1.7px),
+    radial-gradient(circle at 50% 90%, #d4eaffb3 0 .9px, transparent 1.9px),
+    radial-gradient(circle at 92% 72%, #b5d8f7a6 0 .8px, transparent 1.7px);
+}
+
+body[data-dsh-orca-maid] [data-maid-work-light='sidebar'] [data-maid-light-part='dust-far'] {
+  top: 36%;
+  left: 79%;
+  width: 32px;
+  height: 40px;
+  opacity: .48;
+  animation-duration: 12s;
+  animation-delay: -9s;
+  animation-direction: alternate-reverse;
+}
+
+body[data-dsh-orca-maid] [data-maid-work-light='sidebar'] [data-maid-light-part='dust-mid'] {
+  top: 69%;
+  left: 10%;
+  width: 34px;
+  height: 38px;
+  opacity: .55;
+  animation-duration: 15s;
+  animation-delay: -6s;
+}
+
+@keyframes maidDustClusterSway {
+  from { transform: translate(-4px, 5px) rotate(-6deg); }
+  to { transform: translate(5px, -6px) rotate(7deg); }
+}
+
 body[data-dsh-orca-maid] [data-maid-work-light='sidebar'] [data-maid-light-housing],
 body[data-dsh-orca-maid] [data-maid-work-light='sidebar'] [data-maid-light-part='tube'] {
   display: none;
