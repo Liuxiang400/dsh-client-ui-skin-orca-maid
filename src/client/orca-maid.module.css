@@ -487,6 +487,12 @@ body[data-dsh-orca-maid][data-ds-dark-theme] {
   --dsw-alias-brand-primary: #5b9cf8 !important;
   --dsw-alias-brand-primary-invert: #101113 !important;
   --dsw-alias-brand-text: #a8c9ff !important;
+  /* Host dark aliases otherwise resolve through the light block's neutral
+     static ramps. Override only the affected semantics: recolouring those
+     ramps also changes unrelated icons and controls (issue #1). */
+  --dsw-alias-link: var(--maid-blue) !important;
+  --dsw-alias-bg-document-selection: color-mix(in srgb, var(--maid-blue) 40%, transparent) !important;
+  --dsw-alias-label-deep-diving-shimmer: color-mix(in srgb, var(--dsw-alias-brand-text) 65%, var(--maid-cyan)) !important;
   --dsw-alias-button-primary-fill: var(--maid-blue) !important;
   --dsw-alias-button-primary-hover: #4a8df0 !important;
   --dsw-alias-button-info-fill: #5b9cf8 !important;
@@ -517,6 +523,16 @@ body[data-dsh-orca-maid][data-ds-dark-theme] {
   --dsw-specific-sidebar-nav-item-active-accent: #5b9cf8 !important;
   --dsw-specific-sidebar-nav-item-hover: rgba(32, 33, 38, 0.9) !important;
   --dsw-input-solid: #1b1c20 !important;
+}
+
+/* Support both host CSS-module layouts: _local_hash and hash_local,
+   including multiple classes. Dark-only scope preserves the light palette. */
+body[data-dsh-orca-maid][data-ds-dark-theme] :is(
+  [class*='_fileLink_'], [class$='_fileLink'], [class*='_fileLink '],
+  [class*='_fileMention_'], [class$='_fileMention'], [class*='_fileMention ']
+) {
+  --dsw-alias-link: var(--maid-cyan);
+  color: var(--dsw-alias-link);
 }
 
 body[data-dsh-orca-maid] [id='root'] {
