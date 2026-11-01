@@ -1,30 +1,29 @@
 {
   "id": "orca-maid",
-  "name": "虎鲸女仆",
-  "nameEn": "ORCA MAID",
+  "name": "ABYSS · 深海终端",
+  "nameEn": "ABYSS · ORCA MAID",
   "author": "bendix400",
-  "tagline": "深海蓝女仆 · 亮色机能 · 暗色治愈",
-  "taglineEn": "A deep-blue maid · functional light · soothing dark",
-  "description": "深海蓝鲸鱼娘女仆：中性画布、柔和蓝强调、官方圆角、官方 Phosphor 图标，亮色克制、暗色治愈。",
+  "tagline": "灰蓝像素 · 深海终端",
+  "taglineEn": "Gray-blue pixels · a quiet terminal",
+  "description": "灰蓝像素鲸鱼娘、点阵首页标题、断角面板与克制几何背景。自带独立外观设置与工作状态心跳线。",
   "tags": [
-    "whale",
-    "maid",
+    "pixel",
+    "terminal",
     "navy",
-    "mechanical",
-    "anime",
-    "blue"
+    "whale",
+    "abyss"
   ],
-  "accent": "#2e86f7",
+  "accent": "#9caee0",
   "bodyAttr": "data-dsh-orca-maid",
-  "dshCompatibility": "0.2.0rc2",
+  "dshCompatibility": "0.2.1rc5",
   "package": "@bendix400/dsh-client-ui-skin-orca-maid",
   "wiring": {
     "id": "ui-skin-orca-maid",
     "bundleWired": false
   },
   "preview": {
-    "light": "preview/light.webp",
-    "dark": "preview/dark.webp"
+    "light": "preview/light.jpg",
+    "dark": "preview/dark.jpg"
   },
   "desktopIcon": "assets/icons/orca-maid.ico",
   "order": 11

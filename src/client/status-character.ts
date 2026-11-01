@@ -1,4 +1,6 @@
-import { ORCA_MAID_STATUS_ATLAS } from './art.ts'
+import { createHeartbeat } from './heartbeat.ts'
+import { bitmapLabel } from './pixel-text.ts'
+import { ABYSS_PORTRAIT, ORCA_MAID_STATUS_ATLAS } from './art.ts'
 import type { LinkStatus } from './link-status.ts'
 import { hasMutationOutsideTranscript } from './mutation-filter.ts'
 import { createMaidWorkLight } from './work-light.ts'
@@ -155,11 +157,27 @@ function createCharacter(classes: {
 
   const frame = document.createElement('div')
   frame.className = classes.characterFrame
+  frame.dataset.abyssCharacterFrame = ''
   const sprite = document.createElement('div')
   sprite.className = classes.characterSprite
   sprite.dataset.orcaMaidCharacterSprite = ''
   character.style.setProperty('--orca-maid-status-atlas', `url("${ORCA_MAID_STATUS_ATLAS}")`)
   sprite.style.setProperty('--orca-maid-status-atlas', `url("${ORCA_MAID_STATUS_ATLAS}")`)
+  const portrait = document.createElement('img')
+  portrait.src = ABYSS_PORTRAIT
+  portrait.alt = ''
+  portrait.draggable = false
+  portrait.dataset.abyssPortrait = ''
+  portrait.addEventListener('error', () => { portrait.hidden = true })
+  sprite.append(portrait)
+  const heading = bitmapLabel(document, 'ORCA / COMPANION')
+  heading.dataset.abyssCompanionHeading = ''
+  const statusText = document.createElement('span')
+  statusText.dataset.abyssCompanionStatus = ''
+  const greeting = document.createElement('span')
+  greeting.dataset.abyssCompanionGreeting = ''
+  greeting.textContent = /^en\b/i.test(document.documentElement.lang) ? 'I’m here.' : '我在。'
+  character.append(heading, greeting, statusText, createHeartbeat(document))
   frame.append(sprite)
   character.append(frame, createMaidWorkLight('sidebar'), createBubble(classes.characterBubble))
   return character
@@ -202,6 +220,12 @@ export function installMaidStatusCharacter(body: HTMLElement, classes: {
     const current = statusFrame(status, sequenceIndex)
     if (character !== null) {
       if (character.dataset.orcaMaidStatus !== status) character.dataset.orcaMaidStatus = status
+      const label = character.querySelector<HTMLElement>('[data-abyss-companion-status]')
+      const english = /^en\b/i.test(body.ownerDocument.documentElement.lang)
+      const labels: Record<LinkStatus, string> = english
+        ? { standby: 'Standby', syncing: 'Syncing', working: 'Working', approval: 'Approval', input: 'Input needed', review: 'Review', complete: 'Complete', fault: 'Error', offline: 'Offline', ready: 'Ready' }
+        : { standby: '待命', syncing: '同步中', working: '执行中', approval: '待授权', input: '待输入', review: '待审阅', complete: '已完成', fault: '发生错误', offline: '离线', ready: '就绪' }
+      if (label && label.textContent !== labels[status]) label.textContent = labels[status]
       if (character.dataset.orcaMaidFrame !== String(current.frame)) {
         character.dataset.orcaMaidFrame = String(current.frame)
       }
@@ -229,7 +253,7 @@ export function installMaidStatusCharacter(body: HTMLElement, classes: {
   // The loop only runs while a frame change could be seen: a single-cell
   // sequence never changes, so a static status parks after its first render
   // instead of redrawing the same cell every 83ms; it also stays parked in a
-  // background window, while the manager (or the SFW schedule) has the
+  // background window, while appearance preferences have the
   // character switched off, and once a one-shot sequence has settled on its
   // last cell.
   const animating = (): boolean => (
@@ -254,12 +278,21 @@ export function installMaidStatusCharacter(body: HTMLElement, classes: {
     timeout = window.setTimeout(tick, statusFrameDuration(status, sequenceIndex))
   }
 
-  // Resume where the loop stopped once the character can be seen again.
+  const syncHeartbeat = (): void => {
+    const working = status === 'working'
+      && doc.visibilityState !== 'hidden'
+      && doc.documentElement.getAttribute('data-abyss-heartbeat') !== 'off'
+      && doc.documentElement.getAttribute(CHARACTER_VISIBILITY_ATTRIBUTE) !== 'hidden'
+      && prefersReducedMotion?.matches !== true
+    character?.toggleAttribute('data-abyss-heartbeat-running', working)
+  }
+  // Background windows and hidden characters stop all decorative motion.
   const resume = (): void => {
-    if (timeout === undefined) scheduleTick()
+    syncHeartbeat()
+    scheduleTick()
   }
   const visibilityObserver = new MutationObserver(resume)
-  visibilityObserver.observe(doc.documentElement, { attributes: true, attributeFilter: [CHARACTER_VISIBILITY_ATTRIBUTE] })
+  visibilityObserver.observe(doc.documentElement, { attributes: true, attributeFilter: [CHARACTER_VISIBILITY_ATTRIBUTE, 'data-abyss-heartbeat'] })
   doc.addEventListener('visibilitychange', resume)
   prefersReducedMotion?.addEventListener?.('change', resume)
 
@@ -267,6 +300,7 @@ export function installMaidStatusCharacter(body: HTMLElement, classes: {
     if (!hasMutationOutsideTranscript(records)) return
     const previousStatus = status
     render()
+    syncHeartbeat()
     if (status !== previousStatus) scheduleTick()
   })
   observer.observe(body, {
@@ -276,6 +310,7 @@ export function installMaidStatusCharacter(body: HTMLElement, classes: {
     subtree: true,
   })
   render()
+  syncHeartbeat()
   scheduleTick()
 
   return () => {

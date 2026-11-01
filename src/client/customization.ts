@@ -1,21 +1,17 @@
-import {
-  exposeSkinCustomization,
-  SKIN_CUSTOMIZATION_PROTOCOL,
-  SkinAttributeProjector,
-  type SkinCustomizationState,
-} from '../vendor/protocol.ts'
+import { installAbyssPreferences } from './abyss-preferences.ts'
+import { SkinAttributeProjector, type AppearanceState, type AppearanceDefinition } from './appearance-state.ts'
 
 export const COMPOSER_SCROLL_HIDE_ATTRIBUTE = 'data-dsh-whale-maid-composer-scroll-hide'
 export const COMPOSER_BOTTOM_ONLY_ATTRIBUTE = 'data-dsh-whale-maid-composer-bottom-only'
 export const COMPOSER_HANDLES_ATTRIBUTE = 'data-dsh-whale-maid-composer-handles'
 export const HEADLINE_TYPEWRITER_ATTRIBUTE = 'data-dsh-whale-maid-headline-typewriter'
 
-/** A declared behaviour switch reads as enabled until the manager says 'off'. */
+/** A declared behaviour switch reads as enabled until the appearance preference says 'off'. */
 export function maidFeatureEnabled(doc: Document, attribute: string): boolean {
   return doc.documentElement.getAttribute(attribute) !== 'off'
 }
 
-/** Re-run `callback` whenever the manager flips one of the given switches. */
+/** Re-run `callback` whenever appearance settings flip one of the given switches. */
 export function observeMaidFeature(doc: Document, attributes: string[], callback: () => void): () => void {
   const observer = new MutationObserver(callback)
   observer.observe(doc.documentElement, { attributes: true, attributeFilter: attributes })
@@ -25,23 +21,18 @@ export function observeMaidFeature(doc: Document, attributes: string[], callback
 /** ORCA MAID owns the attributes produced from its declared controls. */
 export function installMaidCustomization(root: HTMLElement = document.documentElement): () => void {
   const projector = new SkinAttributeProjector(root)
-  const apply = (state: SkinCustomizationState | null): void => {
+  const apply = (state: AppearanceState | null): void => {
     if (state === null) {
       projector.release()
       return
     }
-    const scheduleVisible = state.visibility.sfwMode !== false
-    projector.set('data-dsh-whale-maid-background', state.values.background === true ? 'visible' : 'hidden')
-    projector.set('data-dsh-whale-maid-pricing', state.values.pricingLight === true ? 'visible' : 'hidden')
-    projector.set('data-dsh-whale-maid-art', scheduleVisible ? 'visible' : 'hidden')
-    // The SFW schedule owns the whole second-dimension presentation: during
-    // its hidden window the corner character retires with the scene art, even
-    // when the standalone character switch is on. Re-applying after the
-    // schedule turns visible restores the switch's own verdict.
-    projector.set(
-      'data-dsh-whale-maid-character',
-      state.values.character === true && scheduleVisible ? 'visible' : 'hidden',
-    )
+    projector.set('data-abyss-texture', state.values.texture === false ? 'off' : 'on')
+    projector.set('data-abyss-pixel-headline', state.values.pixelHeadline === false ? 'off' : 'on')
+    projector.set('data-dsh-whale-maid-background', state.values.background ? 'visible' : 'hidden')
+    projector.set('data-dsh-whale-maid-pricing', state.values.pricingLight ? 'visible' : 'hidden')
+    projector.set('data-dsh-whale-maid-art', 'visible')
+    projector.set('data-dsh-whale-maid-character', state.values.character ? 'visible' : 'hidden')
+    projector.set('data-abyss-heartbeat', state.values.heartbeat === false ? 'off' : 'on')
     projector.set(
       'data-dsh-whale-maid-character-mirror',
       state.values.mirrorCharacter === true ? 'mirrored' : 'original',
@@ -57,11 +48,11 @@ export function installMaidCustomization(root: HTMLElement = document.documentEl
     projector.set(HEADLINE_TYPEWRITER_ATTRIBUTE, state.values.headlineTypewriter === false ? 'off' : 'on')
   }
 
-  return exposeSkinCustomization({
-    protocol: SKIN_CUSTOMIZATION_PROTOCOL,
-    skinId: 'orca-maid',
-    title: 'ORCA MAID',
+  const definition: AppearanceDefinition = {
     settings: [
+      { key: 'heartbeat', type: 'boolean', label: '工作状态心跳线', labelEn: 'Working heartbeat', description: '仅在任务执行时跳动；减少动态效果时保持静态。', descriptionEn: 'Animates only while working; remains still with reduced motion.', defaultValue: true },
+      { key: 'texture', type: 'boolean', label: '终端扫描纹理', labelEn: 'Terminal raster texture', defaultValue: true },
+      { key: 'pixelHeadline', type: 'boolean', label: '首页像素标题', labelEn: 'Pixel home headline', defaultValue: true },
       {
         key: 'character',
         type: 'boolean',
@@ -74,15 +65,15 @@ export function installMaidCustomization(root: HTMLElement = document.documentEl
         type: 'boolean',
         label: '镜像左上角状态小人',
         labelEn: 'Mirror the corner status character',
-        description: '左右翻转角色动画，方便调整鼠标与键盘手位。',
-        descriptionEn: 'Flip the character animation horizontally to match your mouse and keyboard hand position.',
+        description: '左右翻转像素头像。',
+        descriptionEn: 'Flip the pixel portrait horizontally.',
         defaultValue: false,
       },
       {
         key: 'background',
         type: 'boolean',
-        label: '显示背景',
-        labelEn: 'Show the background',
+        label: '显示几何背景',
+        labelEn: 'Show geometric backgrounds',
         defaultValue: true,
       },
       {
@@ -90,7 +81,7 @@ export function installMaidCustomization(root: HTMLElement = document.documentEl
         type: 'boolean',
         label: '显示红绿灯定价指示',
         labelEn: 'Show the pricing traffic light',
-        defaultValue: true,
+        defaultValue: false,
       },
       {
         key: 'centerSettings',
@@ -128,25 +119,9 @@ export function installMaidCustomization(root: HTMLElement = document.documentEl
         descriptionEn: 'Turn the brackets beside the composer into handles that hide it when dragged inward.',
         defaultValue: true,
       },
-      {
-        key: 'headlineTypewriter',
-        type: 'boolean',
-        label: '首页标题打字机动画',
-        labelEn: 'Home headline typewriter',
-        description: '在新会话首页轮播打字机标语；关闭后保留宿主原始标题。',
-        descriptionEn: 'Cycle typewriter slogans on the new-session headline; when off, the host headline stays as is.',
-        defaultValue: true,
-      },
-      {
-        key: 'sfwMode',
-        type: 'visibility-schedule',
-        label: '不那么二次元模式',
-        labelEn: 'Not-so-anime mode',
-        description: '按本机时间控制场景立绘与左上角小人的显示与隐藏。',
-        descriptionEn: 'Control the scene artwork and the corner character by local time.',
-        defaultValue: { enabled: false, outside: 'visible', ranges: [] },
-      },
     ],
     apply,
-  })
+  }
+  const local = installAbyssPreferences(root, definition)
+  return local.dispose
 }

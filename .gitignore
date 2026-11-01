@@ -6,3 +6,7 @@ node_modules/
 .DS_Store
 # Temporary npm/GitHub release artifacts
 release/
+# Local app screenshots and temporary UI regression fixtures
+preview/abyss-v1/live-*.jpg
+preview/abyss-v1/regression/
+preview/abyss-v1/heartbeat-folding-check.jpg

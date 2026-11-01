@@ -1,8 +1,8 @@
 {
   "name": "@bendix400/dsh-client-ui-skin-orca-maid",
-  "description": "A deep-blue whale-girl maid on a neutral Notion/Linear-style palette, official-radius chrome and the host Phosphor line icons; functional by day, soothing by night.",
+  "description": "ABYSS: a gray-blue pixel terminal skin for DSH, with a whale-girl companion and standalone appearance controls.",
   "icon": "assets/plugin-icon.png",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -62,7 +62,6 @@
     "cordis.patch.yml",
     "skin.json",
     "skin.build.json",
-    "preview",
     "assets/icons/*.ico",
     "LICENSE",
     "LICENSE-ARTWORK",
@@ -70,7 +69,9 @@
     "README.md",
     "assets/runtime",
     "locale/*.json",
-    "assets/plugin-icon.png"
+    "assets/plugin-icon.png",
+    "preview/light.jpg",
+    "preview/dark.jpg"
   ],
   "author": "bendix400"
 }

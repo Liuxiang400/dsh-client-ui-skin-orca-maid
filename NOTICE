@@ -3,7 +3,7 @@ ORCA MAID（@bendix400/dsh-client-ui-skin-orca-maid）
 
 美术素材署名链 / Artwork attribution chain（CC BY-NC-SA 4.0）
 
-本包的全部美术素材（十态角色图集、四张场景、应用图标、启动失败页插画）是三方衍生作品。
+本包的全部美术素材（十态角色图集、四张场景、应用图标、启动失败页插画、ABYSS 像素头像）是三方衍生作品。
 依 CC BY-NC-SA 4.0 的署名（BY）、非商业（NC）、相同方式共享（SA）条款，
 必须完整保留以下创作链：
 
@@ -21,6 +21,7 @@ ORCA MAID（@bendix400/dsh-client-ui-skin-orca-maid）
 3. 三创 / this package —— bendix400
    以 ZipZipPipe 的女仆装鲸鱼娘为造型参考，用 OpenAI ImageGen 二次生成：
    十态角色图集（8 列 × 10 行）、四张 16:9 场景、192/512 应用图标与启动失败页插画。
+   2026-11-01 增加 ABYSS 灰蓝像素头像，按用户反馈调整脸型、配色、嘴部和像素颗粒。
    生成时以用户提供的参考图为造型依据；参考图上的水印与文字未被复制到成图。
 
 Artwork usage terms（LICENSE-ARTWORK 正文）：CC BY-NC-SA 4.0
@@ -41,7 +42,8 @@ Artwork usage terms（LICENSE-ARTWORK 正文）：CC BY-NC-SA 4.0
 
   - shared/skin-assets.ts          → src/vendor/skin-assets.ts
   - shared/relational-markers.ts   → src/vendor/relational-markers.ts
-  - skin-manager/src/protocol.ts   → src/vendor/protocol.ts
+  - 属性所有权工具派生自 skin-manager/src/protocol.ts → src/client/appearance-state.ts
+    （已移除外部管理器的协议、注册与配置桥）
 
 构建脚本内联于 `scripts/`。上述代码版权归原作者所有，许可正文见 LICENSE。
 代码与美术分别授权，二者边界以本文件为准。

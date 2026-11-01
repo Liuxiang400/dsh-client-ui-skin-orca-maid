@@ -23,3 +23,6 @@ export const ORCA_MAID_LIGHT_ACTIVE_ART = skinAssetUrl('373e4c4566a5e44840be85db
 
 export const ORCA_MAID_DARK_HERO_ART = skinAssetUrl('d56f5ce44daf1dcba4c7f2275303a5338bcb1708d96de28cbb929a329d7aaf4b.webp')
 export const ORCA_MAID_DARK_ACTIVE_ART = skinAssetUrl('abf01295bcd677eac0b295092cba9e2d375123d8204276b40d6902a355b2e4f7.webp')
+
+/** Approved ABYSS gray-blue pixel portrait; one static pose, live status remains text. */
+export const ABYSS_PORTRAIT = skinAssetUrl('8282ae9fab48d653258b9ff288d7aab5b3d6ddee64e5cead68d4596826299e0b.png')

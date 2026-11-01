@@ -228,16 +228,18 @@ function clientConfig(id: string, entry: string, portableCssModuleIds: boolean):
         for (const [local, exp] of Object.entries(cssExports ?? {}).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)) {
           classMap[local] = exp.name
         }
-        // One <style data-plugin> per module file; idempotent under re-evaluation.
+        // Reuse one owned tag, but refresh its text when the host re-evaluates a rebuilt module.
         return [
           `const css = ${JSON.stringify(code.toString())};`,
           `const tagId = ${JSON.stringify(`${id}/${basename(sourceId)}`)};`,
-          'if (typeof document !== \'undefined\' && document.querySelector(\'style[data-plugin-css=\' + JSON.stringify(tagId) + \']\') === null) {',
-          '  const tag = document.createElement(\'style\');',
+          'if (typeof document !== \'undefined\') {',
+          '  let tag = document.querySelector(\'style[data-plugin-css=\' + JSON.stringify(tagId) + \']\');',
+          '  const fresh = tag === null;',
+          '  if (fresh) tag = document.createElement(\'style\');',
           `  tag.dataset.plugin = ${JSON.stringify(id)};`,
           '  tag.dataset.pluginCss = tagId;',
-          '  tag.textContent = css;',
-          '  document.head.appendChild(tag);',
+          '  if (tag.textContent !== css) tag.textContent = css;',
+          '  if (fresh) document.head.appendChild(tag);',
           '}',
           `export default ${JSON.stringify(classMap)};`,
         ].join('\n')

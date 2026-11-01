@@ -1,107 +1,45 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it } from 'vitest'
-import {
-  SKIN_CUSTOMIZATION_REGISTER_EVENT,
-  type SkinCustomizationRegistration,
-} from '../src/vendor/protocol.ts'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { installMaidCustomization } from '../src/client/customization.ts'
-
+import { ABYSS_STORAGE_KEY } from '../src/client/abyss-preferences.ts'
+let dispose: (() => void) | undefined
 afterEach(() => {
+  dispose?.(); dispose = undefined
+  localStorage.clear()
+  document.body.innerHTML = ''
   for (const attribute of [...document.documentElement.attributes]) {
-    if (attribute.name.startsWith('data-dsh-whale-')) document.documentElement.removeAttribute(attribute.name)
+    if (/^data-(dsh-whale|abyss)/.test(attribute.name)) document.documentElement.removeAttribute(attribute.name)
   }
+  vi.restoreAllMocks()
 })
-
-describe('ORCA MAID customization declaration', () => {
-  it('owns all declared switches and restores them on disposal', () => {
-    let registration: SkinCustomizationRegistration | undefined
-    const receive = (event: Event) => { registration = (event as CustomEvent<SkinCustomizationRegistration>).detail }
-    window.addEventListener(SKIN_CUSTOMIZATION_REGISTER_EVENT, receive)
-    const dispose = installMaidCustomization()
-    const definition = registration!.definition
-    expect(definition.settings.map(setting => setting.key)).toEqual([
-      'character',
-      'mirrorCharacter',
-      'background',
-      'pricingLight',
-      'centerSettings',
-      'scrollHideComposer',
-      'composerBottomOnly',
-      'composerHandles',
-      'headlineTypewriter',
-      'sfwMode',
-    ])
-    definition.apply({
-      values: {
-        character: false,
-        mirrorCharacter: true,
-        background: true,
-        pricingLight: false,
-        centerSettings: true,
-        scrollHideComposer: false,
-        composerHandles: true,
-        headlineTypewriter: false,
-        sfwMode: { enabled: true, outside: 'visible', ranges: [] },
-      },
-      visibility: { sfwMode: false },
-    })
-    expect(document.documentElement.getAttribute('data-dsh-whale-maid-composer-scroll-hide')).toBe('off')
-    expect(document.documentElement.getAttribute('data-dsh-whale-maid-composer-bottom-only')).toBe('off')
-    expect(document.documentElement.getAttribute('data-dsh-whale-maid-composer-handles')).toBe('on')
-    expect(document.documentElement.getAttribute('data-dsh-whale-maid-headline-typewriter')).toBe('off')
+describe('ABYSS standalone appearance', () => {
+  it('restores existing attributes and releases the owned controls', () => {
+    document.documentElement.setAttribute('data-abyss-texture','before')
+    localStorage.setItem(ABYSS_STORAGE_KEY, JSON.stringify({character:false,texture:false,heartbeat:false}))
+    dispose = installMaidCustomization()
     expect(document.documentElement.getAttribute('data-dsh-whale-maid-character')).toBe('hidden')
-    expect(document.documentElement.getAttribute('data-dsh-whale-maid-background')).toBe('visible')
-    expect(document.documentElement.getAttribute('data-dsh-whale-maid-pricing')).toBe('hidden')
-    expect(document.documentElement.getAttribute('data-dsh-whale-maid-art')).toBe('hidden')
-    expect(document.documentElement.getAttribute('data-dsh-whale-maid-character-mirror')).toBe('mirrored')
-    expect(document.documentElement.getAttribute('data-dsh-whale-maid-settings-layout')).toBe('centered')
-    dispose()
-    expect(document.documentElement.hasAttribute('data-dsh-whale-maid-art')).toBe(false)
-    window.removeEventListener(SKIN_CUSTOMIZATION_REGISTER_EVENT, receive)
+    expect(document.documentElement.getAttribute('data-abyss-texture')).toBe('off')
+    expect(document.documentElement.getAttribute('data-abyss-heartbeat')).toBe('off')
+    dispose(); dispose = undefined
+    expect(document.documentElement.getAttribute('data-abyss-texture')).toBe('before')
+    expect(document.documentElement.hasAttribute('data-dsh-whale-maid-character')).toBe(false)
+    expect(document.querySelector('dialog')).toBeNull()
   })
-
-  it('retires the corner character with the scene art during the SFW window', () => {
-    let registration: SkinCustomizationRegistration | undefined
-    const receive = (event: Event) => { registration = (event as CustomEvent<SkinCustomizationRegistration>).detail }
-    window.addEventListener(SKIN_CUSTOMIZATION_REGISTER_EVENT, receive)
-    const dispose = installMaidCustomization()
-    const definition = registration!.definition
-    const values = {
-      character: true,
-      mirrorCharacter: false,
-      background: true,
-      pricingLight: true,
-      centerSettings: false,
-      sfwMode: { enabled: true, outside: 'visible', ranges: [] },
-    }
-
-    // SFW hidden window: the character switch is on, but the schedule wins.
-    definition.apply({ values, visibility: { sfwMode: false } })
-    expect(document.documentElement.getAttribute('data-dsh-whale-maid-art')).toBe('hidden')
-    expect(document.documentElement.getAttribute('data-dsh-whale-maid-character')).toBe('hidden')
-
-    // SFW visible window: the switch's own verdict is restored.
-    definition.apply({ values, visibility: { sfwMode: true } })
-    expect(document.documentElement.getAttribute('data-dsh-whale-maid-art')).toBe('visible')
-    expect(document.documentElement.getAttribute('data-dsh-whale-maid-character')).toBe('visible')
-    dispose()
-    window.removeEventListener(SKIN_CUSTOMIZATION_REGISTER_EVENT, receive)
+  it('does not register or respond to legacy manager events', () => {
+    const register = vi.fn()
+    window.addEventListener('dsh:skin-customization-register-v2',register)
+    dispose = installMaidCustomization()
+    window.dispatchEvent(new Event('dsh:skin-customization-ready-v2'))
+    expect(register).not.toHaveBeenCalled()
+    window.removeEventListener('dsh:skin-customization-register-v2',register)
+    expect(document.querySelector('button[data-abyss-close]')).not.toBeNull()
   })
-
-  it('declares English copy for the manager surface', () => {
-    let registration: SkinCustomizationRegistration | undefined
-    const receive = (event: Event) => { registration = (event as CustomEvent<SkinCustomizationRegistration>).detail }
-    window.addEventListener(SKIN_CUSTOMIZATION_REGISTER_EVENT, receive)
-    const dispose = installMaidCustomization()
-    const definition = registration!.definition
-    // The title is already language-neutral; every label and description
-    // carries an explicit En variant for the manager's fallback path.
-    expect(definition.title).toBe('ORCA MAID')
-    for (const setting of definition.settings) {
-      expect(setting.labelEn, `${setting.key} labelEn`).toBeTypeOf('string')
-      if (setting.description !== undefined) expect(setting.descriptionEn, `${setting.key} descriptionEn`).toBeTypeOf('string')
-    }
-    dispose()
-    window.removeEventListener(SKIN_CUSTOMIZATION_REGISTER_EVENT, receive)
+  it('provides the current appearance controls and no schedule compatibility controls', () => {
+    dispose = installMaidCustomization()
+    const names=[...document.querySelectorAll<HTMLInputElement>('dialog input')].map(input=>input.name)
+    expect(names).toContain('heartbeat')
+    expect(names).toContain('pixelHeadline')
+    expect(names).not.toContain('sfwMode')
+    expect(document.querySelector('dialog')?.textContent).not.toContain('管理器')
   })
 })

@@ -59,12 +59,16 @@ async function main(command) {
     writeFileSync('release/package.json', JSON.stringify({ ...release, filename: packed.filename, integrity: `sha512-${digest(bytes, 'sha512')}` }, null, 2))
     writeFileSync('release/SHA256SUMS.txt', `${digest(bytes, 'sha256')}  ${packed.filename}\n`)
     writeFileSync('release/notes.md', [
-      `ORCA MAID · 虎鲸女仆 ${release.tag}`,
+      `ABYSS · 深海终端 ${release.tag}`,
       '',
       `- [npm ${release.version}](https://www.npmjs.com/package/${pkg.name}/v/${release.version})`,
       `- 发布渠道：\`${release.distTag}\`。`,
       `- dsh 兼容范围：\`${pkg.peerDependencies['@deepseek-ai/dsh']}\`；Cordis：\`${pkg.peerDependencies['@deepseek-ai/cordis']}\`。`,
-      '- 需要 `@smalltailqwq/dsh-client-ui-skin-deep-whale-manager` 才能切换与配置皮肤。',
+      '- 灰蓝像素头像、点阵首页标题、几何背景与终端面板。',
+      '- 自带独立外观设置，无需旧皮肤管理器；旧管理器设置不自动迁移。',
+      '- 工作状态像素心跳线，修复折叠思考过程的实色长条与样式热更新。',
+      '- 沿用原 npm 包名；启用前请关闭其他皮肤，升级后重启 DSH 以刷新素材清单。',
+      '- ABYSS 是唯一持续维护版本；旧版 0.1.2 保留下载，不再同步功能或宿主适配。',
       '- 附件 `.tgz` 与 npm 发布包完全一致；`SHA256SUMS.txt` 提供校验值。',
       '- 固定安装此版本：解压 `.tgz`，运行 `dsh plugin --profile desktop add <解压后package目录的绝对路径>`。',
       '',

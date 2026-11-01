@@ -95,7 +95,7 @@ describe('Maid Link skin apply', () => {
 
   it('injects chrome and retracts every element on dispose', async () => {
     fiber = await mount()
-    expect(document.body.querySelectorAll('[data-skin-chrome]')).toHaveLength(2)
+    expect(document.body.querySelectorAll('[data-skin-chrome]')).toHaveLength(3)
     expect(document.body.querySelectorAll('[data-skin-chrome="light-scene"] > div')).toHaveLength(2)
     expect(document.body.querySelectorAll('[data-skin-chrome="dark-scene"] > div')).toHaveLength(2)
     expect(document.body.style.getPropertyValue('--orca-maid-light-hero-art')).toContain('/skin-assets/orca-maid/')

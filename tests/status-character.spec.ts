@@ -117,3 +117,40 @@ describe('ORCA MAID status character', () => {
     expect(document.querySelector('[data-orca-maid-character]')).toBeNull()
   })
 })
+
+describe('ABYSS working heartbeat', () => {
+  it('animates only the real working state and stops on visibility or preference changes', async () => {
+    document.body.innerHTML = '<div data-slot="sidebar"><div></div></div>'
+    const dispose = installMaidStatusCharacter(document.body, classes)
+    const character = document.querySelector<HTMLElement>('[data-orca-maid-character]')!
+    const settle = async () => { await new Promise<void>(resolve => setTimeout(resolve,0)) }
+    try {
+      expect(character.querySelector('[data-abyss-heartbeat]')?.getAttribute('aria-hidden')).toBe('true')
+      expect(character.hasAttribute('data-abyss-heartbeat-running')).toBe(false)
+      document.body.dataset.orcaMaidStatus = 'working'; await settle()
+      expect(character.hasAttribute('data-abyss-heartbeat-running')).toBe(true)
+      for (const status of ['approval','input','review','complete','fault','offline','standby']) {
+        document.body.dataset.orcaMaidStatus = status; await settle()
+        expect(character.hasAttribute('data-abyss-heartbeat-running')).toBe(false)
+      }
+      document.body.dataset.orcaMaidStatus = 'working'; await settle()
+      document.documentElement.setAttribute('data-abyss-heartbeat','off'); await settle()
+      expect(character.hasAttribute('data-abyss-heartbeat-running')).toBe(false)
+      document.documentElement.removeAttribute('data-abyss-heartbeat'); await settle()
+      expect(character.hasAttribute('data-abyss-heartbeat-running')).toBe(true)
+      vi.spyOn(document,'visibilityState','get').mockReturnValue('hidden')
+      document.dispatchEvent(new Event('visibilitychange'))
+      expect(character.hasAttribute('data-abyss-heartbeat-running')).toBe(false)
+    } finally { dispose(); vi.restoreAllMocks(); document.documentElement.removeAttribute('data-abyss-heartbeat') }
+  })
+  it('keeps a static trace under reduced motion', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches:true, addEventListener(){}, removeEventListener(){} }))
+    document.body.innerHTML = '<div data-slot="sidebar"><div></div></div>'
+    document.body.dataset.orcaMaidStatus = 'working'
+    const dispose = installMaidStatusCharacter(document.body, classes)
+    try {
+      expect(document.querySelector('[data-abyss-heartbeat-running]')).toBeNull()
+      expect(document.querySelector('[data-abyss-heartbeat-part="wave"]')).not.toBeNull()
+    } finally { dispose(); vi.unstubAllGlobals() }
+  })
+})

@@ -11,7 +11,6 @@ import {
 import { installMaidComposerCollapse } from './composer-collapse.ts'
 import { installMaidComposerMotion } from './composer-motion.ts'
 import { installMaidCustomization } from './customization.ts'
-import { installMaidHeadlineTypewriter } from './headline-typewriter.ts'
 import { installOrcaMaidStatus } from './link-status.ts'
 import { hasMutationOutsideTranscript } from './mutation-filter.ts'
 import { installMaidPageIcons } from './page-icons.ts'
@@ -28,8 +27,10 @@ import { installMaidWorkspaceMarks } from './workspace-marks.ts'
 import { installMaidLightVisibility } from './work-light.ts'
 import { installMaidBootError } from './boot-error.ts'
 import css from './orca-maid.module.css'
+import './abyss.module.css'
+import { installAbyss } from './abyss.ts'
 
-const SKIN_TITLE = 'ORCA MAID · DSH'
+const SKIN_TITLE = 'ABYSS · DSH'
 const LIGHT_HERO_ART_PROPERTY = '--orca-maid-light-hero-art'
 const LIGHT_ACTIVE_ART_PROPERTY = '--orca-maid-light-active-art'
 const DARK_HERO_ART_PROPERTY = '--orca-maid-dark-hero-art'
@@ -153,7 +154,6 @@ export function apply(ctx: Context): void {
   const disposeScene = installMaidScene(body)
   const disposeComposerMotion = installMaidComposerMotion(body)
   const disposeComposerCollapse = installMaidComposerCollapse(body)
-  const disposeHeadlineTypewriter = installMaidHeadlineTypewriter(body)
   const disposeRailSearch = installMaidRailSearch(body)
   const disposeWindowResume = installMaidWindowResume(body)
   const disposeTerminalPerformance = installMaidTerminalPerformance(body)
@@ -176,6 +176,7 @@ export function apply(ctx: Context): void {
     characterFrame: cls('statusCharacterFrame'),
     characterSprite: cls('statusCharacterSprite'),
   })
+  const disposeAbyss = installAbyss(body)
   const disposePricingLight = installMaidPricingLight(body, {
     light: cls('pricingLight'),
     housing: cls('pricingHousing'),
@@ -312,11 +313,11 @@ export function apply(ctx: Context): void {
   body.append(lightScene, darkScene)
 
   ctx.effect(() => () => {
+    disposeAbyss()
     disposeScene()
     disposeLinkStatus()
     disposeStatusCharacter()
     disposePricingLight()
-    disposeHeadlineTypewriter()
     disposeComposerCollapse()
     disposeComposerMotion()
     disposeRailSearch()
